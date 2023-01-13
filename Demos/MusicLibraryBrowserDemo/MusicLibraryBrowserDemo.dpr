@@ -1,4 +1,4 @@
-library MusicLibraryBrowserDemo;
+﻿library MusicLibraryBrowserDemo;
 
 uses
   apiPlugin,

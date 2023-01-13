@@ -1,15 +1,13 @@
-{************************************************}
-{*                                              *}
-{*          AIMP Programming Interface          *}
-{*               v4.50 build 2000               *}
-{*                                              *}
-{*                Artem Izmaylov                *}
-{*                (C) 2006-2017                 *}
-{*                 www.aimp.ru                  *}
-{*                                              *}
-{*            Mail: support@aimp.ru             *}
-{*                                              *}
-{************************************************}
+﻿{*********************************************}
+{*                                           *}
+{*        AIMP Programming Interface         *}
+{*                v5.02.2360                 *}
+{*                                           *}
+{*            (c) Artem Izmaylov             *}
+{*                 2006-2022                 *}
+{*                www.aimp.ru                *}
+{*                                           *}
+{*********************************************}
 
 unit apiFileManager;
 
@@ -127,12 +125,13 @@ const
   AIMP_FILEINFO_PROPID_LYRICIST          = 37; // IAIMPString
   AIMP_FILEINFO_PROPID_ENCODEDBY         = 38; // IAIMPString
   AIMP_FILEINFO_PROPID_RATING            = 39; // Int32
-  AIMP_FILEINFO_PROPID_STAT_ADDINGDATE      = 40; // Float (TDateTime)
-  AIMP_FILEINFO_PROPID_STAT_LASTPLAYDATE    = 41; // Float (TDateTime)
-  AIMP_FILEINFO_PROPID_STAT_MARK            = 42; // Int32
-  AIMP_FILEINFO_PROPID_STAT_PLAYCOUNT       = 43; // Int32
-  AIMP_FILEINFO_PROPID_STAT_RATING          = 44; // Float
-  AIMP_FILEINFO_PROPID_STAT_DISPLAYING_MARK = 22; // Float
+  AIMP_FILEINFO_PROPID_ML_ADDINGDATE      = 40; // Float (TDateTime)
+  AIMP_FILEINFO_PROPID_ML_LASTPLAYDATE    = 41; // Float (TDateTime)
+  AIMP_FILEINFO_PROPID_ML_MARK            = 42; // Int32
+  AIMP_FILEINFO_PROPID_ML_PLAYCOUNT       = 43; // Int32
+  AIMP_FILEINFO_PROPID_ML_RATING          = 44; // Float
+  AIMP_FILEINFO_PROPID_ML_DISPLAYING_MARK = 22; // Float
+  AIMP_FILEINFO_PROPID_ML_LABELS          = 45; // IAIMPString, values divided by ";"
 
   // PropertyID for the IAIMPVirtualFile
   AIMP_VIRTUALFILE_PROPID_FILEURI          = 0;
@@ -150,7 +149,7 @@ const
   AIMP_SERVICE_FILESTREAMING_FLAG_CREATENEW   = 1;
   AIMP_SERVICE_FILESTREAMING_FLAG_READ        = 0;
   AIMP_SERVICE_FILESTREAMING_FLAG_READWRITE   = 2;
-  AIMP_SERVICE_FILESTREAMING_FLAG_MAPTOMEMORY = 4;
+  AIMP_SERVICE_FILESTREAMING_FLAG_BUFFERED    = 4;
   
   // Flags for the IAIMPServiceFileInfo.GetFileInfoXXX
   AIMP_SERVICE_FILEINFO_FLAG_DONTUSEAUDIODECODERS = 1;

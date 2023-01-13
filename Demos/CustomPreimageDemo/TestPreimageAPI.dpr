@@ -1,4 +1,4 @@
-library TestPreimageAPI;
+﻿library TestPreimageAPI;
 
 uses
   apiPlugin,

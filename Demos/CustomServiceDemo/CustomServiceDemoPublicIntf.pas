@@ -1,4 +1,4 @@
-unit CustomServiceDemoPublicIntf;
+﻿unit CustomServiceDemoPublicIntf;
 
 // This file contains a public interfaces, which will be available for another developers
 

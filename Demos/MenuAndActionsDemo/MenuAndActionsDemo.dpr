@@ -1,4 +1,4 @@
-library MenuAndActionsDemo;
+﻿library MenuAndActionsDemo;
 
 uses
   apiPlugin,

@@ -6,6 +6,11 @@ object frmRemoteAccessDemo: TfrmRemoteAccessDemo
   ClientHeight = 194
   ClientWidth = 497
   Color = clBtnFace
+  Font.Charset = DEFAULT_CHARSET
+  Font.Color = clWindowText
+  Font.Height = -11
+  Font.Name = 'Tahoma'
+  Font.Style = []
   OldCreateOrder = False
   OnDestroy = FormDestroy
   PixelsPerInch = 96

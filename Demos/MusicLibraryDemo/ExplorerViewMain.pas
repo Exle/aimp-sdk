@@ -1,4 +1,4 @@
-unit ExplorerViewMain;
+﻿unit ExplorerViewMain;
 
 interface
 
@@ -185,7 +185,7 @@ begin
     end;
 end;
 
-function WideExtractFileFormat(const FileName: UnicodeString): UnicodeString;
+function acExtractFileFormat(const FileName: UnicodeString): UnicodeString;
 var
   I: Integer;
 begin
@@ -400,11 +400,6 @@ begin
   Result := PWideChar(FTempBuffer);
 end;
 
-function TDemoExplorerViewAbstractDataProviderSelection.HasNextPage: LongBool;
-begin
-  Result := False;
-end;
-
 { TDemoExplorerViewCustomDataProviderSelection }
 
 constructor TDemoExplorerViewCustomDataProviderSelection.Create(const APath: UnicodeString);
@@ -523,7 +518,7 @@ end;
 function TDemoExplorerViewDataProviderSelection.GetValueAsString(AFieldIndex: Integer): string;
 begin
   if AFieldIndex = FFieldFileFormat then
-    Result := WideExtractFileFormat(FSearchRec.Name)
+    Result := acExtractFileFormat(FSearchRec.Name)
   else
     if AFieldIndex = FFieldID then
       Result := LowerCase(FSearchRec.Name)

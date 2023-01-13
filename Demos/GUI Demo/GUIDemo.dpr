@@ -1,4 +1,4 @@
-library GUIDemo;
+﻿library GUIDemo;
 
 uses
   apiPlugin,

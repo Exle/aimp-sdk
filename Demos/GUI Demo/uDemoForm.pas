@@ -1,4 +1,4 @@
-unit uDemoForm;
+﻿unit uDemoForm;
 
 interface
 
@@ -319,7 +319,6 @@ procedure TDemoForm.CreateGraphics(AParent: IAIMPUIWinControl);
     AImageSize: TSize;
   begin
     CoreCreateObject(IAIMPImage2, AImage);
-    AImage.LoadFromFile(MakeString('B:\asdadasdas'));
     CheckResult(AImage.LoadFromResource(HInstance, PWideChar(ResName), 'PNG'));
     CheckResult(AImage.GetSize(AImageSize));
     CheckResult(FService.CreateControl(FForm, AParent, nil, Self, IAIMPUIImage, Result));

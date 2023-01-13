@@ -1,15 +1,13 @@
-{************************************************}
-{*                                              *}
-{*          AIMP Programming Interface          *}
-{*               v4.60 build 2100               *}
-{*                                              *}
-{*                Artem Izmaylov                *}
-{*                (C) 2006-2019                 *}
-{*                 www.aimp.ru                  *}
-{*                                              *}
-{*            Mail: support@aimp.ru             *}
-{*                                              *}
-{************************************************}
+﻿{*********************************************}
+{*                                           *}
+{*        AIMP Programming Interface         *}
+{*                v5.02.2360                 *}
+{*                                           *}
+{*            (c) Artem Izmaylov             *}
+{*                 2006-2022                 *}
+{*                www.aimp.ru                *}
+{*                                           *}
+{*********************************************}
 
 unit apiGUI;
 
@@ -26,6 +24,9 @@ uses
 const
   SID_IAIMPUIDPIAwareness = '{61756944-5049-4177-6172-656E65737300}';
   IID_IAIMPUIDPIAwareness: TGUID = SID_IAIMPUIDPIAwareness;
+
+  SID_IAIMPUIColorSchema = '{617569D1-6F6C-6F72-5363-68656D610000}';
+  IID_IAIMPUIColorSchema: TGUID = SID_IAIMPUIColorSchema;
 
   SID_IAIMPServiceUI = '{41494D50-5365-7276-6963-655549000000}';
   IID_IAIMPServiceUI: TGUID = SID_IAIMPServiceUI;
@@ -640,6 +641,16 @@ type
   [SID_IAIMPUIDPIAwareness]
     function IsDPIAware: LongBool; stdcall;
     function SetDPIAware(Value: LongBool): HRESULT; stdcall;
+  end;
+
+  { IAIMPUIColorSchema }
+
+  IAIMPUIColorSchema = interface(IAIMPPropertyList)
+  [SID_IAIMPUIColorSchema]
+    procedure ApplyToARGB(var ARGB: DWORD); stdcall;
+    procedure ApplyToColor(var Color: TColorRef); stdcall;
+    procedure ApplyToColors(Colors: PRGBQuad; NumberOfColors: Integer); stdcall;
+    procedure ApplyToImage(var Image: IAIMPImage); stdcall;
   end;
 
   { TAIMPUIControlPlacement }

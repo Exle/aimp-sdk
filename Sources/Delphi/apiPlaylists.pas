@@ -1,14 +1,13 @@
-{************************************************}
-{*                                              *}
-{*          AIMP Programming Interface          *}
-{*               v4.50 build 2000               *}
-{*                                              *}
-{*                Artem Izmaylov                *}
-{*                (C) 2006-2017                 *}
-{*                 www.aimp.ru                  *}
-{*            Mail: support@aimp.ru             *}
-{*                                              *}
-{************************************************}
+﻿{*********************************************}
+{*                                           *}
+{*        AIMP Programming Interface         *}
+{*                v5.10.2400                 *}
+{*                                           *}
+{*            (c) Artem Izmaylov             *}
+{*                 2006-2023                 *}
+{*                www.aimp.ru                *}
+{*                                           *}
+{*********************************************}
 
 unit apiPlaylists;
 
@@ -129,12 +128,15 @@ const
   AIMP_PLAYLIST_DELETE_FLAGS_NOCONFIRMATION = 2;
 
   // Flags for IAIMPPlaylist.Sort
-  AIMP_PLAYLIST_SORTMODE_TITLE      = 1;
-  AIMP_PLAYLIST_SORTMODE_FILENAME   = 2;
-  AIMP_PLAYLIST_SORTMODE_DURATION   = 3;
-  AIMP_PLAYLIST_SORTMODE_ARTIST     = 4;
-  AIMP_PLAYLIST_SORTMODE_INVERSE    = 5;
-  AIMP_PLAYLIST_SORTMODE_RANDOMIZE  = 6;
+  AIMP_PLAYLIST_SORTMODE_TITLE                         = 1;
+  AIMP_PLAYLIST_SORTMODE_FILENAME                      = 2;
+  AIMP_PLAYLIST_SORTMODE_DURATION                      = 3;
+  AIMP_PLAYLIST_SORTMODE_ARTIST                        = 4;
+  AIMP_PLAYLIST_SORTMODE_INVERSE                       = 5;
+  AIMP_PLAYLIST_SORTMODE_RANDOMIZE                     = 6;
+  AIMP_PLAYLIST_SORTMODE_RANDOMIZE_GROUPS              = 7; // v5.10
+  AIMP_PLAYLIST_SORTMODE_RANDOMIZE_GROUPITEMS          = 8; // v5.10
+  AIMP_PLAYLIST_SORTMODE_RANDOMIZE_GROUPS_AND_IT_ITEMS = 9; // v5.10
 
   // Flags for IAIMPPlaylist.Close
   AIMP_PLAYLIST_CLOSE_FLAGS_FORCE_REMOVE = 1;
@@ -164,6 +166,7 @@ const
   AIMP_PLAYLIST_NOTIFY_MODIFIED       = 1024;
   AIMP_PLAYLIST_NOTIFY_DEADSTATE      = 2048;
   AIMP_PLAYLIST_NOTIFY_MAKEVISIBLE    = 4096;
+  AIMP_PLAYLIST_NOTIFY_PLAYBACKQUEUE  = 8192;
 
   // Properties Ids for IAIMPPlaylistPreimage
   AIMP_PLAYLISTPREIMAGE_PROPID_FACTORYID            = 1;
@@ -228,7 +231,7 @@ type
   TAIMPPlaylistCompareProc = function (Item1, Item2: IAIMPPlaylistItem; UserData: Pointer): Integer; stdcall;
   TAIMPPlaylistDeleteProc = function (Item: IAIMPPlaylistItem; UserData: Pointer): LongBool; stdcall;
 
-  IAIMPPlaylist = interface(IUnknown)
+  IAIMPPlaylist = interface(IUnknown) // + IAIMPPropertyList
   [SID_IAIMPPlaylist]
     // Adding
     function Add(Obj: IUnknown; Flags: DWORD; InsertIn: Integer): HRESULT; stdcall;
@@ -372,8 +375,8 @@ type
     // Active Playlist
     function GetActivePlaylist(out Playlist: IAIMPPlaylist): HRESULT; stdcall;
     function SetActivePlaylist(Playlist: IAIMPPlaylist): HRESULT; stdcall;
-    // Playable Playlist
-    function GetPlayablePlaylist(out Playlist: IAIMPPlaylist): HRESULT; stdcall;
+    // Playing Playlist
+    function GetPlayingPlaylist(out Playlist: IAIMPPlaylist): HRESULT; stdcall;
     // Loaded Playlists
     function GetLoadedPlaylist(Index: Integer; out Playlist: IAIMPPlaylist): HRESULT; stdcall;
     function GetLoadedPlaylistByName(Name: IAIMPString; out Playlist: IAIMPPlaylist): HRESULT; stdcall;

@@ -1,15 +1,13 @@
-{************************************************}
-{*                                              *}
-{*          AIMP Programming Interface          *}
-{*               v4.60 build 2160               *}
-{*                                              *}
-{*                Artem Izmaylov                *}
-{*                (C) 2006-2019                 *}
-{*                 www.aimp.ru                  *}
-{*                                              *}
-{*            Mail: support@aimp.ru             *}
-{*                                              *}
-{************************************************}
+﻿{*********************************************}
+{*                                           *}
+{*        AIMP Programming Interface         *}
+{*                v5.02.2360                 *}
+{*                                           *}
+{*            (c) Artem Izmaylov             *}
+{*                 2006-2022                 *}
+{*                www.aimp.ru                *}
+{*                                           *}
+{*********************************************}
 
 unit apiMusicLibrary;
 
@@ -18,7 +16,14 @@ unit apiMusicLibrary;
 interface
 
 uses
-  Windows, ActiveX, apiObjects, apiActions, apiPlaylists;
+  Windows,
+  ActiveX,
+  // API
+  apiObjects,
+  apiActions,
+  apiAlbumArt,
+  apiPlaylists,
+  apiFileManager;
 
 const
   SID_IAIMPServiceMusicLibrary = '{41494D50-5372-764D-4C00-000000000000}';
@@ -41,6 +46,9 @@ const
 
   SID_IAIMPMLGroupingTreeDataProvider = '{41494D50-4D4C-4772-7044-617461507276}';
   IID_IAIMPMLGroupingTreeDataProvider: TGUID = SID_IAIMPMLGroupingTreeDataProvider;
+
+  SID_IAIMPMLGroupingTreeDataProvider2 = '{41494D50-4D4C-4772-7044-617461507232}';
+  IID_IAIMPMLGroupingTreeDataProvider2: TGUID = SID_IAIMPMLGroupingTreeDataProvider2;
 
   SID_IAIMPMLGroupingTreeDataProviderSelection = '{41494D50-4D4C-4772-4474-50727653656C}';
   IID_IAIMPMLGroupingTreeDataProviderSelection: TGUID = SID_IAIMPMLGroupingTreeDataProviderSelection;
@@ -87,6 +95,9 @@ const
   SID_IAIMPMLDataStorageCommandDropData = '{41494D50-4D4C-4453-436D-6444726F7000}';
   IID_IAIMPMLDataStorageCommandDropData: TGUID = SID_IAIMPMLDataStorageCommandDropData;
 
+  SID_IAIMPMLDataStorageCommandFindInLibrary = '{41494D50-4D4C-4453-436D-64466E64496E}';
+  IID_IAIMPMLDataStorageCommandFindInLibrary: TGUID = SID_IAIMPMLDataStorageCommandFindInLibrary;
+
   SID_IAIMPMLDataStorageCommandReloadTags = '{41494D50-4D4C-4453-436D-645570546167}';
   IID_IAIMPMLDataStorageCommandReloadTags: TGUID = SID_IAIMPMLDataStorageCommandReloadTags;
 
@@ -119,6 +130,9 @@ const
 
   SID_IAIMPMLAlbumArtProvider = '{41494D50-4D4C-416C-6241-727450727600}';
   IID_IAIMPMLAlbumArtProvider: TGUID = SID_IAIMPMLAlbumArtProvider;
+
+  SID_IAIMPMLAlbumArtProvider2 = '{41494D50-4D4C-416C-6241-727450727632}';
+  IID_IAIMPMLAlbumArtProvider2: TGUID = SID_IAIMPMLAlbumArtProvider2;
 
   // Property ID for IAIMPPropertyList of IAIMPMLExtensionDataStorage and IAIMPMLDataStorage
   AIMPML_DATASTORAGE_PROPID_ID              = 0;
@@ -176,6 +190,7 @@ const
   AIMPML_FIELDTYPE_INT64       = 2;
   AIMPML_FIELDTYPE_FLOAT       = 3;
   AIMPML_FIELDTYPE_STRING      = 4;
+  AIMPML_FIELDTYPE_STRINGSET   = 5;
   AIMPML_FIELDTYPE_DATETIME    = 10;
   AIMPML_FIELDTYPE_DURATION    = 11;
   AIMPML_FIELDTYPE_FILESIZE    = 12;
@@ -211,6 +226,7 @@ const
   AIMPML_FIELDFILTER_OPERATION_CONTAINS = 7;
   AIMPML_FIELDFILTER_OPERATION_BEGINSWITH = 8;
   AIMPML_FIELDFILTER_OPERATION_ENDSWITH = 9;
+  AIMPML_FIELDFILTER_OPERATION_ISLASTXDAYS = 10;
 
   // Property ID for IAIMPMLDataFilterGroup
   AIMPML_FILTERGROUP_OPERATION = 1; // Refer to the AIMPML_FILTERGROUP_OPERATION_XXX
@@ -227,12 +243,12 @@ const
   // Property ID for IAIMPMLDataFilter
   AIMPML_FILTER_LIMIT           = 11;
   AIMPML_FILTER_OFFSET          = 12;
-  AIMPML_FILTER_SORTBY          = 13;
-  AIMPML_FILTER_SORTDIRECTION   = 14; // Refer to the AIMPML_SORTDIRECTION_XXX
+  AIMPML_FILTER_SORTBYLIST      = 15;
   AIMPML_FILTER_SEARCHSTRING    = 20; // optional
   AIMPML_FILTER_ALPHABETICINDEX = 21; // optional
 
   // Sort Direction
+  AIMPML_SORTDIRECTION_UNDEFINED  = 0;
   AIMPML_SORTDIRECTION_ASCENDING  = 1;
   AIMPML_SORTDIRECTION_DESCENDING = 2;
 
@@ -252,7 +268,7 @@ const
   // LocalDataStorage
   AIMPML_LOCALDATASTORAGE_ID = 'TAIMPMLLocalDataStorage';
 
-  AIMPML_LOCALDATASTORAGE_FIELD_ID = 'ID'; // Int32
+  AIMPML_LOCALDATASTORAGE_FIELD_ID = AIMPML_RESERVED_FIELD_ID; // Int32
   AIMPML_LOCALDATASTORAGE_FIELD_ADDDED = 'Added'; // DateTime (Float);
   AIMPML_LOCALDATASTORAGE_FIELD_ALBUM = 'Album'; // String, multiple values
   AIMPML_LOCALDATASTORAGE_FIELD_ALBUMARTIST = 'AlbumArtist'; // String, multiple values
@@ -261,6 +277,7 @@ const
   AIMPML_LOCALDATASTORAGE_FIELD_BITRATE = 'Bitrate'; // Int32
   AIMPML_LOCALDATASTORAGE_FIELD_BPM = 'BPM'; // Int32;
   AIMPML_LOCALDATASTORAGE_FIELD_CHANNELS = 'Channels'; // Int32;
+  AIMPML_LOCALDATASTORAGE_FIELD_CATALOG = 'Catalog'; // String
   AIMPML_LOCALDATASTORAGE_FIELD_COMMENT = 'Comment'; // String (Memo)
   AIMPML_LOCALDATASTORAGE_FIELD_COMPOSER = 'Composer'; // String, multiple values
   AIMPML_LOCALDATASTORAGE_FIELD_CONDUCTOR = 'Conductor'; // String
@@ -369,65 +386,6 @@ type
   end;
 
 //----------------------------------------------------------------------------------------------------------------------
-// Commands
-//----------------------------------------------------------------------------------------------------------------------
-
-  IAIMPMLDataStorageCommandAddFiles = interface
-  [SID_IAIMPMLDataStorageCommandAddFiles]
-    function Add(Files: IAIMPObjectList): HRESULT; stdcall;
-  end;
-
-  { IAIMPMLDataStorageCommandAddFilesDialog }
-
-  IAIMPMLDataStorageCommandAddFilesDialog = interface
-  [SID_IAIMPMLDataStorageCommandAddFilesDialog]
-    function Execute(OwnerHandle: HWND): HRESULT; stdcall;
-  end;
-
-  { IAIMPMLDataStorageCommandDeleteFiles }
-
-  IAIMPMLDataStorageCommandDeleteFiles = interface
-  [SID_IAIMPMLDataStorageCommandDeleteFiles]
-    function CanDelete(Physically: LongBool): LongBool; stdcall;
-    function Delete(Files: IAIMPMLFileList; Physically: LongBool): HRESULT; stdcall;
-  end;
-
-  { IAIMPMLDataStorageCommandDeleteFiles2 }
-
-  IAIMPMLDataStorageCommandDeleteFiles2 = interface(IAIMPMLDataStorageCommandDeleteFiles)
-  [SID_IAIMPMLDataStorageCommandDeleteFiles2]
-    function Delete2(Filter: IAIMPMLDataFilter; Physically: LongBool): HRESULT; stdcall;
-  end;
-
-  { IAIMPMLDataStorageCommandDropData }
-
-  IAIMPMLDataStorageCommandDropData = interface
-  [SID_IAIMPMLDataStorageCommandDropData]
-    function DropData: HRESULT; stdcall;
-  end;
-
-  { IAIMPMLDataStorageCommandReloadTags }
-
-  IAIMPMLDataStorageCommandReloadTags = interface
-  [SID_IAIMPMLDataStorageCommandReloadTags]
-    function ReloadTags(Files: IAIMPMLFileList): HRESULT; stdcall;
-  end;
-
-  { IAIMPMLDataStorageCommandReportDialog }
-
-  IAIMPMLDataStorageCommandReportDialog = interface
-  [SID_IAIMPMLDataStorageCommandReportDialog]
-    function Execute(OwnerHandle: HWND): HRESULT; stdcall;
-  end;
-
-  { IAIMPMLDataStorageCommandUserMark }
-
-  IAIMPMLDataStorageCommandUserMark = interface
-  [SID_IAIMPMLDataStorageCommandUserMark]
-    function SetMark(const ID: OleVariant; const Value: Double): HRESULT; stdcall;
-  end;
-
-//----------------------------------------------------------------------------------------------------------------------
 // Preimage
 //----------------------------------------------------------------------------------------------------------------------
 
@@ -449,6 +407,14 @@ type
   [SID_IAIMPMLAlbumArtProvider]
     function Get(Fields: IAIMPObjectList; Values: POleVariant;
       Options: IAIMPPropertyList; out Image: IAIMPImageContainer): HRESULT; stdcall;
+  end;
+
+  { IAIMPMLAlbumArtProvider2 }
+
+  IAIMPMLAlbumArtProvider2 = interface
+  [SID_IAIMPMLAlbumArtProvider2]
+    function Get(Fields: IAIMPObjectList; Values: POleVariant;
+      Request: IAIMPAlbumArtRequest; out Image: IAIMPImageContainer): HRESULT; stdcall;
   end;
 
   { IAIMPMLDataProvider }
@@ -508,6 +474,13 @@ type
     function GetFieldForAlphabeticIndex(out FieldName: IAIMPString): HRESULT; stdcall;
   end;
 
+  { IAIMPMLGroupingTreeDataProvider2 }
+
+  IAIMPMLGroupingTreeDataProvider2 = interface(IAIMPMLGroupingTreeDataProvider)
+  [SID_IAIMPMLGroupingTreeDataProvider2]
+    function GetPathSeparator: WideChar; stdcall;
+  end;
+
 //----------------------------------------------------------------------------------------------------------------------
 // Storage
 //----------------------------------------------------------------------------------------------------------------------
@@ -564,6 +537,74 @@ type
   IAIMPMLDataStorage2 = interface(IAIMPMLDataStorage) // + IAIMPMLDataProvider, IAIMPMLDataProvider2
   [SID_IAIMPMLDataStorage2]
     function CreateObject(const IID: TGUID; out Obj): HRESULT; stdcall;
+  end;
+
+//----------------------------------------------------------------------------------------------------------------------
+// Commands
+//----------------------------------------------------------------------------------------------------------------------
+
+  IAIMPMLDataStorageCommandAddFiles = interface
+  [SID_IAIMPMLDataStorageCommandAddFiles]
+    function Add(Files: IAIMPObjectList): HRESULT; stdcall;
+  end;
+
+  { IAIMPMLDataStorageCommandAddFilesDialog }
+
+  IAIMPMLDataStorageCommandAddFilesDialog = interface
+  [SID_IAIMPMLDataStorageCommandAddFilesDialog]
+    function Execute(OwnerHandle: HWND): HRESULT; stdcall;
+  end;
+
+  { IAIMPMLDataStorageCommandDeleteFiles }
+
+  IAIMPMLDataStorageCommandDeleteFiles = interface
+  [SID_IAIMPMLDataStorageCommandDeleteFiles]
+    function CanDelete(Physically: LongBool): LongBool; stdcall;
+    function Delete(Files: IAIMPMLFileList; Physically: LongBool): HRESULT; stdcall;
+  end;
+
+  { IAIMPMLDataStorageCommandDeleteFiles2 }
+
+  IAIMPMLDataStorageCommandDeleteFiles2 = interface(IAIMPMLDataStorageCommandDeleteFiles)
+  [SID_IAIMPMLDataStorageCommandDeleteFiles2]
+    function Delete2(Filter: IAIMPMLDataFilter; Physically: LongBool): HRESULT; stdcall;
+  end;
+
+  { IAIMPMLDataStorageCommandDropData }
+
+  IAIMPMLDataStorageCommandDropData = interface
+  [SID_IAIMPMLDataStorageCommandDropData]
+    function DropData: HRESULT; stdcall;
+  end;
+
+  { IAIMPMLDataStorageCommandFindInLibrary }
+
+  IAIMPMLDataStorageCommandFindInLibrary = interface
+  [SID_IAIMPMLDataStorageCommandFindInLibrary]
+    function Find(FileInfo: IAIMPFileInfo;
+      out GroupingPresetID: IAIMPString;
+      out GroupingTreeSelection: IAIMPMLGroupingTreeSelection): HRESULT; stdcall;
+  end;
+
+  { IAIMPMLDataStorageCommandReloadTags }
+
+  IAIMPMLDataStorageCommandReloadTags = interface
+  [SID_IAIMPMLDataStorageCommandReloadTags]
+    function ReloadTags(Files: IAIMPMLFileList): HRESULT; stdcall;
+  end;
+
+  { IAIMPMLDataStorageCommandReportDialog }
+
+  IAIMPMLDataStorageCommandReportDialog = interface
+  [SID_IAIMPMLDataStorageCommandReportDialog]
+    function Execute(OwnerHandle: HWND): HRESULT; stdcall;
+  end;
+
+  { IAIMPMLDataStorageCommandUserMark }
+
+  IAIMPMLDataStorageCommandUserMark = interface
+  [SID_IAIMPMLDataStorageCommandUserMark]
+    function SetMark(const ID: OleVariant; const Value: Double): HRESULT; stdcall;
   end;
 
 //----------------------------------------------------------------------------------------------------------------------

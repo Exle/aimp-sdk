@@ -1,4 +1,4 @@
-unit uDataProvider;
+﻿unit uDataProvider;
 
 interface
 

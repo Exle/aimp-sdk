@@ -1,4 +1,4 @@
-library DemoExplorerView;
+﻿library DemoExplorerView;
 
 {$R *.res}
 

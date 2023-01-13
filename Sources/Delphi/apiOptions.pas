@@ -1,15 +1,13 @@
-{************************************************}
-{*                                              *}
-{*          AIMP Programming Interface          *}
-{*               v4.50 build 2000               *}
-{*                                              *}
-{*                Artem Izmaylov                *}
-{*                (C) 2006-2017                 *}
-{*                 www.aimp.ru                  *}
-{*                                              *}
-{*            Mail: support@aimp.ru             *}
-{*                                              *}
-{************************************************}
+﻿{*********************************************}
+{*                                           *}
+{*        AIMP Programming Interface         *}
+{*                v5.10.2400                 *}
+{*                                           *}
+{*            (c) Artem Izmaylov             *}
+{*                 2006-2022                 *}
+{*                www.aimp.ru                *}
+{*                                           *}
+{*********************************************}
 
 unit apiOptions;
 
@@ -33,10 +31,11 @@ const
   SID_IAIMPOptionsDialogFrameKeyboardHelper2 = '{41494D50-4F70-7444-6C67-46726D4B4832}';
   IID_IAIMPOptionsDialogFrameKeyboardHelper2: TGUID = SID_IAIMPOptionsDialogFrameKeyboardHelper2;
 
-  AIMP_SERVICE_OPTIONSDIALOG_NOTIFICATION_LOAD         = $1;
-  AIMP_SERVICE_OPTIONSDIALOG_NOTIFICATION_LOCALIZATION = $2;
-  AIMP_SERVICE_OPTIONSDIALOG_NOTIFICATION_SAVE         = $3;
-  AIMP_SERVICE_OPTIONSDIALOG_NOTIFICATION_CAN_SAVE     = $4;
+  AIMP_SERVICE_OPTIONSDIALOG_NOTIFICATION_LOAD         = 1;
+  AIMP_SERVICE_OPTIONSDIALOG_NOTIFICATION_LOCALIZATION = 2;
+  AIMP_SERVICE_OPTIONSDIALOG_NOTIFICATION_SAVE         = 3;
+  AIMP_SERVICE_OPTIONSDIALOG_NOTIFICATION_CAN_SAVE     = 4;
+  AIMP_SERVICE_OPTIONSDIALOG_NOTIFICATION_RESET        = 5;
 
 type
 

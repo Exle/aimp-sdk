@@ -1,14 +1,13 @@
-{************************************************}
-{*                                              *}
-{*          AIMP Programming Interface          *}
-{*               v4.60 build 2100               *}
-{*                                              *}
-{*                Artem Izmaylov                *}
-{*                (C) 2006-2018                 *}
-{*                 www.aimp.ru                  *}
-{*            Mail: support@aimp.ru             *}
-{*                                              *}
-{************************************************}
+﻿{*********************************************}
+{*                                           *}
+{*        AIMP Programming Interface         *}
+{*                v5.02.2360                 *}
+{*                                           *}
+{*            (c) Artem Izmaylov             *}
+{*                 2006-2022                 *}
+{*                www.aimp.ru                *}
+{*                                           *}
+{*********************************************}
 
 unit apiTagEditor;
 
@@ -29,7 +28,7 @@ const
   SID_IAIMPServiceFileTagEditor = '{41494D50-5372-7654-6167-456469740000}';
   IID_IAIMPServiceFileTagEditor: TGUID = SID_IAIMPServiceFileTagEditor;
 
-  SID_IAIMPExtensionTagsProvider = '{41494D50-4578-7446-696E-645461677300}';
+  SID_IAIMPExtensionTagsProvider = '{41494D50-4578-7446-696E-645461677332}';
   IID_IAIMPExtensionTagsProvider: TGUID = SID_IAIMPExtensionTagsProvider;
 
   SID_IAIMPServiceFindTagsOnline = '{41494D50-5372-7646-696E-645461677300}';
@@ -76,13 +75,13 @@ type
 
   IAIMPExtensionTagsProvider = interface
   [SID_IAIMPExtensionTagsProvider]
-    // Info
     function GetName(out S: IAIMPString): HRESULT; stdcall;
-    function GetSupportedFields(Fields: PInteger; var Count: Integer): HRESULT; stdcall;
-    // Commands
-    function FindAlbums(Query: IAIMPString; Owner: IAIMPTaskOwner;
+    function GetSupportedFields(out Fields: PInteger; out Count: Integer): HRESULT; stdcall;
+
+    function FindAlbums(Query: IAIMPString; Owner: IAIMPTaskOwner; ErrorInfo: IAIMPErrorInfo;
       ReceiveProc: TAIMPServiceFindTagsOnlineAlbumInfoReceiveProc; ReceiveProcData: Pointer): HRESULT; stdcall;
-    function FindTracks(AlbumInfo: IAIMPFileInfo; Owner: IAIMPTaskOwner; out TracksInfo: IAIMPObjectList): HRESULT; stdcall;
+    function FindTracks(AlbumInfo: IAIMPFileInfo; Owner: IAIMPTaskOwner;
+      ErrorInfo: IAIMPErrorInfo; out TracksInfo: IAIMPObjectList): HRESULT; stdcall;
   end;
 
   { IAIMPServiceFindTagsOnline }

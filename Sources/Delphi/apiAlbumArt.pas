@@ -1,14 +1,13 @@
-{************************************************}
-{*                                              *}
-{*          AIMP Programming Interface          *}
-{*               v4.50 build 2000               *}
-{*                                              *}
-{*                Artem Izmaylov                *}
-{*                (C) 2006-2017                 *}
-{*                 www.aimp.ru                  *}
-{*            Mail: support@aimp.ru             *}
-{*                                              *}
-{************************************************}
+﻿{*********************************************}
+{*                                           *}
+{*        AIMP Programming Interface         *}
+{*                v5.02.2360                 *}
+{*                                           *}
+{*            (c) Artem Izmaylov             *}
+{*                 2006-2022                 *}
+{*                www.aimp.ru                *}
+{*                                           *}
+{*********************************************}
 
 unit apiAlbumArt;
 
@@ -17,9 +16,12 @@ unit apiAlbumArt;
 interface
 
 uses
-  Windows, apiObjects, apiFileManager;
+  Windows, apiObjects, apiFileManager, apiThreading;
 
 const
+  SID_IAIMPAlbumArtRequest = '{41494D50-416C-6241-7274-526571737400}';
+  IID_IAIMPAlbumArtRequest: TGUID = SID_IAIMPAlbumArtRequest;
+
   SID_IAIMPExtensionAlbumArtCatalog = '{41494D50-4578-7441-6C62-417274436174}';
   IID_IAIMPExtensionAlbumArtCatalog: TGUID = SID_IAIMPExtensionAlbumArtCatalog;
 
@@ -32,10 +34,13 @@ const
   SID_IAIMPExtensionAlbumArtProvider2 = '{41494D50-4578-416C-6241-727450727632}';
   IID_IAIMPExtensionAlbumArtProvider2: TGUID = SID_IAIMPExtensionAlbumArtProvider2;
 
+  SID_IAIMPExtensionAlbumArtProvider3 = '{41494D50-4578-416C-6241-727450727633}';
+  IID_IAIMPExtensionAlbumArtProvider3: TGUID = SID_IAIMPExtensionAlbumArtProvider3;
+
   SID_IAIMPServiceAlbumArt = '{41494D50-5372-7641-6C62-417274000000}';
   IID_IAIMPServiceAlbumArt: TGUID = SID_IAIMPServiceAlbumArt;
 
-  SID_IAIMPServiceAlbumArtCache = '{4941494D-5053-7276-416C-624172744368}';
+  SID_IAIMPServiceAlbumArtCache = '{41494D50-5372-7641-6C62-417274434300}';
   IID_IAIMPServiceAlbumArtCache: TGUID = SID_IAIMPServiceAlbumArtCache;
 
   AIMP_ALBUMART_PROVIDER_CATEGORY_MASK     = $F;
@@ -44,12 +49,13 @@ const
   AIMP_ALBUMART_PROVIDER_CATEGORY_FILE     = 1;
   AIMP_ALBUMART_PROVIDER_CATEGORY_INTERNET = 2;
 
-  // PropIDs for IAIMPPropertyList in IAIMPExtensionAlbumArtLocalFinder.Get
-  AIMP_SERVICE_ALBUMART_PROPID_FIND_IN_FILES                  = 1;
-  AIMP_SERVICE_ALBUMART_PROPID_FIND_IN_FILES_MASKS            = 2;
-  AIMP_SERVICE_ALBUMART_PROPID_FIND_IN_FILES_EXTS             = 3;
-  AIMP_SERVICE_ALBUMART_PROPID_FIND_IN_INTERNET               = 4;
-  AIMP_SERVICE_ALBUMART_PROPID_FIND_IN_INTERNET_MAX_FILE_SIZE = 5;
+  // PropIDs for IAIMPAlbumArtRequest
+  AIMP_ALBUMART_REQUEST_PROPID_FIND_IN_FILES                  = 1;
+  AIMP_ALBUMART_REQUEST_PROPID_FIND_IN_FILES_MASKS            = 2;
+  AIMP_ALBUMART_REQUEST_PROPID_FIND_IN_FILES_EXTS             = 3;
+  AIMP_ALBUMART_REQUEST_PROPID_FIND_IN_INTERNET               = 4;
+  AIMP_ALBUMART_REQUEST_PROPID_FIND_IN_INTERNET_MAX_FILE_SIZE = 5;
+  AIMP_ALBUMART_REQUEST_PROPID_FIND_IN_TAGS                   = 6;
 
   // Flags for IAIMPServiceAlbumArt.Get
   AIMP_SERVICE_ALBUMART_FLAGS_NOCACHE  = 1;
@@ -58,6 +64,16 @@ const
   AIMP_SERVICE_ALBUMART_FLAGS_OFFLINE  = 8;
 
 type
+
+  { IAIMPAlbumArtRequest }
+
+  IAIMPAlbumArtRequest = interface(IAIMPPropertyList)
+  [SID_IAIMPAlbumArtRequest]
+    function CacheGet(Key: IAIMPString; var Image: IAIMPImageContainer): HRESULT; stdcall;
+    function CachePut(Key: IAIMPString; var Image: IAIMPImageContainer): HRESULT; stdcall;
+    function Download(URL: IAIMPString; out Image: IAIMPImageContainer): HRESULT; stdcall;
+    function IsCanceled: LongBool; stdcall;
+  end;
 
   { IAIMPExtensionAlbumArtCatalog }
 
@@ -90,6 +106,14 @@ type
     function Get2(FileInfo: IAIMPFileInfo; Options: IAIMPPropertyList; out Image: IAIMPImageContainer): HRESULT; stdcall;
   end;
 
+  { IAIMPExtensionAlbumArtProvider3 }
+
+  IAIMPExtensionAlbumArtProvider3 = interface(IUnknown)
+  [SID_IAIMPExtensionAlbumArtProvider3]
+    function Get(FileInfo: IAIMPFileInfo; Request: IAIMPAlbumArtRequest; out Image: IAIMPImageContainer): HRESULT; stdcall;
+    function GetCategory: DWORD; stdcall;
+  end;
+
   { IAIMPServiceAlbumArt }
 
   TAIMPServiceAlbumArtReceiveProc = procedure (Image: IAIMPImage; ImageContainer: IAIMPImageContainer; UserData: Pointer); stdcall;
@@ -107,9 +131,11 @@ type
 
   IAIMPServiceAlbumArtCache = interface(IUnknown)
   [SID_IAIMPServiceAlbumArtCache]
-    function Flush(Album, Artist: IAIMPString): HRESULT; stdcall;
-    function Flush2(FileURI: IAIMPString): HRESULT; stdcall;
-    function FlushAll: HRESULT; stdcall;
+    function Flush: HRESULT; stdcall;
+    function Get(Key: IAIMPString; var ImageContainer: IAIMPImageContainer): HRESULT; stdcall;
+    function Put(Key: IAIMPString; var ImageContainer: IAIMPImageContainer): HRESULT; stdcall;
+    function Remove(Key: IAIMPString): HRESULT; stdcall;
+    function Stat(out Size: Int64; out NumberOfEntires: DWORD): HRESULT; stdcall;
   end;
 
 implementation

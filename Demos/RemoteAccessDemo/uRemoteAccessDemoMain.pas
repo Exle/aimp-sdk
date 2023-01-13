@@ -1,4 +1,4 @@
-unit uRemoteAccessDemoMain;
+﻿unit uRemoteAccessDemoMain;
 
 interface
 
@@ -131,27 +131,27 @@ end;
 
 procedure TfrmRemoteAccessDemo.UpdateTrackInfo;
 
-  function ExtractString(var B: PByte; ALength: Integer): WideString;
+  function ExtractString(var B: PByte; ALength: Integer): acString;
   begin
     SetString(Result, PWideChar(B), ALength);
     Inc(B, SizeOf(WideChar) * ALength);
   end;
 
 var
-  AAlbum: WideString;
-  AArtist: WideString;
+  AAlbum: acString;
+  AArtist: acString;
   ABuffer: PByte;
-  ADate: WideString;
+  ADate: acString;
   AFile: THandle;
-  AFileName: WideString;
-  AGenre: WideString;
+  AFileName: acString;
+  AGenre: acString;
   AInfo: PAIMPRemoteFileInfo;
-  ATitle: WideString;
+  ATitle: acString;
 begin
   lbTitle.Caption := '';
   lbDetails.Caption := '';
 
-  // Load info about playable file from shared memory-mapped file
+  // Load info about playing file from shared memory-mapped file
   AFile := OpenFileMapping(FILE_MAP_READ, True, AIMPRemoteAccessClass);
   try
     AInfo := MapViewOfFile(AFile, FILE_MAP_READ, 0, 0, AIMPRemoteAccessMapFileSize);

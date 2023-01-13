@@ -1,14 +1,13 @@
-{************************************************}
-{*                                              *}
-{*          AIMP Programming Interface          *}
-{*               v4.50 build 2000               *}
-{*                                              *}
-{*                Artem Izmaylov                *}
-{*                (C) 2006-2017                 *}
-{*                 www.aimp.ru                  *}
-{*            Mail: support@aimp.ru             *}
-{*                                              *}
-{************************************************}
+﻿{*********************************************}
+{*                                           *}
+{*        AIMP Programming Interface         *}
+{*                v5.02.2360                 *}
+{*                                           *}
+{*            (c) Artem Izmaylov             *}
+{*                 2006-2022                 *}
+{*                www.aimp.ru                *}
+{*                                           *}
+{*********************************************}
 
 unit apiVisuals;
 
@@ -34,14 +33,16 @@ const
   AIMP_VISUAL_CLICK_BUTTON_MIDDLE = 1;
 
   // flags for IAIMPExtensionEmbeddedVisualization.GetFlags and IAIMPExtensionCustomVisualization.GetFlags
-  AIMP_VISUAL_FLAGS_RQD_DATA_WAVE       = 1;
-  AIMP_VISUAL_FLAGS_RQD_DATA_SPECTRUM   = 2;
-  AIMP_VISUAL_FLAGS_NOT_SUSPEND         = 4;
+  AIMP_VISUAL_FLAGS_RQD_DATA_WAVEFORM             = 1;
+  AIMP_VISUAL_FLAGS_RQD_DATA_SPECTRUM             = 2;
+  AIMP_VISUAL_FLAGS_NOT_SUSPEND                   = 4;
+  AIMP_VISUAL_FLAGS_RQD_DATA_LOGARITHMIC_SPECTRUM = 8; // for internal use
 
   AIMP_VISUAL_SPECTRUM_SIZE = 256;
   AIMP_VISUAL_WAVEFORM_SIZE = 512;
 
 type
+  TAIMPVisualDataLogarithmicSpectrum = array[0..AIMP_VISUAL_SPECTRUM_SIZE - 1] of Word;
   TAIMPVisualDataSpectrum = array[0..AIMP_VISUAL_SPECTRUM_SIZE - 1] of Single;
   TAIMPVisualDataWaveform = array[0..AIMP_VISUAL_WAVEFORM_SIZE - 1] of Single;
 
@@ -51,6 +52,7 @@ type
     Spectrum: array[0..2] of TAIMPVisualDataSpectrum;
     Waveform: array[0..1] of TAIMPVisualDataWaveform;
     Reserved: Integer;
+    LogarithmicSpectrum: array[0..2] of TAIMPVisualDataLogarithmicSpectrum; // for internal use
   end;
 
   { IAIMPExtensionCustomVisualization }

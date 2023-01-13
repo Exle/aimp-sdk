@@ -1,14 +1,13 @@
-{************************************************}
-{*                                              *}
-{*          AIMP Programming Interface          *}
-{*               v4.50 build 2000               *}
-{*                                              *}
-{*                Artem Izmaylov                *}
-{*                (C) 2006-2017                 *}
-{*                 www.aimp.ru                  *}
-{*            Mail: support@aimp.ru             *}
-{*                                              *}
-{************************************************}
+﻿{*********************************************}
+{*                                           *}
+{*        AIMP Programming Interface         *}
+{*                v5.02.2360                 *}
+{*                                           *}
+{*            (c) Artem Izmaylov             *}
+{*                 2006-2022                 *}
+{*                www.aimp.ru                *}
+{*                                           *}
+{*********************************************}
 
 unit apiRemote;
 
@@ -191,7 +190,7 @@ const
 
   // AlbumArt Request
   //   LParam: Window Handle, which will process WM_COPYDATA message from AIMP with CoverArt data
-  //   Result: 0, if player doesn't play anything or cover art unavailable
+  //   Result: 0, if player doesn't play anything or cover art is unavailable
   AIMP_RA_CMD_GET_ALBUMART = AIMP_RA_CMD_BASE + 19;
 
   // Start First Visualization

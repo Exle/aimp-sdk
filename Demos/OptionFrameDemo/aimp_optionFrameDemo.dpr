@@ -1,4 +1,4 @@
-library aimp_optionFrameDemo;
+﻿library aimp_optionFrameDemo;
 
 uses
   Windows,
