@@ -19,9 +19,6 @@ uses
   Windows, SysUtils, Classes, apiCore, apiObjects, apiFileManager, apiMUI;
 
 type
-{$IFNDEF UNICODE}
-  UnicodeString = acString;
-{$ENDIF}
 
   { TInterfacedObjectEx }
 
@@ -192,6 +189,9 @@ type
     constructor Create(const AFileName: UnicodeString; AMode: Integer); overload;
   end;
 
+var
+  FInternalConverter: function (const AString: IAIMPString): UnicodeString = nil;
+
 procedure CheckResult(R: HRESULT; const AMessage: string = '%d');
 
 // Core
@@ -214,20 +214,20 @@ function LangLoadStringEx(const KeyPath: UnicodeString): IAIMPString; overload;
 function LangLoadStringEx(const KeyPath: UnicodeString; APartIndex: Integer): IAIMPString; overload;
 
 // Strings
-function IAIMPStringToString(const S: IAIMPString): UnicodeString; {$IFDEF DELPHI2010}inline;{$ENDIF}
+function IAIMPStringToString(const S: IAIMPString): UnicodeString; inline;
 function MakeString(const S: PWideChar; ALength: Integer): IAIMPString; overload;
 function MakeString(const S: PWideChar; ALength: Integer; out R: IAIMPString): HRESULT; overload;
-function MakeString(const S: UnicodeString): IAIMPString; overload; {$IFDEF DELPHI2010}inline;{$ENDIF}
-function MakeString(const S: UnicodeString; out R: IAIMPString): HRESULT; overload; {$IFDEF DELPHI2010}inline;{$ENDIF}
+function MakeString(const S: UnicodeString): IAIMPString; overload; inline;
+function MakeString(const S: UnicodeString; out R: IAIMPString): HRESULT; overload; inline;
 
 function PropListGetBool(const List: IAIMPPropertyList; ID: Integer; const ADefault: LongBool = False): LongBool;
 function PropListGetFloat(const List: IAIMPPropertyList; ID: Integer; const ADefault: Double = 0): Double;
-function PropListGetInt32(const List: IAIMPPropertyList; ID: Integer; ADefault: Integer = 0): Integer; overload; {$IFDEF DELPHI2010}inline;{$ENDIF}
+function PropListGetInt32(const List: IAIMPPropertyList; ID: Integer; const ADefault: Integer = 0): Integer; inline;
 function PropListGetInt64(const List: IAIMPPropertyList; ID: Integer; const ADefault: Int64 = 0): Int64;
 function PropListGetObj(const List: IAIMPPropertyList; ID: Integer): IUnknown;
-function PropListGetStr(const List: IAIMPPropertyList; ID: Integer): UnicodeString; overload; {$IFDEF DELPHI2010}inline;{$ENDIF}
-function PropListGetStr(const List: IAIMPPropertyList; ID: Integer; out S: IAIMPString): LongBool; overload; {$IFDEF DELPHI2010}inline;{$ENDIF}
-function PropListGetStr(const List: IAIMPPropertyList; ID: Integer; out S: UnicodeString): LongBool; overload; {$IFDEF DELPHI2010}inline;{$ENDIF}
+function PropListGetStr(const List: IAIMPPropertyList; ID: Integer): UnicodeString; overload; inline;
+function PropListGetStr(const List: IAIMPPropertyList; ID: Integer; out S: IAIMPString): LongBool; overload; inline;
+function PropListGetStr(const List: IAIMPPropertyList; ID: Integer; out S: UnicodeString): LongBool; overload; inline;
 procedure PropListSetBool(const List: IAIMPPropertyList; ID: Integer; const Value: LongBool);
 procedure PropListSetFloat(const List: IAIMPPropertyList; ID: Integer; const Value: Double);
 procedure PropListSetInt32(const List: IAIMPPropertyList; ID: Integer; const Value: Integer);
@@ -386,10 +386,13 @@ end;
 
 function IAIMPStringToString(const S: IAIMPString): UnicodeString;
 begin
-  if S <> nil then
-    SetString(Result, S.GetData, S.GetLength)
+  if Assigned(FInternalConverter) then
+    Result := FInternalConverter(S)
   else
-    Result := EmptyStr;
+    if S <> nil then
+      SetString(Result, S.GetData, S.GetLength)
+    else
+      Result := EmptyStr;
 end;
 
 function MakeString(const S: PWideChar; ALength: Integer): IAIMPString;
@@ -456,7 +459,7 @@ begin
     Result := ADefault;
 end;
 
-function PropListGetInt32(const List: IAIMPPropertyList; ID: Integer; ADefault: Integer = 0): Integer;
+function PropListGetInt32(const List: IAIMPPropertyList; ID: Integer; const ADefault: Integer = 0): Integer;
 begin
   if (List = nil) or Failed(List.GetValueAsInt32(ID, Result)) then
     Result := ADefault;
