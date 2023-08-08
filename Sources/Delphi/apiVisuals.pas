@@ -43,8 +43,37 @@ const
 
 type
   TAIMPVisualDataLogarithmicSpectrum = array[0..AIMP_VISUAL_SPECTRUM_SIZE - 1] of Word;
-  TAIMPVisualDataSpectrum = array[0..AIMP_VISUAL_SPECTRUM_SIZE - 1] of Single;
   TAIMPVisualDataWaveform = array[0..AIMP_VISUAL_WAVEFORM_SIZE - 1] of Single;
+
+  TAIMPVisualDataSpectrum = array[0..AIMP_VISUAL_SPECTRUM_SIZE - 1] of Single;
+  (*
+    0  ~ 20 Hz
+    10 ~ 200 Hz
+    20 ~ 400 Hz
+    30 ~ 630 Hz
+    40 ~ 870 Hz
+    50 ~ 1.1 KHz
+    60 ~ 1.4 KHz
+    70 ~ 1.7 KHz
+    80 ~ 2.1 KHz
+    90 ~ 2.5 KHz
+    100 ~ 3.0 KHz
+    110 ~ 3.5 KHz
+    120 ~ 4.0 KHz
+    130 ~ 4.5 KHz
+    140 ~ 5.2 KHz
+    150 ~ 6.0 KHz
+    160 ~ 6.7 KHz
+    170 ~ 7.6 KHz
+    180 ~ 8.5 KHz
+    190 ~ 9.6 KHz
+    200 ~ 11.0 KHz
+    210 ~ 12.0 KHz
+    220 ~ 13.5 KHz
+    230 ~ 15.0 KHz
+    240 ~ 16.8 KHz
+    255 ~ 20.0 KHz
+  *)
 
   PAIMPVisualData = ^TAIMPVisualData;
   TAIMPVisualData = packed record

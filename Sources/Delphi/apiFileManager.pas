@@ -1,10 +1,10 @@
 ﻿{*********************************************}
 {*                                           *}
 {*        AIMP Programming Interface         *}
-{*                v5.02.2360                 *}
+{*                v5.30.2500                 *}
 {*                                           *}
 {*            (c) Artem Izmaylov             *}
-{*                 2006-2022                 *}
+{*                 2006-2023                 *}
 {*                www.aimp.ru                *}
 {*                                           *}
 {*********************************************}
@@ -132,6 +132,7 @@ const
   AIMP_FILEINFO_PROPID_ML_RATING          = 44; // Float
   AIMP_FILEINFO_PROPID_ML_DISPLAYING_MARK = 22; // Float
   AIMP_FILEINFO_PROPID_ML_LABELS          = 45; // IAIMPString, values divided by ";"
+  AIMP_FILEINFO_PROPID_KEY                = 46; // IAIMPString
 
   // PropertyID for the IAIMPVirtualFile
   AIMP_VIRTUALFILE_PROPID_FILEURI          = 0;
@@ -161,6 +162,10 @@ const
   // Property IDs for IAIMPExtensionFileSystem
   AIMP_FILESYSTEM_PROPID_SCHEME   = 1;
   AIMP_FILESYSTEM_PROPID_READONLY = 2;
+
+  // Factory IDs for IAIMPServiceFileInfoFormatter and IAIMPServiceFileInfoFormatterUtils
+  AIMP_FILEINFO_FORMATTER_ID_BASIC   = 0;
+  AIMP_FILEINFO_FORMATTER_ID_PLAYING = 1;
 
 type
 
@@ -325,7 +330,7 @@ type
 
   IAIMPServiceFileInfoFormatter = interface
   [SID_IAIMPServiceFileInfoFormatter]
-    function Format(Template: IAIMPString; FileInfo: IAIMPFileInfo; Reserved: Integer;
+    function Format(Template: IAIMPString; FileInfo: IAIMPFileInfo; ID: Integer;
       AdditionalInfo: IUnknown; out FormattedResult: IAIMPString): HRESULT; stdcall;
   end;
 
@@ -333,7 +338,7 @@ type
 
   IAIMPServiceFileInfoFormatterUtils = interface
   [SID_IAIMPServiceFileInfoFormatterUtils]
-    function ShowMacrosLegend(ScreenTarget: TRect; Reserved: Integer; EventsHandler: IUnknown): HRESULT; stdcall;
+    function ShowMacrosLegend(ScreenTarget: TRect; ID: Integer; EventsHandler: IUnknown): HRESULT; stdcall;
   end;
 
   { IAIMPServiceFileStreaming }

@@ -54,7 +54,8 @@ const
   AIMP_MSG_CMD_OPTIONS = AIMP_MSG_CMD_BASE + 7;
 
   // Show the "Options" Dialog with active "plugins" sheet
-  // AParam1, AParam2: unused
+  // AParam1: page index (starts from 1), 0 is for previous user choice (default)
+  // AParam2: unused
   AIMP_MSG_CMD_PLUGINS = AIMP_MSG_CMD_BASE + 8;
 
   // Close the App
@@ -226,7 +227,7 @@ const
   AIMP_MSG_CMD_SEARCH = AIMP_MSG_CMD_BASE + 52;
 
   // Show DSP Manager Dialog
-  // AParam1: Active tab sheet index [0..3]
+  // AParam1: Active tab sheet index [0..5]
   // AParam2: unused
   AIMP_MSG_CMD_DSPMANAGER = AIMP_MSG_CMD_BASE + 53;
 
@@ -249,6 +250,10 @@ const
   // Extended control of "Quick File Info" card that displaying information about playing file
   // AParam2: pointer to TAIMPQuickFileInfoParams
   AIMP_MSG_CMD_QFI = AIMP_MSG_CMD_BASE + 60;
+
+  // Delete selected items with folders from active playlist and disk
+  // AParam1, AParam2: unused
+  AIMP_MSG_CMD_PLS_DELETE_SELECTED_FROM_HDD_W_FOLDERS = AIMP_MSG_CMD_BASE + 61;
 
 // ---------------------------------------------------------------------------------------------------------------------
 // Properties
@@ -555,6 +560,11 @@ const
   // AParam1: Unused
   // AParam2: Unused
   AIMP_MSG_EVENT_PLAYBACK_QUEUE = AIMP_MSG_EVENT_BASE + 23;
+
+  // Callen, when list of DSP/VST plugins is changed
+  // AParam1: Unused
+  // AParam2: Unused
+  AIMP_MSG_EVENT_DSP = AIMP_MSG_EVENT_BASE + 24;
 
 // ---------------------------------------------------------------------------------------------------------------------
 // Quick File Info
