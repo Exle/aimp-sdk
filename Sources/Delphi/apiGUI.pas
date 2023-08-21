@@ -1,10 +1,10 @@
 ﻿{*********************************************}
 {*                                           *}
 {*        AIMP Programming Interface         *}
-{*                v5.02.2360                 *}
+{*                v5.30.2500                 *}
 {*                                           *}
 {*            (c) Artem Izmaylov             *}
-{*                 2006-2022                 *}
+{*                 2006-2023                 *}
 {*                www.aimp.ru                *}
 {*                                           *}
 {*********************************************}
@@ -27,6 +27,9 @@ const
 
   SID_IAIMPUIColorSchema = '{617569D1-6F6C-6F72-5363-68656D610000}';
   IID_IAIMPUIColorSchema: TGUID = SID_IAIMPUIColorSchema;
+
+  SID_IAIMPUIMode = '{61756955-494D-6F64-6500-000000000000}';
+  IID_IAIMPUIMode: TGUID = SID_IAIMPUIMode;
 
   SID_IAIMPServiceUI = '{41494D50-5365-7276-6963-655549000000}';
   IID_IAIMPServiceUI: TGUID = SID_IAIMPServiceUI;
@@ -565,14 +568,48 @@ const
   AIMPUI_PROGRESSDLG_PROPID_MESSAGE                  = 2;
   AIMPUI_PROGRESSDLG_PROPID_SHOW_PROGRESS_ON_TASKBAR = 3;
 
+  // PropID for IAIMPUIMode
+  AIMPUI_MODE_PROPID_ACCENT = 1;
+  AIMPUI_MODE_PROPID_DPI    = 2;
+  AIMPUI_MODE_PROPID_STYLE  = 3;
+
 type
-  TAIMPUIMouseButton   = (umbLeft = 0, umbRight = 1, umbMiddle = 2);
-  TAIMPUITextAlignment = (utaLeftJustify = 0, utaRightJustify = 1, utaCenter = 2);
-  TAIMPUITextVerticalAlignment = (utvaTop = 0, utvaBottom = 1, utvaCenter = 2);
+//----------------------------------------------------------------------------------------------------------------------
+// Basic Interfaces
+//----------------------------------------------------------------------------------------------------------------------
+
+  { IAIMPUIDPIAwareness }
+
+  IAIMPUIDPIAwareness = interface
+  [SID_IAIMPUIDPIAwareness]
+    function IsDPIAware: LongBool; stdcall;
+    function SetDPIAware(Value: LongBool): HRESULT; stdcall;
+  end;
+
+  { IAIMPUIColorSchema }
+
+  IAIMPUIColorSchema = interface(IAIMPPropertyList)
+  [SID_IAIMPUIColorSchema]
+    procedure ApplyToARGB(var ARGB: DWORD); stdcall;
+    procedure ApplyToColor(var Color: TColorRef); stdcall;
+    procedure ApplyToColors(Colors: PRGBQuad; NumberOfColors: Integer); stdcall;
+    procedure ApplyToImage(var Image: IAIMPImage); stdcall;
+  end;
+
+  { IAIMPUIMode }
+
+  IAIMPUIMode = interface(IAIMPPropertyList)
+  [SID_IAIMPUIMode]
+    // + refer to AIMP_MSG_EVENT_UI_MODE
+  end;
 
 //----------------------------------------------------------------------------------------------------------------------
 // Basic Events Interfaces
 //----------------------------------------------------------------------------------------------------------------------
+
+  TAIMPUIMouseButton   = (umbLeft = 0, umbRight = 1, umbMiddle = 2);
+  TAIMPUITextAlignment = (utaLeftJustify = 0, utaRightJustify = 1, utaCenter = 2);
+  TAIMPUITextVerticalAlignment = (utvaTop = 0, utvaBottom = 1, utvaCenter = 2);
 
   { IAIMPUIChangeEvents }
 
@@ -634,24 +671,6 @@ type
 //----------------------------------------------------------------------------------------------------------------------
 // Basic Controls Interfaces
 //----------------------------------------------------------------------------------------------------------------------
-
-  { IAIMPUIDPIAwareness }
-
-  IAIMPUIDPIAwareness = interface
-  [SID_IAIMPUIDPIAwareness]
-    function IsDPIAware: LongBool; stdcall;
-    function SetDPIAware(Value: LongBool): HRESULT; stdcall;
-  end;
-
-  { IAIMPUIColorSchema }
-
-  IAIMPUIColorSchema = interface(IAIMPPropertyList)
-  [SID_IAIMPUIColorSchema]
-    procedure ApplyToARGB(var ARGB: DWORD); stdcall;
-    procedure ApplyToColor(var Color: TColorRef); stdcall;
-    procedure ApplyToColors(Colors: PRGBQuad; NumberOfColors: Integer); stdcall;
-    procedure ApplyToImage(var Image: IAIMPImage); stdcall;
-  end;
 
   { TAIMPUIControlPlacement }
 

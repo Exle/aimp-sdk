@@ -1,7 +1,7 @@
 ﻿{*********************************************}
 {*                                           *}
 {*        AIMP Programming Interface         *}
-{*                v5.10.2400                 *}
+{*                v5.30.2500                 *}
 {*                                           *}
 {*            (c) Artem Izmaylov             *}
 {*                 2006-2023                 *}
@@ -561,10 +561,13 @@ const
   // AParam2: Unused
   AIMP_MSG_EVENT_PLAYBACK_QUEUE = AIMP_MSG_EVENT_BASE + 23;
 
-  // Callen, when list of DSP/VST plugins is changed
+  // Called, when list of DSP/VST plugins is changed
   // AParam1: Unused
   // AParam2: Unused
   AIMP_MSG_EVENT_DSP = AIMP_MSG_EVENT_BASE + 24;
+
+  // Called, after chaning the accent color or night/day mode
+  AIMP_MSG_EVENT_UI_MODE = AIMP_MSG_EVENT_BASE + 25;
 
 // ---------------------------------------------------------------------------------------------------------------------
 // Quick File Info

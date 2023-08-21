@@ -1,7 +1,7 @@
 /************************************************/
 /*                                              */
 /*          AIMP Programming Interface          */
-/*               v5.20 build 2500               */
+/*               v5.30 build 2500               */
 /*                                              */
 /*                Artem Izmaylov                */
 /*                (C) 2006-2023                 */
@@ -562,6 +562,9 @@ const int AIMP_MSG_EVENT_PLAYBACK_QUEUE = AIMP_MSG_EVENT_BASE + 23;
 // AParam1: Unused
 // AParam2: Unused
 const int AIMP_MSG_EVENT_DSP = AIMP_MSG_EVENT_BASE + 24;
+
+  // Called, after chaning the accent color or night/day mode
+const int AIMP_MSG_EVENT_UI_MODE = AIMP_MSG_EVENT_BASE + 25;
 
 // ---------------------------------------------------------------------------------------------------------------------
 // Quick File Info
