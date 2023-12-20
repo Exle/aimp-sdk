@@ -98,6 +98,7 @@ const
   AIMP_PLAYER_PROPID_MANUALSWITCHING_CROSSFADE            = 21; // msec
   AIMP_PLAYER_PROPID_MANUALSWITCHING_FADEIN               = 22; // msec
   AIMP_PLAYER_PROPID_MANUALSWITCHING_FADEOUT              = 23; // msec
+  AIMP_PLAYER_PROPID_OUTPUT                               = 30; // IAIMPString or IAIMPObjectList
 
 type
   PAIMPWaveformPeakInfo = ^TAIMPWaveformPeakInfo;

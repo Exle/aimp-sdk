@@ -62,6 +62,7 @@ const int AIMP_PLAYER_PROPID_MANUALSWITCHING                      = 20;
 const int AIMP_PLAYER_PROPID_MANUALSWITCHING_CROSSFADE            = 21; // msec
 const int AIMP_PLAYER_PROPID_MANUALSWITCHING_FADEIN               = 22; // msec
 const int AIMP_PLAYER_PROPID_MANUALSWITCHING_FADEOUT              = 23; // msec
+const int AIMP_PLAYER_PROPID_OUTPUT				 				  = 30; // IAIMPString or IAIMPObjectList
 
 #pragma pack(push, 1)
 struct TAIMPWaveformPeakInfo
