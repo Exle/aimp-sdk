@@ -131,22 +131,22 @@ end;
 
 procedure TfrmRemoteAccessDemo.UpdateTrackInfo;
 
-  function ExtractString(var B: PByte; ALength: Integer): acString;
+  function ExtractString(var B: PByte; ALength: Integer): UnicodeString;
   begin
     SetString(Result, PWideChar(B), ALength);
     Inc(B, SizeOf(WideChar) * ALength);
   end;
 
 var
-  AAlbum: acString;
-  AArtist: acString;
+  AAlbum: UnicodeString;
+  AArtist: UnicodeString;
   ABuffer: PByte;
-  ADate: acString;
+  ADate: UnicodeString;
   AFile: THandle;
-  AFileName: acString;
-  AGenre: acString;
+  AFileName: UnicodeString;
+  AGenre: UnicodeString;
   AInfo: PAIMPRemoteFileInfo;
-  ATitle: acString;
+  ATitle: UnicodeString;
 begin
   lbTitle.Caption := '';
   lbDetails.Caption := '';
