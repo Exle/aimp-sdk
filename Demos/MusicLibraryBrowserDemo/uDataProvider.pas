@@ -154,20 +154,20 @@ end;
 
 procedure TMLDataProvider.CancelRequest(AHandle: THandle);
 var
-  AService: IAIMPServiceThreadPool;
+  AService: IAIMPServiceThreads;
 begin
-  if CoreGetService(IAIMPServiceThreadPool, AService) then
-    AService.Cancel(AHandle, AIMP_SERVICE_THREADPOOL_FLAGS_WAITFOR);
+  if CoreGetService(IAIMPServiceThreads, AService) then
+    AService.Cancel(AHandle, AIMP_SERVICE_THREADS_FLAGS_WAITFOR);
 end;
 
 function TMLDataProvider.Run(ATask: IAIMPTask): THandle;
 var
-  AService: IAIMPServiceThreadPool;
+  AService: IAIMPServiceThreads;
 begin
   Result := 0;
-  if CoreGetService(IAIMPServiceThreadPool, AService) then
+  if CoreGetService(IAIMPServiceThreads, AService) then
   begin
-    if Failed(AService.Execute(ATask, Result)) then
+    if Failed(AService.ExecuteInThread(ATask, Result)) then
       Result := 0;
   end;
 end;
@@ -242,14 +242,16 @@ end;
 
 procedure TMLFetchFieldDataTask.Execute(Owner: IAIMPTaskOwner);
 var
-  AService: IAIMPServiceSynchronizer;
+  AService: IAIMPServiceThreads;
 begin
   if FDataStorage <> nil then
     PopulateData(Owner);
   if (Owner = nil) or not Owner.IsCanceled then
   begin
-    if CoreGetService(IAIMPServiceSynchronizer, AService) then
-      AService.ExecuteInMainThread(TMLFetchFieldDataTaskCallbackSynchronizer.Create(Self), True);
+    if CoreGetService(IAIMPServiceThreads, AService) then
+      AService.ExecuteInMainThread(
+        TMLFetchFieldDataTaskCallbackSynchronizer.Create(Self),
+        AIMP_SERVICE_THREADS_FLAGS_WAITFOR);
   end;
 end;
 
