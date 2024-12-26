@@ -1,14 +1,18 @@
-﻿{*********************************************}
-{*                                           *}
-{*        AIMP Programming Interface         *}
-{*                v5.30.2500                 *}
-{*                                           *}
-{*            (c) Artem Izmaylov             *}
-{*                 2006-2023                 *}
-{*                www.aimp.ru                *}
-{*                                           *}
-{*********************************************}
-
+﻿////////////////////////////////////////////////////////////////////////////////
+//
+//  Project:   AIMP
+//             Programming Interface
+//
+//  Target:    v5.40 build 2650
+//
+//  Purpose:   File Manager API
+//
+//  Author:    Artem Izmaylov
+//             © 2006-2025
+//             www.aimp.ru
+//
+//  FPC:       OK
+//
 unit apiFileManager;
 
 {$I apiConfig.inc}
@@ -16,7 +20,7 @@ unit apiFileManager;
 interface
 
 uses
-  Windows, apiObjects;
+  Types, apiObjects;
   
 const
   SID_IAIMPFileInfo = '{41494D50-4669-6C65-496E-666F00000000}';
@@ -195,7 +199,7 @@ type
   { TAIMPFileAttributes }
 
   TAIMPFileAttributes = packed record
-    Attributes: DWORD;
+    Attributes: LongWord;
     TimeCreation: TDateTime;
     TimeLastAccess: TDateTime;
     TimeLastWrite: TDateTime;
@@ -254,7 +258,8 @@ type
 
   IAIMPFileSystemCommandStreaming = interface(IUnknown)
   [SID_IAIMPFileSystemCommandStreaming]
-    function CreateStream(FileName: IAIMPString; const Offset, Size: Int64; Flags: DWORD; out Stream: IAIMPStream): HRESULT; stdcall;
+    function CreateStream(FileName: IAIMPString; const Offset, Size: Int64;
+      Flags: LongWord; out Stream: IAIMPStream): HRESULT; stdcall;
   end;
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -265,7 +270,8 @@ type
 
   IAIMPExtensionFileExpander = interface
   [SID_IAIMPExtensionFileExpander]
-    function Expand(FileName: IAIMPString; out List: IAIMPObjectList; ProgressCallback: IAIMPProgressCallback): HRESULT; stdcall;
+    function Expand(FileName: IAIMPString; out List: IAIMPObjectList;
+      ProgressCallback: IAIMPProgressCallback): HRESULT; stdcall;
   end;
 
   { IAIMPExtensionFileFormat }
@@ -274,7 +280,7 @@ type
   [SID_IAIMPExtensionFileFormat]
     function GetDescription(out S: IAIMPString): HRESULT; stdcall;
     function GetExtList(out S: IAIMPString): HRESULT; stdcall;
-    function GetFlags(out Flags: DWORD): HRESULT; stdcall;
+    function GetFlags(out Flags: LongWord): HRESULT; stdcall;
   end;
 
   { IAIMPExtensionFileInfoProvider }
@@ -311,8 +317,8 @@ type
 
   IAIMPServiceFileFormats = interface
   [SID_IAIMPServiceFileFormats]
-    function GetFormats(Flags: DWORD; out S: IAIMPString): HRESULT; stdcall;
-  	function IsSupported(FileName: IAIMPString; Flags: DWORD): HRESULT; stdcall;
+    function GetFormats(Flags: LongWord; out S: IAIMPString): HRESULT; stdcall;
+  	function IsSupported(FileName: IAIMPString; Flags: LongWord): HRESULT; stdcall;
   end;
 
   { IAIMPServiceFileInfo }
@@ -320,10 +326,13 @@ type
   IAIMPServiceFileInfo = interface
   [SID_IAIMPServiceFileInfo]
     // File Info
-    function GetFileInfoFromFileURI(FileURI: IAIMPString; Flags: DWORD; Info: IAIMPFileInfo): HRESULT; stdcall;
-    function GetFileInfoFromStream(Stream: IAIMPStream; Flags: DWORD; Info: IAIMPFileInfo): HRESULT; stdcall;
+    function GetFileInfoFromFileURI(FileURI: IAIMPString;
+      Flags: LongWord; Info: IAIMPFileInfo): HRESULT; stdcall;
+    function GetFileInfoFromStream(Stream: IAIMPStream;
+      Flags: LongWord; Info: IAIMPFileInfo): HRESULT; stdcall;
     // Virtual Files
-    function GetVirtualFile(FileURI: IAIMPString; Flags: DWORD; out Info: IAIMPVirtualFile): HRESULT; stdcall;
+    function GetVirtualFile(FileURI: IAIMPString;
+      Flags: LongWord; out Info: IAIMPVirtualFile): HRESULT; stdcall;
   end;
 
   { IAIMPServiceFileInfoFormatter }
@@ -345,7 +354,7 @@ type
 
   IAIMPServiceFileStreaming = interface
   [SID_IAIMPServiceFileStreaming]
-    function CreateStreamForFile(FileName: IAIMPString; Flags: DWORD;
+    function CreateStreamForFile(FileName: IAIMPString; Flags: LongWord;
       const Offset, Size: Int64; out Stream: IAIMPStream): HRESULT; stdcall;
     function CreateStreamForFileURI(FileURI: IAIMPString;
       out VirtualFile: IAIMPVirtualFile; out Stream: IAIMPStream): HRESULT; stdcall;
@@ -366,8 +375,8 @@ type
     function Build(ContainerFileName, PartName: IAIMPString; out FileURI: IAIMPString): HRESULT; stdcall;
     function Parse(FileURI: IAIMPString; out ContainerFileName, PartName: IAIMPString): HRESULT; stdcall;
 
-    function ChangeFileExt(var FileURI: IAIMPString; NewExt: IAIMPString; Flags: DWORD): HRESULT; stdcall;
-    function ExtractFileExt(FileURI: IAIMPString; out S: IAIMPString; Flags: DWORD): HRESULT; stdcall;
+    function ChangeFileExt(var FileURI: IAIMPString; NewExt: IAIMPString; Flags: LongWord): HRESULT; stdcall;
+    function ExtractFileExt(FileURI: IAIMPString; out S: IAIMPString; Flags: LongWord): HRESULT; stdcall;
     function ExtractFileName(FileURI: IAIMPString; out S: IAIMPString): HRESULT; stdcall;
     function ExtractFileParentDirName(FileURI: IAIMPString; out S: IAIMPString): HRESULT; stdcall;
     function ExtractFileParentName(FileURI: IAIMPString; out S: IAIMPString): HRESULT; stdcall;

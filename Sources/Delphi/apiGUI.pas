@@ -1,25 +1,57 @@
-﻿{*********************************************}
-{*                                           *}
-{*        AIMP Programming Interface         *}
-{*                v5.30.2500                 *}
-{*                                           *}
-{*            (c) Artem Izmaylov             *}
-{*                 2006-2023                 *}
-{*                www.aimp.ru                *}
-{*                                           *}
-{*********************************************}
-
+﻿////////////////////////////////////////////////////////////////////////////////
+//
+//  Project:   AIMP
+//             Programming Interface
+//
+//  Target:    v5.40 build 2650
+//
+//  Purpose:   GUI API
+//
+//  Author:    Artem Izmaylov
+//             © 2006-2025
+//             www.aimp.ru
+//
+//  FPC:       OK
+//
 unit apiGUI;
 
 {$MINENUMSIZE 4}
+{$I apiConfig.inc}
 
 interface
 
 uses
-  Windows, Types,
+{$IFDEF MSWINDOWS}
+  Windows,
+{$ELSE}
+  LCLType,
+{$ENDIF}
+  Types,
   // API
+  apiActions,
   apiMenu,
-  apiObjects;
+  apiObjects,
+  apiTypes;
+
+const
+  MB_OK               = {$IFDEF MSWINDOWS}Windows{$ELSE}LCLType{$ENDIF}.MB_OK;
+  MB_OKCANCEL         = {$IFDEF MSWINDOWS}Windows{$ELSE}LCLType{$ENDIF}.MB_OKCANCEL;
+  MB_YESNO            = {$IFDEF MSWINDOWS}Windows{$ELSE}LCLType{$ENDIF}.MB_YESNO;
+  MB_YESNOCANCEL      = {$IFDEF MSWINDOWS}Windows{$ELSE}LCLType{$ENDIF}.MB_YESNOCANCEL;
+
+  MB_ICONINFORMATION  = {$IFDEF MSWINDOWS}Windows{$ELSE}LCLType{$ENDIF}.MB_ICONINFORMATION;
+  MB_ICONQUESTION     = {$IFDEF MSWINDOWS}Windows{$ELSE}LCLType{$ENDIF}.MB_ICONQUESTION;
+  MB_ICONWARNING      = {$IFDEF MSWINDOWS}Windows{$ELSE}LCLType{$ENDIF}.MB_ICONWARNING;
+  MB_ICONERROR        = {$IFDEF MSWINDOWS}Windows{$ELSE}LCLType{$ENDIF}.MB_ICONERROR;
+
+  MB_DEFBUTTON1       = {$IFDEF MSWINDOWS}Windows{$ELSE}LCLType{$ENDIF}.MB_DEFBUTTON1;
+  MB_DEFBUTTON2       = {$IFDEF MSWINDOWS}Windows{$ELSE}LCLType{$ENDIF}.MB_DEFBUTTON2;
+  MB_DEFBUTTON3       = {$IFDEF MSWINDOWS}Windows{$ELSE}LCLType{$ENDIF}.MB_DEFBUTTON3;
+
+  IDOK     = {$IFDEF MSWINDOWS}Windows{$ELSE}LCLType{$ENDIF}.IDOK;
+  IDCANCEL = {$IFDEF MSWINDOWS}Windows{$ELSE}LCLType{$ENDIF}.IDCANCEL;
+  IDYES    = {$IFDEF MSWINDOWS}Windows{$ELSE}LCLType{$ENDIF}.IDYES;
+  IDNO     = {$IFDEF MSWINDOWS}Windows{$ELSE}LCLType{$ENDIF}.IDNO;
 
 const
   SID_IAIMPUIDPIAwareness = '{61756944-5049-4177-6172-656E65737300}';
@@ -33,6 +65,9 @@ const
 
   SID_IAIMPServiceUI = '{41494D50-5365-7276-6963-655549000000}';
   IID_IAIMPServiceUI: TGUID = SID_IAIMPServiceUI;
+
+  SID_IAIMPUITrayIcon = '{41494D50-5372-7654-7261-7949636F6E00}';
+  IID_IAIMPUITrayIcon: TGUID = SID_IAIMPUITrayIcon;
 
   SID_IAIMPUIImageList = '{61756949-6D67-4C69-7374-000000000000}';
   IID_IAIMPUIImageList: TGUID = SID_IAIMPUIImageList;
@@ -232,6 +267,12 @@ const
   SID_IAIMPUIWndProcEvents = '{61756957-6E64-5072-6F63-45766E747300}';
   IID_IAIMPUIWndProcEvents: TGUID = SID_IAIMPUIWndProcEvents;
 
+  SID_IAIMPUIAuthDialog = '{61756941-7574-6844-6C67-000000000000}';
+  IID_IAIMPUIAuthDialog: TGUID = SID_IAIMPUIAuthDialog;
+
+  SID_IAIMPUIAuthDialogEvents = '{61756941-7574-6844-6C67-45766E740000}';
+  IID_IAIMPUIAuthDialogEvents: TGUID = SID_IAIMPUIAuthDialogEvents;
+
 const
 //----------------------------------------------------------------------------------------------------------------------
 // Flags
@@ -250,6 +291,12 @@ const
   AIMPUI_FLAGS_BORDER_TOP    = 2;
   AIMPUI_FLAGS_BORDER_RIGHT  = 4;
   AIMPUI_FLAGS_BORDER_BOTTOM = 8;
+  AIMPUI_FLAGS_BORDERS_ALL =
+    AIMPUI_FLAGS_BORDER_LEFT or
+    AIMPUI_FLAGS_BORDER_TOP or
+    AIMPUI_FLAGS_BORDER_RIGHT or
+    AIMPUI_FLAGS_BORDER_BOTTOM;
+  AIMPUI_FLAGS_BORDERS_NONE = 0;
 
   // Font Style Flags
   AIMPUI_FLAGS_FONT_BOLD      = 1;
@@ -317,6 +364,15 @@ const
   AIMPUI_FLAGS_TL_GRIDLINE_VERTICAL   = 1;
   AIMPUI_FLAGS_TL_GRIDLINE_HORIZONTAL = 2;
 
+  // Check State
+  AIMPUI_CHECKSTATE_UNCHECKED = 0;
+  AIMPUI_CHECKSTATE_CHECKED   = 1;
+  AIMPUI_CHECKSTATE_MIXED     = 2;
+
+  // ComboBox Styles
+  AIMPUI_COMBOBOX_STYLE_EDIT = 0;
+  AIMPUI_COMBOBOX_STYLE_LIST = 1;
+
 //----------------------------------------------------------------------------------------------------------------------
 // Property IDs
 //----------------------------------------------------------------------------------------------------------------------
@@ -351,6 +407,10 @@ const
   AIMPUI_BBCBOX_PROPID_TEXT        = AIMPUI_WINCONTROL_MAX_PROPID + 2;
   AIMPUI_BBCBOX_PROPID_TRANSPARENT = AIMPUI_WINCONTROL_MAX_PROPID + 3;
   AIMPUI_BBCBOX_PROPID_WORDWRAP    = AIMPUI_WINCONTROL_MAX_PROPID + 4;
+  AIMPUI_BBCBOX_PROPID_AUTOSCROLL  = AIMPUI_WINCONTROL_MAX_PROPID + 5;
+  AIMPUI_BBCBOX_PROPID_TEXTALIGN   = AIMPUI_WINCONTROL_MAX_PROPID + 6;
+  AIMPUI_BBCBOX_PROPID_TEXTCOLOR   = AIMPUI_WINCONTROL_MAX_PROPID + 7;
+  AIMPUI_BBCBOX_PROPID_PADDING     = AIMPUI_WINCONTROL_MAX_PROPID + 8;
 
   // PropID for IAIMPUIBevel
   AIMPUI_BEVEL_PROPID_BORDERS = AIMPUI_CONTROL_MAX_PROPID + 1;
@@ -360,13 +420,14 @@ const
 
   // PropID for IAIMPUIButton
   AIMPUI_BUTTON_PROPID_CAPTION      = AIMPUI_WINCONTROL_MAX_PROPID + 1;
-  AIMPUI_BUTTON_PROPID_FOCUSONCLICK = AIMPUI_WINCONTROL_MAX_PROPID + 2;
+  AIMPUI_BUTTON_PROPID_FOCUSABLE    = AIMPUI_WINCONTROL_MAX_PROPID + 2;
   AIMPUI_BUTTON_PROPID_DEFAULT      = AIMPUI_WINCONTROL_MAX_PROPID + 3;
   AIMPUI_BUTTON_PROPID_DROPDOWNMENU = AIMPUI_WINCONTROL_MAX_PROPID + 4;
   AIMPUI_BUTTON_PROPID_IMAGEINDEX   = AIMPUI_WINCONTROL_MAX_PROPID + 5;
   AIMPUI_BUTTON_PROPID_IMAGELIST    = AIMPUI_WINCONTROL_MAX_PROPID + 6;
   AIMPUI_BUTTON_PROPID_MODALRESULT  = AIMPUI_WINCONTROL_MAX_PROPID + 7;
   AIMPUI_BUTTON_PROPID_STYLE        = AIMPUI_WINCONTROL_MAX_PROPID + 8;
+  AIMPUI_BUTTON_PROPID_TEXTSTYLE    = AIMPUI_WINCONTROL_MAX_PROPID + 9;
 
   // PropID for IAIMPUIBaseButtonnedEdit
   AIMPUI_BUTTONEDEDIT_PROPID_BUTTONSIMAGES = AIMPUI_BASEEDIT_MAX_PROPID + 1;
@@ -389,7 +450,7 @@ const
   // PropID for IAIMPUICheckBox and IAIMPUIRadioBox
   AIMPUI_CHECKBOX_PROPID_AUTOSIZE = AIMPUI_WINCONTROL_MAX_PROPID + 1;
   AIMPUI_CHECKBOX_PROPID_CAPTION  = AIMPUI_WINCONTROL_MAX_PROPID + 2;
-  AIMPUI_CHECKBOX_PROPID_STATE    = AIMPUI_WINCONTROL_MAX_PROPID + 3;
+  AIMPUI_CHECKBOX_PROPID_STATE    = AIMPUI_WINCONTROL_MAX_PROPID + 3; // ref.AIMPUI_CHECKSTATE_XXX
   AIMPUI_CHECKBOX_PROPID_WORDWRAP = AIMPUI_WINCONTROL_MAX_PROPID + 4;
 
   // PropID for IAIMPUIComboBox
@@ -397,7 +458,7 @@ const
   AIMPUI_COMBOBOX_PROPID_ITEMINDEX      = AIMPUI_BUTTONEDEDIT_MAX_PROPID + 2;
   AIMPUI_COMBOBOX_PROPID_ITEMOBJECT     = AIMPUI_BUTTONEDEDIT_MAX_PROPID + 3;
   AIMPUI_COMBOBOX_PROPID_TEXT           = AIMPUI_BUTTONEDEDIT_MAX_PROPID + 4;
-  AIMPUI_COMBOBOX_PROPID_STYLE          = AIMPUI_BUTTONEDEDIT_MAX_PROPID + 5;
+  AIMPUI_COMBOBOX_PROPID_STYLE          = AIMPUI_BUTTONEDEDIT_MAX_PROPID + 5; // ref.AIMPUI_COMBOBOX_STYLE_XXX
 
   // PropID for IAIMPUICheckComboBox
   AIMPUI_CHECKCOMBO_PROPID_TEXT      = AIMPUI_BUTTONEDEDIT_MAX_PROPID + 1;
@@ -411,7 +472,7 @@ const
   AIMPUI_GROUPBOX_PROPID_BORDERS     = AIMPUI_WINCONTROL_MAX_PROPID + 2;
   AIMPUI_GROUPBOX_PROPID_TRANSPARENT = AIMPUI_WINCONTROL_MAX_PROPID + 3;
   AIMPUI_GROUPBOX_PROPID_CHECKMODE   = AIMPUI_WINCONTROL_MAX_PROPID + 4;
-  AIMPUI_GROUPBOX_PROPID_CHECKED     = AIMPUI_WINCONTROL_MAX_PROPID + 5;
+  AIMPUI_GROUPBOX_PROPID_CHECKED     = AIMPUI_WINCONTROL_MAX_PROPID + 5; // ref.AIMPUI_CHECKSTATE_XXX
   AIMPUI_GROUPBOX_PROPID_CAPTION     = AIMPUI_WINCONTROL_MAX_PROPID + 6;
 
   // PropID for IAIMPUIImage
@@ -438,7 +499,7 @@ const
   AIMPUI_LABEL_MAX_PROPID            = AIMPUI_CONTROL_MAX_PROPID + 20;
 
   // PropID for IAIMPUIMemo
-  AIMPUI_MEMO_PROPID_CARET_XY = AIMPUI_BASEEDIT_MAX_PROPID + 1;
+  AIMPUI_MEMO_PROPID_CARET_XY      = AIMPUI_BASEEDIT_MAX_PROPID + 1;
 
   // PropID for IAIMPUITabSheet
   AIMPUI_TABSHEET_PROPID_CAPTION   = AIMPUI_WINCONTROL_MAX_PROPID + 1;
@@ -504,7 +565,7 @@ const
 
   // PropID for IAIMPUITreeListGroup
   AIMPUI_TL_GROUP_PROPID_CAPTION      = 1;
-  AIMPUI_TL_GROUP_PROPID_CHECKSTATE   = 2;
+  AIMPUI_TL_GROUP_PROPID_CHECKSTATE   = 2; // ref.AIMPUI_CHECKSTATE_XXX
   AIMPUI_TL_GROUP_PROPID_EXPANDED     = 3;
   AIMPUI_TL_GROUP_PROPID_INDEX        = 4;
   AIMPUI_TL_GROUP_PROPID_SELECTED     = 5;
@@ -513,7 +574,7 @@ const
   AIMPUI_TL_NODE_PROPID_ABS_VISIBLE_INDEX     = 0;
   AIMPUI_TL_NODE_PROPID_CHECK_ENABLED         = 1;
   AIMPUI_TL_NODE_PROPID_CHECKED               = 2;
-  AIMPUI_TL_NODE_PROPID_CHILDREN_CHECK_STATE  = 3;
+  AIMPUI_TL_NODE_PROPID_CHILDREN_CHECK_STATE  = 3; // ref.AIMPUI_CHECKSTATE_XXX
   AIMPUI_TL_NODE_PROPID_EXPANDED              = 4;
   AIMPUI_TL_NODE_PROPID_IMAGEINDEX            = 5;
   AIMPUI_TL_NODE_PROPID_INDEX                 = 6;
@@ -573,6 +634,13 @@ const
   AIMPUI_MODE_PROPID_DPI    = 2;
   AIMPUI_MODE_PROPID_STYLE  = 3;
 
+  // PropID for IAIMPUITrayIcon
+  AIMPUI_TRAYICON_ID        = 1; // IAIMPString
+  AIMPUI_TRAYICON_HINT      = 2; // IAIMPString
+  AIMPUI_TRAYICON_ICON      = 3; // IAIMPImage or IAIMPImageContainer or IAIMPStream
+  AIMPUI_TRAYICON_MENU      = 4; // IAIMPUIPopupMenu
+  AIMPUI_TRAYICON_VISIBLE   = 5;
+
 type
 //----------------------------------------------------------------------------------------------------------------------
 // Basic Interfaces
@@ -590,7 +658,7 @@ type
 
   IAIMPUIColorSchema = interface(IAIMPPropertyList)
   [SID_IAIMPUIColorSchema]
-    procedure ApplyToARGB(var ARGB: DWORD); stdcall;
+    procedure ApplyToARGB(var ARGB: LongWord); stdcall;
     procedure ApplyToColor(var Color: TColorRef); stdcall;
     procedure ApplyToColors(Colors: PRGBQuad; NumberOfColors: Integer); stdcall;
     procedure ApplyToImage(var Image: IAIMPImage); stdcall;
@@ -622,7 +690,7 @@ type
 
   IAIMPUIDrawEvents = interface
   [SID_IAIMPUIDrawEvents]
-    procedure OnDraw(Sender: IUnknown; DC: HDC; const R: TRect); stdcall;
+    procedure OnDraw(Sender: IUnknown; Canvas: HCANVAS; const R: TRect); stdcall;
   end;
 
   { IAIMPUIKeyboardEvents }
@@ -681,7 +749,6 @@ type
     AlignmentMargins: TRect;
     Anchors: TRect;
     Bounds: TRect;
-  {$IF CompilerVersion > 20}
     constructor Create(AAlignment: TAIMPUIControlAlignment; ASize: Integer); overload;
     constructor Create(AAlignment: TAIMPUIControlAlignment; ASize: Integer; const AAlignmentMargins: TRect); overload;
     constructor Create(AAlignment: TAIMPUIControlAlignment; const ABounds, AAlignmentMargins: TRect); overload;
@@ -689,7 +756,6 @@ type
     constructor Create(const ABounds, AAnchors: TRect); overload;
     constructor Create(const ABounds: TRect); overload;
     procedure Reset;
-  {$IFEND}
   end;
 
   { TAIMPUIControlPlacementConstraints }
@@ -699,12 +765,9 @@ type
     MaxWidth: Integer;
     MinHeight: Integer;
     MinWidth: Integer;
-
-  {$IF CompilerVersion > 20}
     constructor Create(AMinWidth, AMinHeight, AMaxWidth, AMaxHeight: Integer); overload;
     constructor CreateMaxSize(AMaxWidth, AMaxHeight: Integer); overload;
     constructor CreateMinSize(AMinWidth, AMinHeight: Integer); overload;
-  {$IFEND}
   end;
 
   { IAIMPUIControl }
@@ -722,7 +785,7 @@ type
     function ScreenToClient(var P: TPoint): HRESULT; stdcall;
 
     // Drawing
-    function PaintTo(DC: HDC; X, Y: Integer): HRESULT; stdcall;
+    function PaintTo(Canvas: HCANVAS; X, Y: Integer): HRESULT; stdcall;
     function Invalidate: HRESULT; stdcall;
   end;
 
@@ -741,9 +804,11 @@ type
 
   IAIMPUIWndProcEvents = interface
   [SID_IAIMPUIWndProcEvents]
-    function OnBeforeWndProc(Message: Cardinal; ParamW: WPARAM; ParamL: LPARAM; var Result: LRESULT): LongBool; stdcall;
-    procedure OnAfterWndProc(Message: Cardinal; ParamW: WPARAM; ParamL: LPARAM; var Result: LRESULT); stdcall;
-  end;
+    function OnBeforeWndProc(Message: LongWord; ParamW: WPARAM;
+      ParamL: LPARAM; var Result: LRESULT): LongBool; stdcall;
+    procedure OnAfterWndProc(Message: LongWord; ParamW: WPARAM;
+      ParamL: LPARAM; var Result: LRESULT); stdcall;
+  end deprecated;
 
 //----------------------------------------------------------------------------------------------------------------------
 // Non-Visual Components Interfaces
@@ -756,8 +821,8 @@ type
     function Add(Image: IAIMPImage): HRESULT; stdcall;
     function Clear: HRESULT; stdcall;
     function Delete(Index: Integer): HRESULT; stdcall;
-    function Draw(DC: HDC; Index, X, Y: Integer; Enabled: LongBool): HRESULT; stdcall;
-    function LoadFromResource(Instance: THandle; ResName, ResType: PWideChar): HRESULT; stdcall;
+    function Draw(Canvas: HCANVAS; Index, X, Y: Integer; Enabled: LongBool): HRESULT; stdcall;
+    function LoadFromResource(Instance: HMODULE; ResName, ResType: PChar): HRESULT; stdcall;
     function GetCount: Integer; stdcall;
     function GetSize(out Size: TSize): HRESULT; stdcall;
     function SetSize(Size: TSize): HRESULT; stdcall;
@@ -767,7 +832,7 @@ type
 
   IAIMPUIImageList2 = interface
   [SID_IAIMPUIImageList2]
-    function DrawEx(DC: HDC; Index: Integer; const R: TRect; Enabled: LongBool): HRESULT; stdcall;
+    function DrawEx(Canvas: HCANVAS; Index: Integer; const R: TRect; Enabled: LongBool): HRESULT; stdcall;
   end;
 
   { IAIMPUIMenuItem }
@@ -791,6 +856,13 @@ type
     function GetCount: Integer; stdcall;
     function Popup(ScreenPoint: TPoint): HRESULT; stdcall;
     function Popup2(ScreenRect: TRect): HRESULT; stdcall;
+  end;
+
+  { IAIMPUITrayIcon }
+
+  IAIMPUITrayIcon = interface(IAIMPPropertyList)
+  [SID_IAIMPUITrayIcon]
+    function Notify(Title, Message: IAIMPString; Reserved: LongWord): HRESULT; stdcall;
   end;
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -1055,8 +1127,10 @@ type
     // Nodes
     function Add(out Node: IAIMPUITreeListNode): HRESULT; stdcall;
     function ClearChildren: HRESULT; stdcall;
-    function FindByTag(Tag: NativeUInt; Recursive: LongBool; const IID: TGUID; out Node): HRESULT; stdcall;
-    function FindByValue(ColumnIndex: Integer; Value: IAIMPString; Recursive: LongBool; const IID: TGUID; out Node): HRESULT; stdcall;
+    function FindByTag(Tag: NativeUInt; Recursive: LongBool;
+      const IID: TGUID; out Node): HRESULT; stdcall;
+    function FindByValue(ColumnIndex: Integer; Value: IAIMPString;
+      Recursive: LongBool; const IID: TGUID; out Node): HRESULT; stdcall;
     function Get(Index: Integer; const IID: TGUID; out Obj): HRESULT; stdcall;
     function GetCount: Integer; stdcall;
 
@@ -1117,7 +1191,8 @@ type
     // Sorting
     function ResetSortingParams: HRESULT; stdcall;
     function Resort: HRESULT; stdcall;
-    function SortBy(Column: IAIMPUITreeListColumn; Flags: DWORD; ResetPrevSortingParams: LongBool = False): HRESULT; stdcall;
+    function SortBy(Column: IAIMPUITreeListColumn; Flags: LongWord;
+      ResetPrevSortingParams: LongBool = False): HRESULT; stdcall;
 
     // Customized Settings
     function ConfigLoad(Config: IAIMPConfig; Key: IAIMPString): HRESULT; stdcall;
@@ -1129,26 +1204,29 @@ type
   IAIMPUITreeListDragSortingEvents = interface(IUnknown)
   [SID_IAIMPUITreeListDragSortingEvents]
     procedure OnDragSorting(Sender: IAIMPUITreeList); stdcall;
-    procedure OnDragSortingNodeOver(Sender: IAIMPUITreeList; Node: IAIMPUITreeListNode; Flags: DWORD; var Handled: LongBool); stdcall;
+    procedure OnDragSortingNodeOver(Sender: IAIMPUITreeList;
+      Node: IAIMPUITreeListNode; Flags: LongWord; var Handled: LongBool); stdcall;
   end;
 
   { IAIMPUITreeListCustomDrawEvents }
 
   IAIMPUITreeListCustomDrawEvents = interface(IUnknown)
   [SID_IAIMPUITreeListCustomDrawEvents]
-    procedure OnCustomDrawNode(Sender: IAIMPUITreeList; DC: HDC; R: TRect;
+    procedure OnCustomDrawNode(Sender: IAIMPUITreeList; Canvas: HCANVAS; R: TRect;
       Node: IAIMPUITreeListNode; var Handled: LongBool); stdcall;
-    procedure OnCustomDrawNodeCell(Sender: IAIMPUITreeList; DC: HDC; R: TRect;
+    procedure OnCustomDrawNodeCell(Sender: IAIMPUITreeList; Canvas: HCANVAS; R: TRect;
       Node: IAIMPUITreeListNode; Column: IAIMPUITreeListColumn; var Handled: LongBool); stdcall;
-    procedure OnGetNodeBackground(Sender: IAIMPUITreeList; Node: IAIMPUITreeListNode; var Color: DWORD); stdcall;
+    procedure OnGetNodeBackground(Sender: IAIMPUITreeList; Node: IAIMPUITreeListNode; var Color: LongWord); stdcall;
   end;
 
   { IAIMPUITreeListInplaceEditingEvents }
 
   IAIMPUITreeListInplaceEditingEvents = interface(IUnknown)
   [SID_IAIMPUITreeListInplaceEditingEvents]
-    procedure OnEditing(Sender: IAIMPUITreeList; Node: IAIMPUITreeListNode; ColumnIndex: Integer; var Allow: LongBool); stdcall;
-    procedure OnEdited(Sender: IAIMPUITreeList; Node: IAIMPUITreeListNode; ColumnIndex: Integer; var Value: IAIMPString); stdcall;
+    procedure OnEditing(Sender: IAIMPUITreeList; Node: IAIMPUITreeListNode;
+      ColumnIndex: Integer; var Allow: LongBool); stdcall;
+    procedure OnEdited(Sender: IAIMPUITreeList; Node: IAIMPUITreeListNode;
+      ColumnIndex: Integer; var Value: IAIMPString); stdcall;
   end;
 
   { IAIMPUITreeListEvents }
@@ -1223,20 +1301,40 @@ type
 // Dialogs
 //----------------------------------------------------------------------------------------------------------------------
 
+  { IAIMPUIAuthDialog }
+
+  IAIMPUIAuthDialog = interface
+  [SID_IAIMPUIAuthDialog]
+    function Execute(OwnerWnd: HWND; Title, Text: IAIMPString;
+      EventsHandler: IUnknown; Flags: LongWord): HRESULT; stdcall;
+  end;
+
+  { IAIMPUIAuthDialogEvents }
+
+  IAIMPUIAuthDialogEvents = interface
+  [SID_IAIMPUIAuthDialogEvents]
+    function OnParse(Params: IAIMPString; out ErrorText: IAIMPString): HRESULT; stdcall;
+    function OnRequestUrl(out Url: IAIMPString): HRESULT; stdcall;
+  end;
+
   { IAIMPUIBrowseFolderDialog }
 
   IAIMPUIBrowseFolderDialog = interface
   [SID_IAIMPUIBrowseFolderDialog]
-    function Execute(OwnerWnd: HWND; Flags: DWORD; DefaultPath: IAIMPString; out Selection: IAIMPObjectList): HRESULT; stdcall;
+    function Execute(OwnerWnd: HWND; Flags: LongWord;
+      DefaultPath: IAIMPString; out Selection: IAIMPObjectList): HRESULT; stdcall;
   end;
 
   { IAIMPUIFileDialogs }
 
   IAIMPUIFileDialogs = interface
   [SID_IAIMPUIFileDialogs]
-    function ExecuteOpenDialog(OwnerWnd: HWND; Caption, Filter: IAIMPString; out FileName: IAIMPString): HRESULT; stdcall;
-    function ExecuteOpenDialog2(OwnerWnd: HWND; Caption, Filter: IAIMPString; out Files: IAIMPObjectList): HRESULT; stdcall;
-    function ExecuteSaveDialog(OwnerWnd: HWND; Caption, Filter: IAIMPString; var FileName: IAIMPString; out FilterIndex: Integer): HRESULT; stdcall;
+    function ExecuteOpenDialog(OwnerWnd: HWND;
+      Caption, Filter: IAIMPString; out FileName: IAIMPString): HRESULT; stdcall;
+    function ExecuteOpenDialog2(OwnerWnd: HWND;
+      Caption, Filter: IAIMPString; out Files: IAIMPObjectList): HRESULT; stdcall;
+    function ExecuteSaveDialog(OwnerWnd: HWND;
+      Caption, Filter: IAIMPString; var FileName: IAIMPString; out FilterIndex: Integer): HRESULT; stdcall;
   end;
 
   { IAIMPUIInputDialog }
@@ -1246,7 +1344,8 @@ type
     function Execute(OwnerWnd: HWND; Caption: IAIMPString;
       EventsHandler: IUnknown; Text: IAIMPString; var Value: OleVariant): HRESULT; stdcall;
     function Execute2(OwnerWnd: HWND; Caption: IAIMPString;
-      EventsHandler: IUnknown; TextForValues: IAIMPObjectList; Values: POleVariant; ValueCount: Integer): HRESULT; stdcall;
+      EventsHandler: IUnknown; TextForValues: IAIMPObjectList;
+      Values: POleVariant; ValueCount: Integer): HRESULT; stdcall;
   end;
 
   { IAIMPUIInputDialogEvents }
@@ -1260,7 +1359,7 @@ type
 
   IAIMPUIMessageDialog = interface
   [SID_IAIMPUIMessageDialog]
-    function Execute(OwnerWnd: HWND; Caption, Text: IAIMPString; Flags: DWORD): HRESULT; stdcall;
+    function Execute(OwnerWnd: HWND; Caption, Text: IAIMPString; Flags: LongWord): HRESULT; stdcall;
   end;
 
   { IAIMPUIProgressDialog }
@@ -1294,7 +1393,7 @@ type
   [SID_IAIMPServiceUI]
     function CreateControl(Owner: IAIMPUIForm; Parent: IAIMPUIWinControl; Name: IAIMPString;
       EventsHandler: IUnknown; const IID: TGUID; out Control): HRESULT; stdcall;
-    function CreateForm(OwnerWindow: HWND; Flags: DWORD; Name: IAIMPString;
+    function CreateForm(OwnerWindow: HWND; Flags: LongWord; Name: IAIMPString;
       EventsHandler: IUnknown; out Form: IAIMPUIForm): HRESULT; stdcall;
     function CreateObject(Owner: IAIMPUIForm; EventsHandler: IUnknown; const IID: TGUID; out Obj): HRESULT; stdcall;
   end;
@@ -1303,9 +1402,8 @@ implementation
 
 { TAIMPUIControlPlacement }
 
-{$IF CompilerVersion > 20}
-
-constructor TAIMPUIControlPlacement.Create(AAlignment: TAIMPUIControlAlignment; ASize: Integer);
+constructor TAIMPUIControlPlacement.Create(
+  AAlignment: TAIMPUIControlAlignment; ASize: Integer);
 var
   R: TRect;
 begin
@@ -1317,19 +1415,24 @@ begin
   Create(AAlignment, R);
 end;
 
-constructor TAIMPUIControlPlacement.Create(AAlignment: TAIMPUIControlAlignment; ASize: Integer; const AAlignmentMargins: TRect);
+constructor TAIMPUIControlPlacement.Create(
+  AAlignment: TAIMPUIControlAlignment;
+  ASize: Integer; const AAlignmentMargins: TRect);
 begin
   Create(AAlignment, ASize);
   AlignmentMargins := AAlignmentMargins;
 end;
 
-constructor TAIMPUIControlPlacement.Create(AAlignment: TAIMPUIControlAlignment; const ABounds, AAlignmentMargins: TRect);
+constructor TAIMPUIControlPlacement.Create(
+  AAlignment: TAIMPUIControlAlignment;
+  const ABounds, AAlignmentMargins: TRect);
 begin
   Create(AAlignment, ABounds);
   AlignmentMargins := AAlignmentMargins;
 end;
 
-constructor TAIMPUIControlPlacement.Create(AAlignment: TAIMPUIControlAlignment; const ABounds: TRect);
+constructor TAIMPUIControlPlacement.Create(
+  AAlignment: TAIMPUIControlAlignment; const ABounds: TRect);
 begin
   Reset;
   Alignment := AAlignment;
@@ -1375,5 +1478,4 @@ begin
   Create(AMinWidth, AMinHeight, 0, 0);
 end;
 
-{$IFEND}
 end.

@@ -1,23 +1,24 @@
-/************************************************/
-/*                                              */
-/*          AIMP Programming Interface          */
-/*               v5.30 build 2500               */
-/*                                              */
-/*                Artem Izmaylov                */
-/*                (C) 2006-2023                 */
-/*                 www.aimp.ru                  */
-/*               support@aimp.ru                */
-/*                                              */
-/************************************************/
-
+////////////////////////////////////////////////////////////////////////////////
+//
+//  Project:   AIMP
+//             Programming Interface
+//
+//  Target:    v5.40 build 2650
+//
+//  Purpose:   Tags Library API
+//
+//  Author:    Artem Izmaylov
+//             © 2006-2025
+//             www.aimp.ru
+//
 #ifndef apiTagEditorH
 #define apiTagEditorH
 
-#include <windows.h>
 #include <unknwn.h>
 #include "apiObjects.h"
 #include "apiFileManager.h"
 #include "apiThreading.h"
+#include "apiTypes.h"
 
 static const GUID IID_IAIMPFileTag 		        = {0x41494D50, 0x4669, 0x6C65, 0x54, 0x61, 0x67, 0x00, 0x00, 0x00, 0x00, 0x00};
 static const GUID IID_IAIMPFileTagEditor        = {0x41494D50, 0x4669, 0x6C65, 0x54, 0x61, 0x67, 0x45, 0x64, 0x69, 0x74, 0x00};

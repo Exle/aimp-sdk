@@ -1,14 +1,18 @@
-﻿{*********************************************}
-{*                                           *}
-{*        AIMP Programming Interface         *}
-{*                v5.30.2500                 *}
-{*                                           *}
-{*            (c) Artem Izmaylov             *}
-{*                 2006-2023                 *}
-{*                www.aimp.ru                *}
-{*                                           *}
-{*********************************************}
-
+﻿////////////////////////////////////////////////////////////////////////////////
+//
+//  Project:   AIMP
+//             Programming Interface
+//
+//  Target:    v5.40 build 2650
+//
+//  Purpose:   MusicLibrary API
+//
+//  Author:    Artem Izmaylov
+//             © 2006-2025
+//             www.aimp.ru
+//
+//  FPC:       OK
+//
 unit apiMusicLibrary;
 
 {$I apiConfig.inc}
@@ -16,14 +20,12 @@ unit apiMusicLibrary;
 interface
 
 uses
-  Windows,
-  ActiveX,
-  // API
   apiObjects,
   apiActions,
   apiAlbumArt,
   apiPlaylists,
-  apiFileManager;
+  apiFileManager,
+  apiTypes;
 
 const
   SID_IAIMPServiceMusicLibrary = '{41494D50-5372-764D-4C00-000000000000}';
@@ -319,7 +321,7 @@ type
 
   IAIMPMLDataFieldDisplayValue = interface
   [SID_IAIMPMLDataFieldDisplayValue]
-    function GetDisplayValue(const Value: OleVariant; out Length: Integer): PWideChar; stdcall;
+    function GetDisplayValue(const Value: OleVariant; out Length: Integer): PChar; stdcall;
   end;
 
   { IAIMPMLDataFieldFilter }
@@ -439,7 +441,7 @@ type
     function GetValueAsFloat(FieldIndex: Integer): Double; stdcall;
     function GetValueAsInt32(FieldIndex: Integer): Integer; stdcall;
     function GetValueAsInt64(FieldIndex: Integer): Int64; stdcall;
-    function GetValueAsString(FieldIndex: Integer; out Length: Integer): PWideChar; stdcall;
+    function GetValueAsString(FieldIndex: Integer; out Length: Integer): PChar; stdcall;
     function NextRow: LongBool; stdcall;
     // Deprecated, use IAIMPMLDataProvider2 instead
     // function HasNextPage: LongBool; stdcall;
@@ -458,7 +460,7 @@ type
   IAIMPMLGroupingTreeDataProviderSelection = interface
   [SID_IAIMPMLGroupingTreeDataProviderSelection]
     function GetDisplayValue(out S: IAIMPString): HRESULT; stdcall;
-    function GetFlags: DWORD; stdcall;
+    function GetFlags: LongWord; stdcall;
     function GetImageIndex(out Index: Integer): HRESULT; stdcall;
     function GetValue(out FieldName: IAIMPString; out Value: OleVariant): HRESULT; stdcall;
     function NextRecord: LongBool; stdcall;
@@ -468,9 +470,11 @@ type
 
   IAIMPMLGroupingTreeDataProvider = interface
   [SID_IAIMPMLGroupingTreeDataProvider]
-    function AppendFilter(Filter: IAIMPMLDataFilterGroup; Selection: IAIMPMLGroupingTreeSelection): HRESULT; stdcall;
-    function GetCapabilities: DWORD; stdcall;
-    function GetData(Selection: IAIMPMLGroupingTreeSelection; out Data: IAIMPMLGroupingTreeDataProviderSelection): HRESULT; stdcall;
+    function AppendFilter(Filter: IAIMPMLDataFilterGroup;
+      Selection: IAIMPMLGroupingTreeSelection): HRESULT; stdcall;
+    function GetCapabilities: LongWord; stdcall;
+    function GetData(Selection: IAIMPMLGroupingTreeSelection;
+      out Data: IAIMPMLGroupingTreeDataProviderSelection): HRESULT; stdcall;
     function GetFieldForAlphabeticIndex(out FieldName: IAIMPString): HRESULT; stdcall;
   end;
 
@@ -478,7 +482,7 @@ type
 
   IAIMPMLGroupingTreeDataProvider2 = interface(IAIMPMLGroupingTreeDataProvider)
   [SID_IAIMPMLGroupingTreeDataProvider2]
-    function GetPathSeparator: WideChar; stdcall;
+    function GetPathSeparator: Char; stdcall;
   end;
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -505,11 +509,11 @@ type
     function BeginUpdate: HRESULT; stdcall;
     function EndUpdate: HRESULT; stdcall;
 
-    function Add(ID, Name: IAIMPString; Reserved: Cardinal;
+    function Add(ID, Name: IAIMPString; Reserved: LongWord;
       Provider: IAIMPMLGroupingTreeDataProvider; out Preset: IAIMPMLGroupingPreset): HRESULT; stdcall;
-    function Add2(ID, Name: IAIMPString; Reserved: Cardinal;
+    function Add2(ID, Name: IAIMPString; Reserved: LongWord;
       FieldNames: IAIMPObjectList; out Preset: IAIMPMLGroupingPresetStandard): HRESULT; stdcall;
-    function Add3(ID, Name: IAIMPString; Reserved: Cardinal;
+    function Add3(ID, Name: IAIMPString; Reserved: LongWord;
       FieldName: IAIMPString; out Preset: IAIMPMLGroupingPresetStandard): HRESULT; stdcall;
     function Delete(Index: Integer): HRESULT; stdcall;
     function Get(Index: Integer; const IID: TGUID; out Obj): HRESULT; stdcall;
@@ -647,7 +651,7 @@ type
 
   IAIMPServiceMusicLibraryUI = interface
   [SID_IAIMPServiceMusicLibraryUI]
-    function GetFiles(Flags: DWORD; out List: IAIMPMLFileList): HRESULT; stdcall;
+    function GetFiles(Flags: LongWord; out List: IAIMPMLFileList): HRESULT; stdcall;
     function GetGroupingFilter(out Filter: IAIMPMLDataFilter): HRESULT; stdcall;
     function GetGroupingFilterPath(out Path: IAIMPString): HRESULT; stdcall;
     function SetGroupingFilterPath(Path: IAIMPString): HRESULT; stdcall;

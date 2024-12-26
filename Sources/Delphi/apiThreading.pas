@@ -1,14 +1,18 @@
-﻿{*********************************************}
-{*                                           *}
-{*        AIMP Programming Interface         *}
-{*                v5.30.2500                 *}
-{*                                           *}
-{*            (c) Artem Izmaylov             *}
-{*                 2006-2023                 *}
-{*                www.aimp.ru                *}
-{*                                           *}
-{*********************************************}
-
+﻿////////////////////////////////////////////////////////////////////////////////
+//
+//  Project:   AIMP
+//             Programming Interface
+//
+//  Target:    v5.40 build 2650
+//
+//  Purpose:   ThreadPool API
+//
+//  Author:    Artem Izmaylov
+//             © 2006-2025
+//             www.aimp.ru
+//
+//  FPC:       OK
+//
 unit apiThreading;
 
 {$I apiConfig.inc}
@@ -16,7 +20,7 @@ unit apiThreading;
 interface
 
 uses
-  Windows;
+  apiTypes;
 
 const
   SID_IAIMPTask = '{41494D50-5461-736B-3200-000000000000}';
@@ -67,10 +71,10 @@ type
 
   IAIMPServiceThreads = interface(IUnknown)
   [SID_IAIMPServiceThreads]
-    function ExecuteInMainThread(Task: IAIMPTask; Flags: DWORD): HRESULT; stdcall;
-    function ExecuteInThread(Task: IAIMPTask; out TaskHandle: THandle): HRESULT; stdcall;
-    function Cancel(TaskHandle: THandle; Flags: DWORD): HRESULT; stdcall;
-    function WaitFor(TaskHandle: THandle): HRESULT; stdcall;
+    function ExecuteInMainThread(Task: IAIMPTask; Flags: LongWord): HRESULT; stdcall;
+    function ExecuteInThread(Task: IAIMPTask; out TaskHandle: TTaskHandle): HRESULT; stdcall;
+    function Cancel(TaskHandle: TTaskHandle; Flags: LongWord): HRESULT; stdcall;
+    function WaitFor(TaskHandle: TTaskHandle): HRESULT; stdcall;
   end;
 
 implementation

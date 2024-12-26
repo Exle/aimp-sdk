@@ -1,24 +1,28 @@
-/************************************************/
-/*                                              */
-/*          AIMP Programming Interface          */
-/*               v5.30 build 2500               */
-/*                                              */
-/*                Artem Izmaylov                */
-/*                (C) 2006-2023                 */
-/*                 www.aimp.ru                  */
-/*               support@aimp.ru                */
-/*                                              */
-/************************************************/
-
+////////////////////////////////////////////////////////////////////////////////
+//
+//  Project:   AIMP
+//             Programming Interface
+//
+//  Target:    v5.40 build 2650
+//
+//  Purpose:   GUI API
+//
+//  Author:    Artem Izmaylov
+//             © 2006-2025
+//             www.aimp.ru
+//
 #ifndef apiGUIH
 #define apiGUIH
 
-#include <windows.h>
 #include <unknwn.h>
 #include "apiObjects.h"
 #include "apiMenu.h"
+#include "apiTypes.h"
 
 static const GUID IID_IAIMPServiceUI = {0x41494D50, 0x5365, 0x7276, 0x69, 0x63, 0x65, 0x55, 0x49, 0x00, 0x00, 0x00};
+
+static const GUID IID_IAIMPUIAuthDialog = {0x61756941, 0x7574, 0x6844, 0x6C, 0x67, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
+static const GUID IID_IAIMPUIAuthDialogEvents = {0x61756941, 0x7574, 0x6844, 0x6C, 0x67, 0x45, 0x76, 0x6E, 0x74, 0x00, 0x00};
 static const GUID IID_IAIMPUIBaseButtonnedEdit = {0x61756942, 0x6173, 0x6542, 0x74, 0x6E, 0x45, 0x64, 0x69, 0x74, 0x00, 0x00};
 static const GUID IID_IAIMPUIBaseComboBox = {0x61756942, 0x6173, 0x6543, 0x6F, 0x6D, 0x62, 0x6F, 0x00, 0x00, 0x00, 0x00};
 static const GUID IID_IAIMPUIBaseEdit = {0x61756942, 0x6173, 0x6545, 0x64, 0x69, 0x74, 0x00, 0x00, 0x00, 0x00, 0x00};
@@ -77,6 +81,7 @@ static const GUID IID_IAIMPUITabControl = {0x61756954, 0x6162, 0x4374, 0x72, 0x6
 static const GUID IID_IAIMPUITabControlEvents = {0x61756954, 0x6162, 0x4374, 0x72, 0x6C, 0x45, 0x76, 0x6E, 0x74, 0x73, 0x00};
 static const GUID IID_IAIMPUITabSheet = {0x61756954, 0x6162, 0x5368, 0x65, 0x65, 0x74, 0x00, 0x00, 0x00, 0x00, 0x00};
 static const GUID IID_IAIMPUITimeEdit = {0x61756954, 0x696D, 0x6545, 0x64, 0x69, 0x74, 0x00, 0x00, 0x00, 0x00, 0x00};
+static const GUID IID_IAIMPUITrayIcon = {0x41494D50, 0x5372, 0x7654, 0x72, 0x61, 0x79, 0x49, 0x63, 0x6F, 0x6E, 0x00};
 static const GUID IID_IAIMPUITreeList = {0x61756954, 0x4C00, 0x0000, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
 static const GUID IID_IAIMPUITreeListColumn = {0x61756954, 0x4C43, 0x6F6C, 0x75, 0x6D, 0x6E, 0x00, 0x00, 0x00, 0x00, 0x00};
 static const GUID IID_IAIMPUITreeListCustomDrawEvents = {0x61756954, 0x4C44, 0x7261, 0x77, 0x45, 0x76, 0x6E, 0x74, 0x73, 0x00, 0x00};
@@ -88,7 +93,6 @@ static const GUID IID_IAIMPUITreeListNode = {0x61756954, 0x4C4E, 0x6F64, 0x65, 0
 static const GUID IID_IAIMPUIValidationLabel = {0x61756956, 0x616C, 0x6964, 0x4C, 0x61, 0x62, 0x65, 0x6C, 0x00, 0x00, 0x00};
 static const GUID IID_IAIMPUIWinControl = {0x61756957, 0x696E, 0x4374, 0x72, 0x6C, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
 static const GUID IID_IAIMPUIWndProcEvents = {0x61756957, 0x6E64, 0x5072, 0x6F, 0x63, 0x45, 0x76, 0x6E, 0x74, 0x73, 0x00};
-
 
 /*----------------------------------------------------------------------------------------------------------------------*/
 /* Flags																												   */
@@ -106,6 +110,10 @@ static const GUID IID_IAIMPUIWndProcEvents = {0x61756957, 0x6E64, 0x5072, 0x6F, 
   const int AIMPUI_FLAGS_BORDER_TOP    = 2;
   const int AIMPUI_FLAGS_BORDER_RIGHT  = 4;
   const int AIMPUI_FLAGS_BORDER_BOTTOM = 8;
+  const int AIMPUI_FLAGS_BORDERS_ALL =
+  	AIMPUI_FLAGS_BORDER_LEFT  | AIMPUI_FLAGS_BORDER_TOP |
+	AIMPUI_FLAGS_BORDER_RIGHT | AIMPUI_FLAGS_BORDER_BOTTOM;
+  const int AIMPUI_FLAGS_BORDERS_NONE = 0;
 
   // Font Style Flags
   const int AIMPUI_FLAGS_FONT_BOLD      = 1;
@@ -173,6 +181,15 @@ static const GUID IID_IAIMPUIWndProcEvents = {0x61756957, 0x6E64, 0x5072, 0x6F, 
   const int AIMPUI_FLAGS_TL_GRIDLINE_VERTICAL   = 1;
   const int AIMPUI_FLAGS_TL_GRIDLINE_HORIZONTAL = 2;
 
+  // Check State
+  const int AIMPUI_CHECKSTATE_UNCHECKED = 0;
+  const int AIMPUI_CHECKSTATE_CHECKED   = 1;
+  const int AIMPUI_CHECKSTATE_MIXED     = 2;
+
+  // ComboBox Styles
+  const int AIMPUI_COMBOBOX_STYLE_EDIT = 0;
+  const int AIMPUI_COMBOBOX_STYLE_LIST = 1;
+
 /*----------------------------------------------------------------------------------------------------------------------*/
 /* Property IDs																											   */
 /*----------------------------------------------------------------------------------------------------------------------*/
@@ -207,6 +224,10 @@ static const GUID IID_IAIMPUIWndProcEvents = {0x61756957, 0x6E64, 0x5072, 0x6F, 
   const int AIMPUI_BBCBOX_PROPID_TEXT        = AIMPUI_WINCONTROL_MAX_PROPID + 2;
   const int AIMPUI_BBCBOX_PROPID_TRANSPARENT = AIMPUI_WINCONTROL_MAX_PROPID + 3;
   const int AIMPUI_BBCBOX_PROPID_WORDWRAP    = AIMPUI_WINCONTROL_MAX_PROPID + 4;
+  const int AIMPUI_BBCBOX_PROPID_AUTOSCROLL  = AIMPUI_WINCONTROL_MAX_PROPID + 5;
+  const int AIMPUI_BBCBOX_PROPID_TEXTALIGN   = AIMPUI_WINCONTROL_MAX_PROPID + 6;
+  const int AIMPUI_BBCBOX_PROPID_TEXTCOLOR   = AIMPUI_WINCONTROL_MAX_PROPID + 7;
+  const int AIMPUI_BBCBOX_PROPID_PADDING     = AIMPUI_WINCONTROL_MAX_PROPID + 8;
 
   // PropID for IAIMPUIBevel
   const int AIMPUI_BEVEL_PROPID_BORDERS = AIMPUI_CONTROL_MAX_PROPID + 1;
@@ -216,13 +237,14 @@ static const GUID IID_IAIMPUIWndProcEvents = {0x61756957, 0x6E64, 0x5072, 0x6F, 
 
   // PropID for IAIMPUIButton
   const int AIMPUI_BUTTON_PROPID_CAPTION      = AIMPUI_WINCONTROL_MAX_PROPID + 1;
-  const int AIMPUI_BUTTON_PROPID_FOCUSONCLICK = AIMPUI_WINCONTROL_MAX_PROPID + 2;
+  const int AIMPUI_BUTTON_PROPID_FOCUSABLE    = AIMPUI_WINCONTROL_MAX_PROPID + 2;
   const int AIMPUI_BUTTON_PROPID_DEFAULT      = AIMPUI_WINCONTROL_MAX_PROPID + 3;
   const int AIMPUI_BUTTON_PROPID_DROPDOWNMENU = AIMPUI_WINCONTROL_MAX_PROPID + 4;
   const int AIMPUI_BUTTON_PROPID_IMAGEINDEX   = AIMPUI_WINCONTROL_MAX_PROPID + 5;
   const int AIMPUI_BUTTON_PROPID_IMAGELIST    = AIMPUI_WINCONTROL_MAX_PROPID + 6;
   const int AIMPUI_BUTTON_PROPID_MODALRESULT  = AIMPUI_WINCONTROL_MAX_PROPID + 7;
   const int AIMPUI_BUTTON_PROPID_STYLE        = AIMPUI_WINCONTROL_MAX_PROPID + 8;
+  const int AIMPUI_BUTTON_PROPID_TEXTSTYLE    = AIMPUI_WINCONTROL_MAX_PROPID + 9;
 
   // PropID for IAIMPUIBaseButtonnedEdit
   const int AIMPUI_BUTTONEDEDIT_PROPID_BUTTONSIMAGES = AIMPUI_BASEEDIT_MAX_PROPID + 1;
@@ -245,7 +267,7 @@ static const GUID IID_IAIMPUIWndProcEvents = {0x61756957, 0x6E64, 0x5072, 0x6F, 
   // PropID for IAIMPUICheckBox and IAIMPUIRadioBox
   const int AIMPUI_CHECKBOX_PROPID_AUTOSIZE = AIMPUI_WINCONTROL_MAX_PROPID + 1;
   const int AIMPUI_CHECKBOX_PROPID_CAPTION  = AIMPUI_WINCONTROL_MAX_PROPID + 2;
-  const int AIMPUI_CHECKBOX_PROPID_STATE    = AIMPUI_WINCONTROL_MAX_PROPID + 3;
+  const int AIMPUI_CHECKBOX_PROPID_STATE    = AIMPUI_WINCONTROL_MAX_PROPID + 3; // ref.AIMPUI_CHECKSTATE_XXX
   const int AIMPUI_CHECKBOX_PROPID_WORDWRAP = AIMPUI_WINCONTROL_MAX_PROPID + 4;
 
   // PropID for IAIMPUIComboBox
@@ -253,7 +275,7 @@ static const GUID IID_IAIMPUIWndProcEvents = {0x61756957, 0x6E64, 0x5072, 0x6F, 
   const int AIMPUI_COMBOBOX_PROPID_ITEMINDEX      = AIMPUI_BUTTONEDEDIT_MAX_PROPID + 2;
   const int AIMPUI_COMBOBOX_PROPID_ITEMOBJECT     = AIMPUI_BUTTONEDEDIT_MAX_PROPID + 3;
   const int AIMPUI_COMBOBOX_PROPID_TEXT           = AIMPUI_BUTTONEDEDIT_MAX_PROPID + 4;
-  const int AIMPUI_COMBOBOX_PROPID_STYLE          = AIMPUI_BUTTONEDEDIT_MAX_PROPID + 5;
+  const int AIMPUI_COMBOBOX_PROPID_STYLE          = AIMPUI_BUTTONEDEDIT_MAX_PROPID + 5; // ref.AIMPUI_COMBOBOX_STYLE_XXX
 
   // PropID for IAIMPUICheckComboBox
   const int AIMPUI_CHECKCOMBO_PROPID_TEXT      = AIMPUI_BUTTONEDEDIT_MAX_PROPID + 1;
@@ -267,7 +289,7 @@ static const GUID IID_IAIMPUIWndProcEvents = {0x61756957, 0x6E64, 0x5072, 0x6F, 
   const int AIMPUI_GROUPBOX_PROPID_BORDERS     = AIMPUI_WINCONTROL_MAX_PROPID + 2;
   const int AIMPUI_GROUPBOX_PROPID_TRANSPARENT = AIMPUI_WINCONTROL_MAX_PROPID + 3;
   const int AIMPUI_GROUPBOX_PROPID_CHECKMODE   = AIMPUI_WINCONTROL_MAX_PROPID + 4;
-  const int AIMPUI_GROUPBOX_PROPID_CHECKED     = AIMPUI_WINCONTROL_MAX_PROPID + 5;
+  const int AIMPUI_GROUPBOX_PROPID_CHECKED     = AIMPUI_WINCONTROL_MAX_PROPID + 5; // ref.AIMPUI_CHECKSTATE_XXX
   const int AIMPUI_GROUPBOX_PROPID_CAPTION     = AIMPUI_WINCONTROL_MAX_PROPID + 6;
 
   // PropID for IAIMPUIImage
@@ -360,7 +382,7 @@ static const GUID IID_IAIMPUIWndProcEvents = {0x61756957, 0x6E64, 0x5072, 0x6F, 
 
   // PropID for IAIMPUITreeListGroup
   const int AIMPUI_TL_GROUP_PROPID_CAPTION      = 1;
-  const int AIMPUI_TL_GROUP_PROPID_CHECKSTATE   = 2;
+  const int AIMPUI_TL_GROUP_PROPID_CHECKSTATE   = 2;  // ref.AIMPUI_CHECKSTATE_XXX
   const int AIMPUI_TL_GROUP_PROPID_EXPANDED     = 3;
   const int AIMPUI_TL_GROUP_PROPID_INDEX        = 4;
   const int AIMPUI_TL_GROUP_PROPID_SELECTED     = 5;
@@ -369,7 +391,7 @@ static const GUID IID_IAIMPUIWndProcEvents = {0x61756957, 0x6E64, 0x5072, 0x6F, 
   const int AIMPUI_TL_NODE_PROPID_ABS_VISIBLE_INDEX     = 0;
   const int AIMPUI_TL_NODE_PROPID_CHECK_ENABLED         = 1;
   const int AIMPUI_TL_NODE_PROPID_CHECKED               = 2;
-  const int AIMPUI_TL_NODE_PROPID_CHILDREN_CHECK_STATE  = 3;
+  const int AIMPUI_TL_NODE_PROPID_CHILDREN_CHECK_STATE  = 3; // ref.AIMPUI_CHECKSTATE_XXX
   const int AIMPUI_TL_NODE_PROPID_EXPANDED              = 4;
   const int AIMPUI_TL_NODE_PROPID_IMAGEINDEX            = 5;
   const int AIMPUI_TL_NODE_PROPID_INDEX                 = 6;
@@ -429,6 +451,13 @@ static const GUID IID_IAIMPUIWndProcEvents = {0x61756957, 0x6E64, 0x5072, 0x6F, 
   const int AIMPUI_MODE_PROPID_DPI    = 2;
   const int AIMPUI_MODE_PROPID_STYLE  = 3;
 
+  // TrayIcon
+  const int AIMPUI_TRAYICON_ID        = 1; // IAIMPString
+  const int AIMPUI_TRAYICON_HINT      = 2; // IAIMPString
+  const int AIMPUI_TRAYICON_ICON      = 3; // IAIMPImage or IAIMPImageContainer or IAIMPStream
+  const int AIMPUI_TRAYICON_MENU      = 4; // IAIMPUIPopupMenu
+  const int AIMPUI_TRAYICON_VISIBLE	  = 5;
+
 /*----------------------------------------------------------------------------------------------------------------------*/
 /* Basic Interfaces																								   */
 /*----------------------------------------------------------------------------------------------------------------------*/
@@ -447,8 +476,8 @@ static const GUID IID_IAIMPUIWndProcEvents = {0x61756957, 0x6E64, 0x5072, 0x6F, 
   class IAIMPUIColorSchema: public IAIMPPropertyList
   {
 		public:
-			virtual void WINAPI ApplyToARGB(DWORD* ARGB) = 0;
-			virtual void WINAPI ApplyToColor(DWORD* Color) = 0;
+			virtual void WINAPI ApplyToARGB(LongWord* ARGB) = 0;
+			virtual void WINAPI ApplyToColor(LongWord* Color) = 0;
 			virtual void WINAPI ApplyToColors(RGBQUAD* Colors, int numbersOfColors) = 0;
 			virtual void WINAPI ApplyToImage(IAIMPImage* Image) = 0;
   };
@@ -498,7 +527,7 @@ static const GUID IID_IAIMPUIWndProcEvents = {0x61756957, 0x6E64, 0x5072, 0x6F, 
   class IAIMPUIDrawEvents: public IUnknown
   {
 		public:
-			virtual void WINAPI OnDraw(IUnknown* Sender, HDC DC, const RECT R) = 0;
+			virtual void WINAPI OnDraw(IUnknown* Sender, HCANVAS Canvas, const RECT R) = 0;
   };
 
   /* IAIMPUIKeyboardEvents */
@@ -600,7 +629,7 @@ static const GUID IID_IAIMPUIWndProcEvents = {0x61756957, 0x6E64, 0x5072, 0x6F, 
 			virtual HRESULT WINAPI ScreenToClient(POINT* P) = 0;
 
 			// Drawing
-			virtual HRESULT WINAPI PaintTo(HDC DC, int X, int Y) = 0;
+			virtual HRESULT WINAPI PaintTo(HCANVAS Canvas, int X, int Y) = 0;
 			virtual HRESULT WINAPI Invalidate() = 0;
   };
 
@@ -622,8 +651,8 @@ static const GUID IID_IAIMPUIWndProcEvents = {0x61756957, 0x6E64, 0x5072, 0x6F, 
   class IAIMPUIWndProcEvents: public IUnknown
   {
 	  public:
-			virtual BOOL WINAPI OnBeforeWndProc(DWORD Message, WPARAM ParamW, LPARAM ParamL, LRESULT* Result) = 0;
-			virtual void WINAPI OnAfterWndProc(DWORD Message, WPARAM ParamW, LPARAM ParamL, LRESULT* Result) = 0;
+			virtual BOOL WINAPI OnBeforeWndProc(LongWord Message, WPARAM ParamW, LPARAM ParamL, LRESULT* Result) = 0;
+			virtual void WINAPI OnAfterWndProc(LongWord Message, WPARAM ParamW, LPARAM ParamL, LRESULT* Result) = 0;
   };
 
 /*----------------------------------------------------------------------------------------------------------------------*/
@@ -638,8 +667,8 @@ static const GUID IID_IAIMPUIWndProcEvents = {0x61756957, 0x6E64, 0x5072, 0x6F, 
 			virtual HRESULT WINAPI Add(IAIMPImage* Image) = 0;
 			virtual HRESULT WINAPI Clear() = 0;
 			virtual HRESULT WINAPI Delete(int Index) = 0; 
-			virtual HRESULT WINAPI Draw(HDC DC, int Index, int X, int Y, BOOL Enabled) = 0;
-			virtual HRESULT WINAPI LoadFromResource(HMODULE Instance, WCHAR* ResName, WCHAR* ResType) = 0;
+			virtual HRESULT WINAPI Draw(HCANVAS Canvas, int Index, int X, int Y, BOOL Enabled) = 0;
+			virtual HRESULT WINAPI LoadFromResource(HMODULE Instance, TChar* ResName, TChar* ResType) = 0;
 			virtual int WINAPI GetCount() = 0;
 			virtual HRESULT WINAPI GetSize(SIZE* Size) = 0;
 			virtual HRESULT WINAPI SetSize(SIZE Size) = 0;
@@ -650,7 +679,7 @@ static const GUID IID_IAIMPUIWndProcEvents = {0x61756957, 0x6E64, 0x5072, 0x6F, 
   class IAIMPUIImageList2: public IAIMPUIImageList
   {
 	  public:
-	 		virtual HRESULT WINAPI DrawEx(HDC DC, int Index, const RECT R, BOOL Enabled) = 0;
+	 		virtual HRESULT WINAPI DrawEx(HCANVAS Canvas, int Index, const RECT R, BOOL Enabled) = 0;
   };
 
   /* IAIMPUIMenuItem */
@@ -676,6 +705,14 @@ static const GUID IID_IAIMPUIWndProcEvents = {0x61756957, 0x6E64, 0x5072, 0x6F, 
 		virtual int WINAPI GetCount() = 0;
 		virtual HRESULT WINAPI Popup(POINT ScreenPoint) = 0;
 		virtual HRESULT WINAPI Popup2(RECT ScreenRect) = 0;
+  };
+
+  /* IAIMPUITrayIcon */
+
+  class IAIMPUITrayIcon: public IAIMPPropertyList
+  {
+	public:
+		virtual HRESULT WINAPI Notify(IAIMPString* Title, IAIMPString* Message, int Reserved) = 0;
   };
 
 /*----------------------------------------------------------------------------------------------------------------------*/
@@ -1014,7 +1051,7 @@ static const GUID IID_IAIMPUIWndProcEvents = {0x61756957, 0x6E64, 0x5072, 0x6F, 
 			// Sorting
 			virtual HRESULT WINAPI ResetSortingParams() = 0;
 			virtual HRESULT WINAPI Resort() = 0;
-			virtual HRESULT WINAPI SortBy(IAIMPUITreeListColumn* Column, DWORD Flags, BOOL ResetPrevSortingParams) = 0;
+			virtual HRESULT WINAPI SortBy(IAIMPUITreeListColumn* Column, LongWord Flags, BOOL ResetPrevSortingParams) = 0;
 
 			// Customized Settings
 			virtual HRESULT WINAPI ConfigLoad(IAIMPConfig* Config, IAIMPString* Key) = 0;
@@ -1027,7 +1064,7 @@ static const GUID IID_IAIMPUIWndProcEvents = {0x61756957, 0x6E64, 0x5072, 0x6F, 
   {
 		public:
 			virtual void WINAPI OnDragSorting(IAIMPUITreeList* Sender) = 0;
-			virtual void WINAPI OnDragSortingNodeOver(IAIMPUITreeList* Sender, IAIMPUITreeListNode* Node, DWORD Flags, BOOL* Handled) = 0;
+			virtual void WINAPI OnDragSortingNodeOver(IAIMPUITreeList* Sender, IAIMPUITreeListNode* Node, LongWord Flags, BOOL* Handled) = 0;
   };
 
   /* IAIMPUITreeListCustomDrawEvents */
@@ -1035,9 +1072,9 @@ static const GUID IID_IAIMPUIWndProcEvents = {0x61756957, 0x6E64, 0x5072, 0x6F, 
   class IAIMPUITreeListCustomDrawEvents: public IUnknown
   {
 		public:
-			virtual void WINAPI OnCustomDrawNode(IAIMPUITreeList* Sender, HDC DC, RECT R, IAIMPUITreeListNode* Node, BOOL* Handled) = 0;
-			virtual void WINAPI OnCustomDrawNodeCell(IAIMPUITreeList* Sender, HDC DC, RECT R, IAIMPUITreeListNode* Node, IAIMPUITreeListColumn* Column, BOOL* Handled) = 0;
-			virtual void WINAPI OnGetNodeBackground(IAIMPUITreeList* Sender, IAIMPUITreeListNode* Node, DWORD* Color) = 0;
+			virtual void WINAPI OnCustomDrawNode(IAIMPUITreeList* Sender, HCANVAS Canvas, RECT R, IAIMPUITreeListNode* Node, BOOL* Handled) = 0;
+			virtual void WINAPI OnCustomDrawNodeCell(IAIMPUITreeList* Sender, HCANVAS Canvas, RECT R, IAIMPUITreeListNode* Node, IAIMPUITreeListColumn* Column, BOOL* Handled) = 0;
+			virtual void WINAPI OnGetNodeBackground(IAIMPUITreeList* Sender, IAIMPUITreeListNode* Node, LongWord* Color) = 0;
   };
 
   /* IAIMPUITreeListInplaceEditingEvents */
@@ -1126,12 +1163,29 @@ static const GUID IID_IAIMPUIWndProcEvents = {0x61756957, 0x6E64, 0x5072, 0x6F, 
 /* Dialogs																				 						        */
 /*----------------------------------------------------------------------------------------------------------------------*/
 
+  { IAIMPUIAuthDialog }
+
+  class IAIMPUIAuthDialog: public IUnknown
+  {
+		public:
+			virtual HRESULT WINAPI Execute(HWND OwnerWnd, IAIMPString* Title, IAIMPString* Text, IUnknown* EventsHandler, LongWord Flags) = 0;
+  };
+
+  /* IAIMPUIAuthDialogEvents */
+
+  class IAIMPUIAuthDialogEvents: public IUnknown
+  {
+		public:
+			virtual HRESULT WINAPI OnParse(IAIMPString* Params, IAIMPString** ErrorText) = 0;
+			virtual HRESULT WINAPI OnRequestUrl(IAIMPString** Url) = 0;
+  };
+
   /* IAIMPUIBrowseFolderDialog */
 
   class IAIMPUIBrowseFolderDialog: public IUnknown
   {
 		public:
-			virtual HRESULT WINAPI Execute(HWND OwnerWnd, DWORD Flags, IAIMPString* DefaultPath, IAIMPObjectList** Selection) = 0;
+			virtual HRESULT WINAPI Execute(HWND OwnerWnd, LongWord Flags, IAIMPString* DefaultPath, IAIMPObjectList** Selection) = 0;
   };
 
   /* IAIMPUIFileDialogs */
@@ -1168,7 +1222,7 @@ static const GUID IID_IAIMPUIWndProcEvents = {0x61756957, 0x6E64, 0x5072, 0x6F, 
   class IAIMPUIMessageDialog: public IUnknown
   {
 		public:
-		    virtual HRESULT WINAPI Execute(HWND OwnerWnd, IAIMPString* Caption, IAIMPString* Text, DWORD Flags) = 0;
+			virtual HRESULT WINAPI Execute(HWND OwnerWnd, IAIMPString* Caption, IAIMPString* Text, LongWord Flags) = 0;
   };
 
   /* IAIMPUIProgressDialog */
@@ -1202,7 +1256,7 @@ const int AIMPUI_SERVICE_CREATEFORM_FLAGS_CHILD = 1;
 		public:
 			virtual HRESULT WINAPI CreateControl(IAIMPUIForm* Owner, IAIMPUIWinControl* Parent, 
 				IAIMPString* Name, IUnknown* EventsHandler, REFIID IID, void** Control) = 0;
-			virtual HRESULT WINAPI CreateForm(HWND OwnerWindow, DWORD Flags, 
+			virtual HRESULT WINAPI CreateForm(HWND OwnerWindow, LongWord Flags, 
 				IAIMPString* Name, IUnknown* EventsHandler, IAIMPUIForm** Form) = 0;
 			virtual HRESULT WINAPI CreateObject(IAIMPUIForm* Owner, IUnknown* EventsHandler, REFIID IID, void** Obj) = 0;
   };

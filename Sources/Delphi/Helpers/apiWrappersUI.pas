@@ -1,13 +1,14 @@
-﻿{*********************************************}
-{*                                           *}
-{*        AIMP Programming Interface         *}
-{*                v5.00.2300                 *}
-{*                                           *}
-{*            (c) Artem Izmaylov             *}
-{*                 2006-2021                 *}
-{*                www.aimp.ru                *}
-{*                                           *}
-{*********************************************}
+﻿////////////////////////////////////////////////////////////////////////////////
+//
+//  Project:   AIMP
+//             Programming Interface
+//
+//  Target:    v5.40 build 2650
+//
+//  Author:    Artem Izmaylov
+//             © 2006-2025
+//             www.aimp.ru
+//
 
 unit apiWrappersUI;
 
@@ -16,9 +17,20 @@ unit apiWrappersUI;
 interface
 
 uses
-  Windows, Classes, Controls, Forms,
+{$IFDEF FPC}
+  LCLIntf,
+  LCLType,
+{$ELSE}
+  Windows,
+{$ENDIF}
+  Classes,
+  Controls,
+  Forms,
   // API
-  apiObjects, apiOptions, apiWrappers;
+  apiObjects,
+  apiOptions,
+  apiWrappers,
+  apiTypes;
 
 type
 
@@ -31,7 +43,8 @@ type
   private
     FForm: TForm;
 
-    function FindNextControl(OwnerControl, CurControl: TWinControl; GoForward, CheckTabStop, CheckParent: Boolean): TWinControl;
+    function FindNextControl(OwnerControl, CurControl: TWinControl;
+      GoForward, CheckTabStop, CheckParent: Boolean): TWinControl;
     function SelectControl(Control: TWinControl): LongBool;
     // IAIMPOptionsDialogFrame
     function CreateFrame(ParentWnd: HWND): HWND; stdcall;
@@ -48,9 +61,9 @@ type
     // ParentControl is assigned if plugin was built with AIMP.RunTime.dll
     function CreateForm(ParentWnd: HWND; ParentControl: TWinControl): TForm; virtual; abstract;
     function GetName(out S: IAIMPString): HRESULT; overload; virtual; stdcall;
-    function GetName: UnicodeString; overload; virtual;
+    function GetName: string; overload; virtual;
     procedure Notification(ID: Integer); virtual; stdcall;
-    //
+    //# Properties
     property Form: TForm read FForm;
   end;
 
@@ -65,7 +78,7 @@ procedure LangLocalizeForm(AFormComponent: TComponent; const ALangRoot: string);
 implementation
 
 uses
-  TypInfo, SysUtils, Math, ActiveX, Menus;
+  TypInfo, SysUtils, Math, Menus;
 
 type
   TWinControlAccess = class(TWinControl);
@@ -109,7 +122,7 @@ begin
   end;
 end;
 
-function TAIMPCustomOptionsFrame.GetName: UnicodeString;
+function TAIMPCustomOptionsFrame.GetName: string;
 begin
   Result := '-';
 end;
@@ -131,13 +144,15 @@ end;
 
 function TAIMPCustomOptionsFrame.FindNextControl(OwnerControl, CurControl: TWinControl;
   GoForward, CheckTabStop, CheckParent: Boolean): TWinControl;
+type
+  TTabList = {$IFDEF FPC}TFPList{$ELSE}TList{$ENDIF};
 var
   AIndex: Integer;
-  AList: TList;
+  AList: TTabList;
 begin
   Result := nil;
 
-  AList := TList.Create;
+  AList := TTabList.Create;
   try
     TWinControlAccess(OwnerControl).GetTabOrderList(AList);
     if AList.Count > 0 then
@@ -177,7 +192,7 @@ begin
   FForm := CreateForm(ParentWnd, FindControl(ParentWnd));
   FForm.Visible := True; // before BoundsRect initialization
   GetWindowRect(ParentWnd, R);
-  OffsetRect(R, -R.Left, -R.Top);
+  R.Offset(-R.Left, -R.Top);
   FForm.BoundsRect := R;
   Result := FForm.Handle;
 end;

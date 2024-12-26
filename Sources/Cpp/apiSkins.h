@@ -1,22 +1,23 @@
-/************************************************/
-/*                                              */
-/*          AIMP Programming Interface          */
-/*               v5.30 build 2500               */
-/*                                              */
-/*                Artem Izmaylov                */
-/*                (C) 2006-2023                 */
-/*                 www.aimp.ru                  */
-/*               support@aimp.ru                */
-/*                                              */
-/************************************************/
-
+////////////////////////////////////////////////////////////////////////////////
+//
+//  Project:   AIMP
+//             Programming Interface
+//
+//  Target:    v5.40 build 2650
+//
+//  Purpose:   Skin Manager API
+//
+//  Author:    Artem Izmaylov
+//             © 2006-2025
+//             www.aimp.ru
+//
 #ifndef apiSkinsH
 #define apiSkinsH
 
-#include <windows.h>
 #include <unknwn.h>
 #include "apiObjects.h"
 #include "apiCore.h"
+#include "apiTypes.h"
 
 static const GUID IID_IAIMPSkinInfo = {0x41494D50, 0x536B, 0x696E, 0x49, 0x6E, 0x66, 0x6F, 0x00, 0x00, 0x00, 0x00};
 static const GUID IID_IAIMPServiceSkinsManager = {0x41494D50, 0x5372, 0x7653, 0x6B, 0x69, 0x6E, 0x73, 0x4D, 0x6E, 0x67, 0x72};
@@ -50,7 +51,7 @@ class IAIMPServiceSkinsManager: public IUnknown
 		virtual HRESULT WINAPI EnumSkins(IAIMPObjectList **List) = 0;
 		virtual HRESULT WINAPI GetSkinInfo(IAIMPString* FileName, IAIMPSkinInfo **Info) = 0;
 		virtual HRESULT WINAPI Select(IAIMPString* FileName) = 0;
-		//
+		// Install/Uninstall
 		virtual HRESULT WINAPI Install(IAIMPString *FileName, DWORD Flags) = 0;
 		virtual HRESULT WINAPI Uninstall(IAIMPString *FileName) = 0;
 		// Tools

@@ -1,14 +1,18 @@
-﻿{*********************************************}
-{*                                           *}
-{*        AIMP Programming Interface         *}
-{*                v5.30.2500                 *}
-{*                                           *}
-{*            (c) Artem Izmaylov             *}
-{*                 2006-2023                 *}
-{*                www.aimp.ru                *}
-{*                                           *}
-{*********************************************}
-
+﻿////////////////////////////////////////////////////////////////////////////////
+//
+//  Project:   AIMP
+//             Programming Interface
+//
+//  Target:    v5.40 build 2650
+//
+//  Purpose:   Skin Manager API
+//
+//  Author:    Artem Izmaylov
+//             © 2006-2025
+//             www.aimp.ru
+//
+//  FPC:       OK
+//
 unit apiSkins;
 
 {$I apiConfig.inc}
@@ -16,7 +20,7 @@ unit apiSkins;
 interface
 
 uses
-  Windows, apiObjects, apiCore;
+  apiObjects;
 
 const
   SID_IAIMPSkinInfo = '{41494D50-536B-696E-496E-666F00000000}';
@@ -54,8 +58,8 @@ type
     function EnumSkins(out List: IAIMPObjectList): HRESULT; stdcall;
     function GetSkinInfo(FileName: IAIMPString; out Info: IAIMPSkinInfo): HRESULT; stdcall;
     function Select(FileName: IAIMPString): HRESULT; stdcall;
-    //
-    function Install(FileName: IAIMPString; Flags: DWORD): HRESULT; stdcall;
+    // Install/Uninstall
+    function Install(FileName: IAIMPString; Flags: Cardinal): HRESULT; stdcall;
     function Uninstall(FileName: IAIMPString): HRESULT; stdcall;
     // Tools
     function HSLToRGB(H, S, L: Byte; out R, G, B: Byte): HRESULT; stdcall;

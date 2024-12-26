@@ -1,27 +1,29 @@
-/************************************************/
-/*                                              */
-/*          AIMP Programming Interface          */
-/*               v5.30 build 2500               */
-/*                                              */
-/*                Artem Izmaylov                */
-/*                (C) 2006-2023                 */
-/*                 www.aimp.ru                  */
-/*               support@aimp.ru                */
-/*                                              */
-/************************************************/
-
+////////////////////////////////////////////////////////////////////////////////
+//
+//  Project:   AIMP
+//             Programming Interface
+//
+//  Target:    v5.40 build 2650
+//
+//  Purpose:   Plugin Header API
+//
+//  Author:    Artem Izmaylov
+//             © 2006-2025
+//             www.aimp.ru
+//
 #ifndef apiPluginH
 #define apiPluginH
 
-#include <windows.h>
 #include <unknwn.h>
 #include "apiCore.h"
+#include "apiTypes.h"
  
 // IAIMPPlugin.InfoGetCategories
-const int  AIMP_PLUGIN_CATEGORY_ADDONS   = 0x1;
-const int  AIMP_PLUGIN_CATEGORY_DECODERS = 0x2;
-const int  AIMP_PLUGIN_CATEGORY_VISUALS  = 0x4;
-const int  AIMP_PLUGIN_CATEGORY_DSP	     = 0x8;
+const int  AIMP_PLUGIN_CATEGORY_ADDONS   = 1;
+const int  AIMP_PLUGIN_CATEGORY_DECODERS = 2;
+const int  AIMP_PLUGIN_CATEGORY_VISUALS  = 4;
+const int  AIMP_PLUGIN_CATEGORY_DSP	     = 8;
+const int  AIMP_PLUGIN_CATEGORY_ENCODER  = 16;
 
 // IAIMPPlugin.InfoGet
 const int  AIMP_PLUGIN_INFO_NAME              = 0x0;
@@ -51,8 +53,8 @@ class IAIMPPlugin: public IUnknown
 {
 	public:
 		// Information about the plugin
-		virtual PWCHAR WINAPI InfoGet(int Index) = 0;
-		virtual DWORD WINAPI InfoGetCategories() = 0;
+		virtual TChar* WINAPI InfoGet(int Index) = 0;
+		virtual LongWord WINAPI InfoGetCategories() = 0;
 		// Initialization / Finalization
 		virtual HRESULT WINAPI Initialize(IAIMPCore* Core) = 0;
 		virtual HRESULT WINAPI Finalize() = 0;

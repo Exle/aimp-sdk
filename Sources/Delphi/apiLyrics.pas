@@ -1,14 +1,18 @@
-﻿{*********************************************}
-{*                                           *}
-{*        AIMP Programming Interface         *}
-{*                v5.30.2500                 *}
-{*                                           *}
-{*            (c) Artem Izmaylov             *}
-{*                 2006-2023                 *}
-{*                www.aimp.ru                *}
-{*                                           *}
-{*********************************************}
-
+﻿////////////////////////////////////////////////////////////////////////////////
+//
+//  Project:   AIMP
+//             Programming Interface
+//
+//  Target:    v5.40 build 2650
+//
+//  Purpose:   Lyrics API
+//
+//  Author:    Artem Izmaylov
+//             © 2006-2025
+//             www.aimp.ru
+//
+//  FPC:       OK
+//
 unit apiLyrics;
 
 {$I apiConfig.inc}
@@ -16,11 +20,10 @@ unit apiLyrics;
 interface
 
 uses
-  Windows,
-  // API
   apiObjects,
   apiFileManager,
-  apiThreading;
+  apiThreading,
+  apiTypes;
 
 const
   SID_IAIMPServiceLyrics = '{41494D50-5372-764C-7972-697800000000}';
@@ -88,8 +91,9 @@ type
 
   IAIMPExtensionLyricsProvider = interface
   [SID_IAIMPExtensionLyricsProvider]
-    function Get(Owner: IAIMPTaskOwner; FileInfo: IAIMPFileInfo; Flags: DWORD; Lyrics: IAIMPLyrics): HRESULT; stdcall;
-    function GetCategory: DWORD; stdcall;
+    function Get(Owner: IAIMPTaskOwner; FileInfo: IAIMPFileInfo;
+      Flags: LongWord; Lyrics: IAIMPLyrics): HRESULT; stdcall;
+    function GetCategory: LongWord; stdcall;
   end;
 
   { IAIMPServiceLyrics }
@@ -98,9 +102,10 @@ type
 
   IAIMPServiceLyrics = interface
   [SID_IAIMPServiceLyrics]
-    function Get(FileInfo: IAIMPFileInfo; Flags: DWORD;
-      CallbackProc: TAIMPServiceLyricsReceiveProc; UserData: Pointer; out TaskID: Pointer): HRESULT; stdcall;
-    function Cancel(TaskID: Pointer; Flags: DWORD): HRESULT; stdcall;
+    function Get(FileInfo: IAIMPFileInfo; Flags: LongWord;
+      CallbackProc: TAIMPServiceLyricsReceiveProc;
+      UserData: Pointer; out TaskID: TTaskHandle): HRESULT; stdcall;
+    function Cancel(TaskID: TTaskHandle; Flags: LongWord): HRESULT; stdcall;
   end;
 
 implementation

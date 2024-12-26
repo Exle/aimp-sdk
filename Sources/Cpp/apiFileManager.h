@@ -1,21 +1,24 @@
-/************************************************/
-/*                                              */
-/*          AIMP Programming Interface          */
-/*               v5.30 build 2500               */
-/*                                              */
-/*                Artem Izmaylov                */
-/*                (C) 2006-2023                 */
-/*                 www.aimp.ru                  */
-/*               support@aimp.ru                */
-/*                                              */
-/************************************************/
-
+////////////////////////////////////////////////////////////////////////////////
+//
+//  Project:   AIMP
+//             Programming Interface
+//
+//  Target:    v5.40 build 2650
+//
+//  Purpose:   File Manager API
+//
+//  Author:    Artem Izmaylov
+//             © 2006-2025
+//             www.aimp.ru
+//
+//  FPC:       OK
+//
 #ifndef apiFileManagerH
 #define apiFileManagerH
 
-#include <windows.h>
 #include <unknwn.h>
 #include "apiObjects.h"
+#include "apiTypes.h"
 
 static const GUID IID_IAIMPFileInfo = {0x41494D50, 0x4669, 0x6C65, 0x49, 0x6E, 0x66, 0x6F, 0x00, 0x00, 0x00, 0x00};
 static const GUID IID_IAIMPExtensionFileExpander = {0x41494D50, 0x4578, 0x7446, 0x69, 0x6C, 0x65, 0x45, 0x78, 0x70, 0x64, 0x72};
@@ -152,7 +155,7 @@ class IAIMPVirtualFile: public IAIMPPropertyList
 #pragma pack(push, 1)
 struct TAIMPFileAttributes 
 {
-	DWORD Attributes;
+	LongWord Attributes;
 	DOUBLE TimeCreation;
 	DOUBLE TimeLastAccess;
 	DOUBLE TimeLastWrite;
@@ -219,7 +222,7 @@ class IAIMPFileSystemCommandOpenFileFolder : public IAIMPFileSystemCustomFileCom
 class IAIMPFileSystemCommandStreaming : public IUnknown
 {
 	public:
-		virtual HRESULT WINAPI CreateStream(IAIMPString* FileName, const INT64 Offset, const INT64 Size, DWORD Flags, IAIMPStream** Stream) = 0;
+		virtual HRESULT WINAPI CreateStream(IAIMPString* FileName, const INT64 Offset, const INT64 Size, LongWord Flags, IAIMPStream** Stream) = 0;
 };
 //----------------------------------------------------------------------------------------------------------------------
 // Extensions
@@ -240,7 +243,7 @@ class IAIMPExtensionFileFormat: public IUnknown
 	public:
 		virtual HRESULT WINAPI GetDescription(IAIMPString **S) = 0;
 		virtual HRESULT WINAPI GetExtList(IAIMPString **S) = 0;
-		virtual HRESULT WINAPI GetFlags(DWORD *S) = 0;
+		virtual HRESULT WINAPI GetFlags(LongWord *S) = 0;
 };
 
 /* IAIMPExtensionFileInfoProvider */
@@ -282,8 +285,8 @@ class IAIMPServiceFileManager: public IUnknown
 class IAIMPServiceFileFormats: public IUnknown
 {
 	public:
-		virtual HRESULT WINAPI GetFormats(DWORD Flags, IAIMPString **S) = 0;
-		virtual HRESULT WINAPI IsSupported(IAIMPString *FileName, DWORD Flags) = 0;
+		virtual HRESULT WINAPI GetFormats(LongWord Flags, IAIMPString **S) = 0;
+		virtual HRESULT WINAPI IsSupported(IAIMPString *FileName, LongWord Flags) = 0;
 };
 
 /* IAIMPServiceFileInfo */
@@ -292,10 +295,10 @@ class IAIMPServiceFileInfo: public IUnknown
 {
 	public:
 		// File Info
-		virtual HRESULT WINAPI GetFileInfoFromFileURI(IAIMPString *FileURI, DWORD Flags, IAIMPFileInfo *Info) = 0;
-		virtual HRESULT WINAPI GetFileInfoFromStream(IAIMPStream *Stream, DWORD Flags, IAIMPFileInfo *Info) = 0;
+		virtual HRESULT WINAPI GetFileInfoFromFileURI(IAIMPString *FileURI, LongWord Flags, IAIMPFileInfo *Info) = 0;
+		virtual HRESULT WINAPI GetFileInfoFromStream(IAIMPStream *Stream, LongWord Flags, IAIMPFileInfo *Info) = 0;
 		// Virtual Files
-		virtual HRESULT WINAPI GetVirtualFile(IAIMPString *FileURI, DWORD Flags, IAIMPVirtualFile **Info) = 0;
+		virtual HRESULT WINAPI GetVirtualFile(IAIMPString *FileURI, LongWord Flags, IAIMPVirtualFile **Info) = 0;
 };
 
 /* IAIMPServiceFileInfoFormatter */
@@ -319,7 +322,7 @@ class IAIMPServiceFileInfoFormatterUtils: public IUnknown
 class IAIMPServiceFileStreaming: public IUnknown
 {
 	public:
-		virtual HRESULT WINAPI CreateStreamForFile(IAIMPString *FileName, DWORD Flags, const INT64 Offset, const INT64 Size, IAIMPStream **Stream) = 0;
+		virtual HRESULT WINAPI CreateStreamForFile(IAIMPString *FileName, LongWord Flags, const INT64 Offset, const INT64 Size, IAIMPStream **Stream) = 0;
 		virtual HRESULT WINAPI CreateStreamForFileURI(IAIMPString *FileURI, IAIMPVirtualFile **VirtualFile, IAIMPStream **Stream) = 0;
 };
 
@@ -340,8 +343,8 @@ class IAIMPServiceFileURI: public IUnknown
 		virtual HRESULT WINAPI Build(IAIMPString* ContainerFileName, IAIMPString* PartName, IAIMPString** FileURI) = 0;
 		virtual HRESULT WINAPI Parse(IAIMPString* FileURI, IAIMPString** ContainerFileName, IAIMPString** PartName) = 0;
 
-		virtual HRESULT WINAPI ChangeFileExt(IAIMPString** FileURI, IAIMPString* NewExt, DWORD Flags) = 0;
-		virtual HRESULT WINAPI ExtractFileExt(IAIMPString* FileURI, IAIMPString** S, DWORD Flags) = 0;
+		virtual HRESULT WINAPI ChangeFileExt(IAIMPString** FileURI, IAIMPString* NewExt, LongWord Flags) = 0;
+		virtual HRESULT WINAPI ExtractFileExt(IAIMPString* FileURI, IAIMPString** S, LongWord Flags) = 0;
 		virtual HRESULT WINAPI ExtractFileName(IAIMPString* FileURI, IAIMPString* S) = 0;
 		virtual HRESULT WINAPI ExtractFileParentDirName(IAIMPString* FileURI, IAIMPString** S) = 0;
 		virtual HRESULT WINAPI ExtractFileParentName(IAIMPString* FileURI, IAIMPString** S) = 0;

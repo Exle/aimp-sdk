@@ -1,14 +1,18 @@
-﻿{*********************************************}
-{*                                           *}
-{*        AIMP Programming Interface         *}
-{*                v5.30.2500                 *}
-{*                                           *}
-{*            (c) Artem Izmaylov             *}
-{*                 2006-2023                 *}
-{*                www.aimp.ru                *}
-{*                                           *}
-{*********************************************}
-
+﻿////////////////////////////////////////////////////////////////////////////////
+//
+//  Project:   AIMP
+//             Programming Interface
+//
+//  Target:    v5.40 build 2650
+//
+//  Purpose:   Tags Library API
+//
+//  Author:    Artem Izmaylov
+//             © 2006-2025
+//             www.aimp.ru
+//
+//  FPC:       OK
+//
 unit apiTagEditor;
 
 {$I apiConfig.inc}
@@ -16,7 +20,9 @@ unit apiTagEditor;
 interface
 
 uses
-  apiObjects, apiFileManager, apiThreading;
+  apiObjects,
+  apiFileManager,
+  apiThreading;
 
 const
   SID_IAIMPFileTag = '{41494D50-4669-6C65-5461-670000000000}';

@@ -1,5 +1,9 @@
-{$IFDEF ConditionalExpressions}
-  {$IF CompilerVersion >= 21.0} { Borland Delphi 2010 }
-    {$DEFINE DELPHI2010}
-  {$IFEND}
+{$IFDEF FPC}
+  {$mode delphi}
+  {$codepage UTF8}
+  {$inline off}
+{$ELSE}
+  {$IFNDEF UNICODE}
+    {$MESSAGE FATAL 'You MUST use unicode version of Delphi to build this library!'}
+  {$ENDIF}
 {$ENDIF}

@@ -1,14 +1,18 @@
-﻿{*********************************************}
-{*                                           *}
-{*        AIMP Programming Interface         *}
-{*                v5.00.2300                 *}
-{*                                           *}
-{*            (c) Artem Izmaylov             *}
-{*                 2006-2021                 *}
-{*                www.aimp.ru                *}
-{*                                           *}
-{*********************************************}
-
+﻿////////////////////////////////////////////////////////////////////////////////
+//
+//  Project:   AIMP
+//             Programming Interface
+//
+//  Target:    v5.40 build 2650
+//
+//  Purpose:   GUI Api Wrappers
+//
+//  Author:    Artem Izmaylov
+//             © 2006-2025
+//             www.aimp.ru
+//
+//  FPC:       OK
+//
 unit apiWrappersGUI;
 
 {$I apiConfig.inc}
@@ -16,14 +20,20 @@ unit apiWrappersGUI;
 interface
 
 uses
-  Windows, Classes,
+  Classes,
+  Types,
   // API
-  apiObjects, apiOptions, apiWrappers, apiGUI, apiActions;
+  apiActions,
+  apiGUI,
+  apiObjects,
+  apiOptions,
+  apiWrappers,
+  apiTypes;
 
 type
-  TAIMPUIDrawEvent = procedure (const Sender: IUnknown; DC: HDC; const R: TRect) of object;
+  TAIMPUIDrawEvent = procedure (const Sender: IUnknown; Canvas: HCANVAS; const R: TRect) of object;
   TAIMPUIKeyEvent = procedure (const Sender: IUnknown; var Key: Word; Modifiers: TShiftState) of object;
-  TAIMPUIKeyPressEvent = procedure (const Sender: IUnknown; var Key: Char) of object;
+  TAIMPUIKeyPressEvent = procedure (const Sender: IUnknown; var Key: WideChar) of object;
   TAIMPUIMouseEvent = procedure (const Sender: IUnknown; Button: TAIMPUIMouseButton; Shift: TShiftState; X, Y: Integer) of object;
   TAIMPUIMouseMoveEvent = procedure (const Sender: IUnknown; Shift: TShiftState; X, Y: Integer) of object;
   TAIMPUIMouseWheelEvent = procedure (const Sender: IUnknown; Shift: TShiftState; Delta, X, Y: Integer; var Handled: LongBool) of object;
@@ -36,7 +46,8 @@ type
     FMasterAdapter: IUnknown;
   protected
     // IUnknown
-    function QueryInterface(const IID: TGUID; out Obj): HRESULT; override; stdcall;
+    function QueryInterface({$IFDEF FPC}constref{$ELSE}const{$ENDIF}
+      IID: TGUID; out Obj): HRESULT; override;
   public
     constructor Create(AMasterAdapter: IUnknown);
   end;
@@ -48,7 +59,7 @@ type
     FOnDraw: TAIMPUIDrawEvent;
   protected
     // IAIMPUIDrawEvents
-    procedure OnDraw(Sender: IInterface; DC: HDC; const R: TRect); stdcall;
+    procedure OnDraw(Sender: IInterface; Canvas: HCANVAS; const R: TRect); stdcall;
   public
     constructor Create(ADrawEvent: TAIMPUIDrawEvent; AMasterAdapter: IUnknown = nil);
   end;
@@ -67,7 +78,7 @@ type
     procedure OnEnter(Sender: IInterface); stdcall;
     procedure OnExit(Sender: IInterface); stdcall;
     procedure OnKeyDown(Sender: IInterface; var Key: Word; Modifiers: Word); stdcall;
-    procedure OnKeyPress(Sender: IInterface; var Key: Char); stdcall;
+    procedure OnKeyPress(Sender: IInterface; var Key: WideChar); stdcall;
     procedure OnKeyUp(Sender: IInterface; var Key: Word; Modifiers: Word); stdcall;
   public
     constructor Create(AEnterEvent, AExitEvent: TAIMPUINotifyEvent;
@@ -123,6 +134,9 @@ type
   end;
 
 function ModifiersToShiftState(Modifiers: Word): TShiftState;
+
+function uiMessageBox(AOwner: IAIMPUIForm; AMessage: IAIMPString; AFlags: Cardinal): Integer;
+function uiWrap(AEvent: TAIMPUINotifyEvent; AMasterAdapter: IUnknown = nil): IUnknown;
 implementation
 
 function ModifiersToShiftState(Modifiers: Word): TShiftState;
@@ -136,6 +150,24 @@ begin
     Include(Result, ssShift);
 end;
 
+function uiMessageBox(AOwner: IAIMPUIForm; AMessage: IAIMPString; AFlags: Cardinal): Integer;
+var
+  LCaption: IAIMPString;
+  LService: IAIMPUIMessageDialog;
+begin
+  Result := 0;
+  if CoreGetService(IAIMPUIMessageDialog, LService) then
+  begin
+    AOwner.GetValueAsObject(AIMPUI_FORM_PROPID_CAPTION, IAIMPString, LCaption);
+    Result := LService.Execute(AOwner.GetHandle, LCaption, AMessage, AFlags);
+  end;
+end;
+
+function uiWrap(AEvent: TAIMPUINotifyEvent; AMasterAdapter: IUnknown = nil): IUnknown;
+begin
+  Result := TAIMPUINotifyEventAdapter.Create(AEvent, AMasterAdapter);
+end;
+
 { TAIMPUICustomEventAdapter }
 
 constructor TAIMPUICustomEventAdapter.Create(AMasterAdapter: IInterface);
@@ -144,9 +176,9 @@ begin
   FMasterAdapter := AMasterAdapter;
 end;
 
-function TAIMPUICustomEventAdapter.QueryInterface(const IID: TGUID; out Obj): HRESULT;
+function TAIMPUICustomEventAdapter.QueryInterface;
 begin
-  Result := inherited QueryInterface(IID, Obj);
+  Result := inherited;
   if Result = E_NOINTERFACE then
   begin
     if FMasterAdapter <> nil then
@@ -162,10 +194,10 @@ begin
   FOnDraw := ADrawEvent;
 end;
 
-procedure TAIMPUIDrawEventAdapter.OnDraw(Sender: IInterface; DC: HDC; const R: TRect);
+procedure TAIMPUIDrawEventAdapter.OnDraw(Sender: IInterface; Canvas: HCANVAS; const R: TRect);
 begin
   if Assigned(FOnDraw) then
-    FOnDraw(Sender, DC, R);
+    FOnDraw(Sender, Canvas, R);
 end;
 
 { TAIMPUIKeyboardEventsAdapter }
@@ -199,7 +231,7 @@ begin
     FOnKeyDown(Sender, Key, ModifiersToShiftState(Modifiers));
 end;
 
-procedure TAIMPUIKeyboardEventsAdapter.OnKeyPress(Sender: IInterface; var Key: Char);
+procedure TAIMPUIKeyboardEventsAdapter.OnKeyPress(Sender: IInterface; var Key: WideChar);
 begin
   if Assigned(FOnKeyPress) then
     FOnKeyPress(Sender, Key);

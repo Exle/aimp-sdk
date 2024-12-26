@@ -1,14 +1,18 @@
-﻿{*********************************************}
-{*                                           *}
-{*        AIMP Programming Interface         *}
-{*                v5.30.2500                 *}
-{*                                           *}
-{*            (c) Artem Izmaylov             *}
-{*                 2006-2023                 *}
-{*                www.aimp.ru                *}
-{*                                           *}
-{*********************************************}
-
+﻿////////////////////////////////////////////////////////////////////////////////
+//
+//  Project:   AIMP
+//             Programming Interface
+//
+//  Target:    v5.40 build 2650
+//
+//  Purpose:   General API Objects
+//
+//  Author:    Artem Izmaylov
+//             © 2006-2025
+//             www.aimp.ru
+//
+//  FPC:       OK
+//
 unit apiObjects;
 
 {$I apiConfig.inc}
@@ -16,7 +20,7 @@ unit apiObjects;
 interface
 
 uses
-  Windows;
+  Types, apiTypes;
 
 const
   SID_IAIMPConfig = '{41494D50-436F-6E66-6967-000000000000}';
@@ -80,7 +84,7 @@ const
   AIMP_IMAGE_DRAW_QUALITY_DEFAULT     = 0;
   AIMP_IMAGE_DRAW_QUALITY_LOW         = 8;
   AIMP_IMAGE_DRAW_QUALITY_HIGH        = 16;
-  
+
   // IAIMPPropertyList
   AIMP_PROPERTYLIST_CUSTOM_PROPID_BASE = 1000;
 
@@ -127,7 +131,8 @@ type
 
   IAIMPErrorInfo = interface(IUnknown)
   [SID_IAIMPErrorInfo]
-    function GetInfo(out ErrorCode: Integer; out Message: IAIMPString; out Details: IAIMPString): HRESULT; stdcall;
+    function GetInfo(out ErrorCode: Integer;
+      out Message: IAIMPString; out Details: IAIMPString): HRESULT; stdcall;
     function GetInfoFormatted(out S: IAIMPString): HRESULT; stdcall;
     procedure SetInfo(ErrorCode: Integer; Message, Details: IAIMPString); stdcall;
   end;
@@ -162,7 +167,7 @@ type
     function GetSize(out Size: TSize): HRESULT; stdcall;
     // Methods
     function Clone(out Image: IAIMPImage): HRESULT; stdcall;
-    function Draw(DC: HDC; R: TRect; Flags: DWORD; Attrs: IUnknown): HRESULT; stdcall;
+    function Draw(Canvas: HCANVAS; R: TRect; Flags: LongWord; Attrs: IUnknown): HRESULT; stdcall;
     function Resize(Width, Height: Integer): HRESULT; stdcall;
   end;
 
@@ -171,7 +176,7 @@ type
   IAIMPImage2 = interface(IAIMPImage)
   [SID_IAIMPImage2]
     // I/O
-    function LoadFromResource(ResInstance: THandle; ResName, ResType: PWideChar): HRESULT; stdcall;
+    function LoadFromResource(ResInstance: HMODULE; ResName, ResType: PChar): HRESULT; stdcall;
     function LoadFromBitmap(Bitmap: HBITMAP): HRESULT; stdcall;
     function LoadFromBits(Bits: PRGBQuad; Width, Height: Integer): HRESULT; stdcall;
     // Clipboard
@@ -187,8 +192,8 @@ type
     function CreateImage(out Image: IAIMPImage): HRESULT; stdcall;
     function GetInfo(out Size: TSize; out FormatID: Integer): HRESULT; stdcall;
     function GetData: PByte; stdcall;
-    function GetDataSize: DWORD; stdcall;
-    function SetDataSize(Value: DWORD): HRESULT; stdcall;
+    function GetDataSize: LongWord; stdcall;
+    function SetDataSize(Value: LongWord): HRESULT; stdcall;
   end;
 
   { IAIMPObjectList }
@@ -247,8 +252,8 @@ type
     function SetSize(const Value: Int64): HRESULT; stdcall;
     function GetPosition: Int64; stdcall;
     function Seek(const Offset: Int64; Mode: Integer): HRESULT; stdcall;
-    function Read(Buffer: PByte; Count: DWORD): Integer; stdcall;
-    function Write(Buffer: PByte; Count: DWORD; Written: PDWORD = nil): HRESULT; stdcall;
+    function Read(Buffer: PByte; Count: LongWord): Integer; stdcall;
+    function Write(Buffer: PByte; Count: LongWord; Written: PLongWord = nil): HRESULT; stdcall;
   end;
 
   { IAIMPFileStream }
@@ -270,33 +275,37 @@ type
 
   IAIMPString = interface(IUnknown)
   [SID_IAIMPString]
-    function GetChar(Index: Integer; out Char: WideChar): HRESULT; stdcall;
-    function GetData: PWideChar; stdcall;
+    function GetChar(Index: Integer; out Char: Char): HRESULT; stdcall;
+    function GetData: PChar; stdcall;
     function GetLength: Integer; stdcall;
     function GetHashCode: Integer; stdcall;
-    function SetChar(Index: Integer; Char: WideChar): HRESULT; stdcall;
-    function SetData(Chars: PWideChar; CharsCount: Integer): HRESULT; stdcall;
+    function SetChar(Index: Integer; Char: Char): HRESULT; stdcall;
+    function SetData(Chars: PChar; CharsCount: Integer): HRESULT; stdcall;
 
     function Add(S: IAIMPString): HRESULT; stdcall;
-    function Add2(Chars: PWideChar; Count: Integer): HRESULT; stdcall;
+    function Add2(Chars: PChar; Count: Integer): HRESULT; stdcall;
 
     function ChangeCase(Mode: Integer): HRESULT; stdcall;
     function Clone(out S: IAIMPString): HRESULT; stdcall;
 
-    function Compare(S: IAIMPString; out CompareResult: Integer; IgnoreCase: LongBool): HRESULT; stdcall;
-    function Compare2(Chars: PWideChar; CharsCount: Integer; out CompareResult: Integer; IgnoreCase: LongBool): HRESULT; stdcall;
+    function Compare(S: IAIMPString;
+      out CompareResult: Integer; IgnoreCase: LongBool): HRESULT; stdcall;
+    function Compare2(Chars: PChar; CharsCount: Integer;
+      out CompareResult: Integer; IgnoreCase: LongBool): HRESULT; stdcall;
 
     function Delete(Index, Count: Integer): HRESULT; stdcall;
 
-    function Find(S: IAIMPString; out Index: Integer; Flags: Integer; StartFromIndex: Integer = 0): HRESULT; stdcall;
-    function Find2(Chars: PWideChar; CharsCount: Integer; out Index: Integer; Flags: Integer; StartFromIndex: Integer = 0): HRESULT; stdcall;
+    function Find(S: IAIMPString; out Index: Integer;
+      Flags: Integer; StartFromIndex: Integer = 0): HRESULT; stdcall;
+    function Find2(Chars: PChar; CharsCount: Integer;
+      out Index: Integer; Flags: Integer; StartFromIndex: Integer = 0): HRESULT; stdcall;
 
     function Insert(Index: Integer; S: IAIMPString): HRESULT; stdcall;
-    function Insert2(Index: Integer; Chars: PWideChar; CharsCount: Integer): HRESULT; stdcall;
+    function Insert2(Index: Integer; Chars: PChar; CharsCount: Integer): HRESULT; stdcall;
 
     function Replace(OldPattern, NewPattern: IAIMPString; Flags: Integer): HRESULT; stdcall;
-    function Replace2(OldPatternChars: PWideChar; OldPatternCharsCount: Integer;
-      NewPatternChars: PWideChar; NewPatternCharsCount: Integer; Flags: Integer): HRESULT; stdcall;
+    function Replace2(OldPatternChars: PChar; OldPatternCharsCount: Integer;
+      NewPatternChars: PChar; NewPatternCharsCount: Integer; Flags: Integer): HRESULT; stdcall;
 
     function SubString(Index, Count: Integer; out S: IAIMPString): HRESULT; stdcall;
   end;

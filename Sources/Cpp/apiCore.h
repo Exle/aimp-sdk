@@ -1,21 +1,22 @@
-/************************************************/
-/*                                              */
-/*          AIMP Programming Interface          */
-/*               v5.30 build 2500               */
-/*                                              */
-/*                Artem Izmaylov                */
-/*                (C) 2006-2023                 */
-/*                 www.aimp.ru                  */
-/*               support@aimp.ru                */
-/*                                              */
-/************************************************/
-
+////////////////////////////////////////////////////////////////////////////////
+//
+//  Project:   AIMP
+//             Programming Interface
+//
+//  Target:    v5.40 build 2650
+//
+//  Purpose:   Core API
+//
+//  Author:    Artem Izmaylov
+//             © 2006-2025
+//             www.aimp.ru
+//
 #ifndef apiCoreH
 #define apiCoreH
 
-#include <windows.h>
 #include <unknwn.h>
 #include "apiObjects.h"
+#include "apiTypes.h"
 
 static const GUID IID_IAIMPCore               = {0x41494D50, 0x436F, 0x7265, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
 static const GUID IID_IAIMPServiceConfig      = {0x41494D50, 0x5372, 0x7643, 0x66, 0x67, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
@@ -42,7 +43,6 @@ const int AIMP_SERVICE_SHUTDOWN_FLAGS_NO_CONFIRM = 0x20;
 
 /* IAIMPCore.GetPath */
 const int AIMP_CORE_PATH_AUDIOLIBRARY = 6;
-const int AIMP_CORE_PATH_ENCODERS     = 8;
 const int AIMP_CORE_PATH_HELP         = 9;
 const int AIMP_CORE_PATH_ICONS        = 5;
 const int AIMP_CORE_PATH_LANGS        = 2;
@@ -98,7 +98,7 @@ class IAIMPServiceShutdown: public IUnknown
 {
 	public:
 		virtual HRESULT WINAPI Restart(IAIMPString *Params) = 0;
-		virtual HRESULT WINAPI Shutdown(DWORD Flags) = 0;
+		virtual HRESULT WINAPI Shutdown(LongWord Flags) = 0;
 };
 
 /* IAIMPServiceVersionInfo */

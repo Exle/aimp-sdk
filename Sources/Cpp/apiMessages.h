@@ -1,25 +1,27 @@
-/************************************************/
-/*                                              */
-/*          AIMP Programming Interface          */
-/*               v5.30 build 2500               */
-/*                                              */
-/*                Artem Izmaylov                */
-/*                (C) 2006-2023                 */
-/*                 www.aimp.ru                  */
-/*               support@aimp.ru                */
-/*                                              */
-/************************************************/
-
+////////////////////////////////////////////////////////////////////////////////
+//
+//  Project:   AIMP
+//             Programming Interface
+//
+//  Target:    v5.40 build 2650
+//
+//  Purpose:   Messages API
+//
+//  Author:    Artem Izmaylov
+//             © 2006-2025
+//             www.aimp.ru
+//
 #ifndef apiMessagesH
 #define apiMessagesH
 
-#include <windows.h>
 #include <unknwn.h>
 #include "apiFileManager.h"
+#include "apiPlayer.h"
+#include "apiTypes.h"
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 // Commands
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
 const int AIMP_MSG_CMD_BASE = 0;
 
@@ -38,7 +40,7 @@ const int AIMP_MSG_CMD_QFI_PLAYING_TRACK = AIMP_MSG_CMD_BASE + 2;
 // Show custom text in display of RunningLine or Text elements
 // AParam1: 0 - Hide text automaticly after 2 seconds
 //          1 - Text will be hidden manually (put nil to AParam2 to hide previous text)
-// AParam2: Pointer to WideChar array
+// AParam2: Pointer to TChar-array
 const int AIMP_MSG_CMD_SHOW_NOTIFICATION = AIMP_MSG_CMD_BASE + 3;
 
 const int AIMP_MSG_CMD_TOGGLE_PARTREPEAT = AIMP_MSG_CMD_BASE + 5;
@@ -253,9 +255,9 @@ const int AIMP_MSG_CMD_QFI = AIMP_MSG_CMD_BASE + 60;
 // AParam1, AParam2: unused
 const int AIMP_MSG_CMD_PLS_DELETE_SELECTED_FROM_HDD_W_FOLDERS = AIMP_MSG_CMD_BASE + 61;
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 // Properties
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
 const int AIMP_MSG_PROPERTY_BASE = 0x1000;
 
@@ -341,9 +343,7 @@ const int AIMP_MSG_PROPERTY_EQUALIZER_BAND = AIMP_MSG_PROPERTY_BASE + 15;
 // !!!ReadOnly property
 // AParam1: AIMP_MSG_PROPVALUE_GET
 // AParam2: Pointer to Integer variable
-//          0 = Stopped
-//          1 = Paused
-//          2 = Playing
+//			One of the AIMP_PLAYER_STATE_XXX
 // See AIMP_MSG_EVENT_PLAYER_STATE event
 const int AIMP_MSG_PROPERTY_PLAYER_STATE = AIMP_MSG_PROPERTY_BASE + 16;
 
@@ -462,9 +462,9 @@ const int AIMP_MSG_PROPERTY_PARTREPEAT_RANGE = AIMP_MSG_PROPERTY_BASE + 37;
 // AParam2: Pointer to LongBool (32-bit boolean value) variable
 const int AIMP_MSG_PROPERTY_AUTOJUMP_TO_NEXT_TRACK = AIMP_MSG_PROPERTY_BASE + 38;
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 // Events
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
 const int AIMP_MSG_EVENT_BASE = 0x2000;
 
@@ -486,7 +486,7 @@ const int AIMP_MSG_EVENT_STREAM_END = AIMP_MSG_EVENT_BASE + 5;
 	const int AIMP_MES_HAS_NEXT_TRACK  = 4;
 
 // Called, when player state has been changed (Played / Paused / Stopped)
-// AParam1: 0 = Stopped; 1 = Paused; 2 = Playing
+// AParam1: One of the AIMP_PLAYER_STATE_XXX
 const int AIMP_MSG_EVENT_PLAYER_STATE = AIMP_MSG_EVENT_BASE + 6;
 
 // Called, when property value has been changed
@@ -508,12 +508,12 @@ const int AIMP_MSG_EVENT_VISUAL_PLUGIN = AIMP_MSG_EVENT_BASE + 11;
 
 // Called, when mark of file has been changed
 // AParam1: New Mark Value (0..5)
-// AParam2: FileName (Pointer to WideChar)
+// AParam2: FileName (Pointer to TChar)
 // !!!WARNING: You must not fire this event manually!
 const int AIMP_MSG_EVENT_FILEMARK = AIMP_MSG_EVENT_BASE + 12;
 
 // Called, when statistics of the file changed
-// AParam2: FileName (Pointer to WideChar),
+// AParam2: FileName (Pointer to TChar),
 // !!!Note: If filename is empty or AParam2 is null - statistics for all files has been changed
 // !!!WARNING: You must not fire this event manually!
 const int AIMP_MSG_EVENT_STATISTICS_CHANGED = AIMP_MSG_EVENT_BASE + 14;
@@ -550,7 +550,7 @@ const int AIMP_MSG_EVENT_PLAYER_UPDATE_POSITION_HR = AIMP_MSG_EVENT_BASE + 21;
 
 // Called, when name of equalizer preset has been changed
 // AParam1: Unused
-// AParam2: Pointer to WideChar array, can be = nil (ReadOnly!)
+// AParam2: Pointer to TChar-array, can be = nil (ReadOnly!)
 const int AIMP_MSG_EVENT_EQUALIZER_PRESET_NAME = AIMP_MSG_EVENT_BASE + 22;
 
 // Callen, when playback queue changed
@@ -601,7 +601,7 @@ static const GUID IID_IAIMPServiceMessageDispatcher = {0x41494D50, 0x5372, 0x764
 class IAIMPMessageHook: public IUnknown
 {
 	public:
-		virtual void WINAPI CoreMessage(DWORD AMessage, int AParam1, void *AParam2, HRESULT *AResult) = 0;
+		virtual void WINAPI CoreMessage(LongWord AMessage, int AParam1, void *AParam2, HRESULT *AResult) = 0;
 };
 
 /* IAIMPServiceMessageDispatcher */
@@ -609,9 +609,9 @@ class IAIMPMessageHook: public IUnknown
 class IAIMPServiceMessageDispatcher: public IUnknown
 {
 	public:
-		virtual HRESULT WINAPI Send(DWORD AMessage, int AParam1, void *AParam2) = 0;
+		virtual HRESULT WINAPI Send(LongWord AMessage, int AParam1, void *AParam2) = 0;
 		// Custom Messages
-		virtual DWORD   WINAPI Register(PWCHAR AMessageName) = 0;
+		virtual LongWord   WINAPI Register(TChar* AMessageName) = 0;
 		// Hook
 		virtual HRESULT WINAPI Hook(IAIMPMessageHook *AHook) = 0;
 		virtual HRESULT WINAPI Unhook(IAIMPMessageHook *AHook) = 0;

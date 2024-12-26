@@ -1,14 +1,18 @@
-﻿{*********************************************}
-{*                                           *}
-{*        AIMP Programming Interface         *}
-{*                v5.30.2500                 *}
-{*                                           *}
-{*            (c) Artem Izmaylov             *}
-{*                 2006-2023                 *}
-{*                www.aimp.ru                *}
-{*                                           *}
-{*********************************************}
-
+﻿////////////////////////////////////////////////////////////////////////////////
+//
+//  Project:   AIMP
+//             Programming Interface
+//
+//  Target:    v5.40 build 2650
+//
+//  Purpose:   Visualization API
+//
+//  Author:    Artem Izmaylov
+//             © 2006-2025
+//             www.aimp.ru
+//
+//  FPC:       OK
+//
 unit apiVisuals;
 
 {$I apiConfig.inc}
@@ -16,7 +20,8 @@ unit apiVisuals;
 interface
 
 uses
-  Windows, apiObjects, apiCore;
+  apiObjects,
+  apiTypes;
 
 const
   SID_IAIMPExtensionEmbeddedVisualization = '{41494D50-4578-7445-6D62-645669730000}';
@@ -107,7 +112,7 @@ type
     procedure Finalize; stdcall;
     // Basic functionality
     procedure Click(X, Y: Integer; Button: Integer); stdcall;
-    procedure Draw(DC: HDC; Data: PAIMPVisualData); stdcall;
+    procedure Draw(Canvas: HCANVAS; Data: PAIMPVisualData); stdcall;
     procedure Resize(NewWidth, NewHeight: Integer); stdcall;
   end;
 

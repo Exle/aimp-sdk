@@ -1,20 +1,21 @@
-/************************************************/
-/*                                              */
-/*          AIMP Programming Interface          */
-/*               v5.30 build 2500               */
-/*                                              */
-/*                Artem Izmaylov                */
-/*                (C) 2006-2023                 */
-/*                 www.aimp.ru                  */
-/*               support@aimp.ru                */
-/*                                              */
-/************************************************/
-
+////////////////////////////////////////////////////////////////////////////////
+//
+//  Project:   AIMP
+//             Programming Interface
+//
+//  Target:    v5.40 build 2650
+//
+//  Purpose:   General API Objects
+//
+//  Author:    Artem Izmaylov
+//             © 2006-2025
+//             www.aimp.ru
+//
 #ifndef apiObjectsH
 #define apiObjectsH
 
-#include <windows.h>
 #include <unknwn.h>
+#include "apiTypes.h"
 
 static const GUID IID_IAIMPConfig = {0x41494D50, 0x436F, 0x6E66, 0x69, 0x67, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
 static const GUID IID_IAIMPDPIAware = {0x41494D50, 0x4450, 0x4941, 0x77, 0x61, 0x72, 0x65, 0x00, 0x00, 0x00, 0x00};
@@ -103,34 +104,34 @@ class IAIMPObjectList: public IUnknown
 
 class IAIMPString: public IUnknown
 {
-	public:
-		virtual HRESULT WINAPI GetChar(int Index, WCHAR *Char) = 0;
-		virtual WCHAR* WINAPI GetData() = 0;
+	public: 
+		virtual HRESULT WINAPI GetChar(int Index, TChar *Char) = 0;
+		virtual TChar* WINAPI GetData() = 0;
 		virtual int WINAPI GetLength() = 0;
 		virtual int WINAPI GetHashCode() = 0;
-		virtual HRESULT WINAPI SetChar(int Index, WCHAR Char) = 0;
-		virtual HRESULT WINAPI SetData(WCHAR* Chars, int CharsCount) = 0;
+		virtual HRESULT WINAPI SetChar(int Index, TChar Char) = 0;
+		virtual HRESULT WINAPI SetData(TChar* Chars, int CharsCount) = 0;
 
 		virtual HRESULT WINAPI Add(IAIMPString* S) = 0;
-		virtual HRESULT WINAPI Add2(WCHAR* Chars, int CharsCount) = 0;
+		virtual HRESULT WINAPI Add2(TChar* Chars, int CharsCount) = 0;
 
 		virtual HRESULT WINAPI ChangeCase(int Mode) = 0;
 		virtual HRESULT WINAPI Clone(IAIMPString **S) = 0;
 
 		virtual HRESULT WINAPI Compare(IAIMPString* S, int* CompareResult, BOOL IgnoreCase) = 0;
-		virtual HRESULT WINAPI Compare2(WCHAR* Chars, int CharsCount, int* CompareResult, BOOL IgnoreCase) = 0;
+		virtual HRESULT WINAPI Compare2(TChar* Chars, int CharsCount, int* CompareResult, BOOL IgnoreCase) = 0;
 
 		virtual HRESULT WINAPI Delete(int Index, int Count) = 0;
 
 		virtual HRESULT WINAPI Find(IAIMPString* S, int *Index, int Flags, int StartFromIndex) = 0;
-		virtual HRESULT WINAPI Find2(WCHAR *Chars, int CharsCount, int *Index, int Flags, int StartFromIndex) = 0;
+		virtual HRESULT WINAPI Find2(TChar *Chars, int CharsCount, int *Index, int Flags, int StartFromIndex) = 0;
 
 		virtual HRESULT WINAPI Insert(int Index, IAIMPString *S) = 0;
-		virtual HRESULT WINAPI Insert2(int Index, WCHAR *Chars, int CharsCount) = 0;
+		virtual HRESULT WINAPI Insert2(int Index, TChar *Chars, int CharsCount) = 0;
 
 		virtual HRESULT WINAPI Replace(IAIMPString *OldPattern, IAIMPString *NewPattern, int Flags) = 0;
-		virtual HRESULT WINAPI Replace2(WCHAR *OldPatternChars, int OldPatternCharsCount,
-			WCHAR *NewPatternChars, int NewPatternCharsCount, int Flags) = 0;
+		virtual HRESULT WINAPI Replace2(TChar *OldPatternChars, int OldPatternCharsCount,
+			TChar *NewPatternChars, int NewPatternCharsCount, int Flags) = 0;
 
 		virtual HRESULT WINAPI SubString(int Index, int Count, IAIMPString **S) = 0;
 };
@@ -187,7 +188,7 @@ class IAIMPImage: public IUnknown
 		virtual int WINAPI GetFormatID() = 0;
 		virtual HRESULT WINAPI GetSize(SIZE *size) = 0;
 		virtual HRESULT Clone(IAIMPImage **Image) = 0;
-		virtual HRESULT WINAPI Draw(HDC DC, RECT R, DWORD Flags, IUnknown *Attrs) = 0;
+		virtual HRESULT WINAPI Draw(HCANVAS Canvas, RECT R, LongWord Flags, IUnknown *Attrs) = 0;
 		virtual HRESULT WINAPI Resize(int Width, int Height) = 0;
 };
 
@@ -196,7 +197,7 @@ class IAIMPImage: public IUnknown
 class IAIMPImage2: public IAIMPImage
 {
 	public:
-		virtual HRESULT WINAPI LoadFromResource(HMODULE ResInstance, WCHAR* ResName, WCHAR* ResType) = 0;
+		virtual HRESULT WINAPI LoadFromResource(HMODULE ResInstance, TChar* ResName, TChar* ResType) = 0;
 		virtual HRESULT WINAPI LoadFromBitmap(HBITMAP Bitmap) = 0;
 		virtual HRESULT WINAPI LoadFromBits(RGBQUAD* Bits, int Width, int Height) = 0;
 		virtual HRESULT WINAPI CopyToClipboard() = 0;
@@ -213,8 +214,8 @@ class IAIMPImageContainer: public IUnknown
 		virtual HRESULT WINAPI CreateImage(IAIMPImage **Image) = 0;
 		virtual HRESULT WINAPI GetInfo(SIZE *Size, int *FormatID) = 0;
 		virtual byte* WINAPI GetData() = 0;
-		virtual DWORD WINAPI GetDataSize() = 0;
-		virtual HRESULT WINAPI SetDataSize(DWORD Value) = 0;
+		virtual LongWord WINAPI GetDataSize() = 0;
+		virtual HRESULT WINAPI SetDataSize(LongWord Value) = 0;
 };
 
 /* IAIMPProgressCallback */

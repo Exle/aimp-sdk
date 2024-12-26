@@ -138,17 +138,11 @@ end;
 
 constructor TAIMPDemoPluginOptionForm.Create(AParentWnd: HWND);
 var
-  ABounds: Trect;
   AService: IAIMPServiceUI;
 begin
-  GetWindowRect(AParentWnd, ABounds);
-  OffsetRect(ABounds, -ABounds.Left, -ABounds.Top);
-
   CoreGetService(IAIMPServiceUI, AService);
   CheckResult(AService.CreateForm(AParentWnd, AIMPUI_SERVICE_CREATEFORM_FLAGS_CHILD, MakeString('DemoForm'), nil, FForm));
   CheckResult(FForm.SetValueAsInt32(AIMPUI_FORM_PROPID_BORDERSTYLE, AIMPUI_FLAGS_BORDERSTYLE_NONE));
-  CheckResult(FForm.SetPlacement(TAIMPUIControlPlacement.Create(ABounds)));
-
   CreateControls(AService);
 end;
 

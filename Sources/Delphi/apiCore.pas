@@ -1,14 +1,18 @@
-﻿{*********************************************}
-{*                                           *}
-{*        AIMP Programming Interface         *}
-{*                v5.30.2500                 *}
-{*                                           *}
-{*            (c) Artem Izmaylov             *}
-{*                 2006-2023                 *}
-{*                www.aimp.ru                *}
-{*                                           *}
-{*********************************************}
-
+﻿////////////////////////////////////////////////////////////////////////////////
+//
+//  Project:   AIMP
+//             Programming Interface
+//
+//  Target:    v5.40 build 2650
+//
+//  Purpose:   Core API
+//
+//  Author:    Artem Izmaylov
+//             © 2006-2025
+//             www.aimp.ru
+//
+//  FPC:       OK
+//
 unit apiCore;
 
 {$I apiConfig.inc}
@@ -16,7 +20,7 @@ unit apiCore;
 interface
 
 uses
-  Windows, apiObjects;
+  apiObjects;
 
 const
   SID_IAIMPCore = '{41494D50-436F-7265-0000-000000000000}';
@@ -54,7 +58,6 @@ const
 
   // IAIMPCore.GetPath
   AIMP_CORE_PATH_AUDIOLIBRARY = 6;
-  AIMP_CORE_PATH_ENCODERS     = 8;
   AIMP_CORE_PATH_HELP         = 9;
   AIMP_CORE_PATH_ICONS        = 5;
   AIMP_CORE_PATH_LANGS        = 2;
@@ -107,7 +110,7 @@ type
   IAIMPServiceShutdown = interface(IUnknown)
   [SID_IAIMPServiceShutdown]
     function Restart(Params: IAIMPString): HRESULT; stdcall;
-    function Shutdown(Flags: DWORD): HRESULT; stdcall;
+    function Shutdown(Flags: LongWord): HRESULT; stdcall;
   end;
 
   { IAIMPServiceVersionInfo }

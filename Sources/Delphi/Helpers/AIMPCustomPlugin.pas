@@ -1,14 +1,14 @@
-﻿{*********************************************}
-{*                                           *}
-{*        AIMP Programming Interface         *}
-{*                v5.00.2300                 *}
-{*                                           *}
-{*            (c) Artem Izmaylov             *}
-{*                 2006-2021                 *}
-{*                www.aimp.ru                *}
-{*                                           *}
-{*********************************************}
-
+﻿////////////////////////////////////////////////////////////////////////////////
+//
+//  Project:   AIMP
+//             Programming Interface
+//
+//  Target:    v5.40 build 2650
+//
+//  Author:    Artem Izmaylov
+//             © 2006-2025
+//             www.aimp.ru
+//
 unit AIMPCustomPlugin;
 
 {$I apiConfig.inc}
@@ -16,7 +16,7 @@ unit AIMPCustomPlugin;
 interface
 
 uses
-  Windows, apiCore, apiObjects, apiPlugin, apiWrappers;
+  apiCore, apiObjects, apiPlugin, apiWrappers;
 
 type
 
@@ -25,8 +25,8 @@ type
   TAIMPCustomPlugin = class(TInterfacedObjectEx, IAIMPPlugin)
   protected
     // IAIMPPlugin
-    function InfoGet(Index: Integer): PWideChar; virtual; stdcall; abstract;
-    function InfoGetCategories: DWORD; virtual; stdcall; abstract;
+    function InfoGet(Index: Integer): PChar; virtual; stdcall; abstract;
+    function InfoGetCategories: LongWord; virtual; stdcall; abstract;
     function Initialize(Core: IAIMPCore): HRESULT; virtual; stdcall;
     procedure Finalize; virtual; stdcall;
     procedure SystemNotification(NotifyID: Integer; Data: IUnknown); virtual; stdcall;

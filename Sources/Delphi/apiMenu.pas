@@ -1,14 +1,18 @@
-﻿{*********************************************}
-{*                                           *}
-{*        AIMP Programming Interface         *}
-{*                v5.30.2500                 *}
-{*                                           *}
-{*            (c) Artem Izmaylov             *}
-{*                 2006-2023                 *}
-{*                www.aimp.ru                *}
-{*                                           *}
-{*********************************************}
-
+﻿////////////////////////////////////////////////////////////////////////////////
+//
+//  Project:   AIMP
+//             Programming Interface
+//
+//  Target:    v5.40 build 2650
+//
+//  Purpose:   Menus API
+//
+//  Author:    Artem Izmaylov
+//             © 2006-2025
+//             www.aimp.ru
+//
+//  FPC:       OK
+//
 unit apiMenu;
 
 {$I apiConfig.inc}
@@ -16,7 +20,7 @@ unit apiMenu;
 interface
 
 uses
-  Windows, apiObjects, apiActions;
+  apiObjects;
 
 const
   SID_IAIMPMenuItem = '{41494D50-4D65-6E75-4974-656D00000000}';

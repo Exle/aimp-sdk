@@ -1,23 +1,24 @@
-/************************************************/
-/*                                              */
-/*          AIMP Programming Interface          */
-/*               v5.30 build 2500               */
-/*                                              */
-/*                Artem Izmaylov                */
-/*                (C) 2006-2023                 */
-/*                 www.aimp.ru                  */
-/*               support@aimp.ru                */
-/*                                              */
-/************************************************/
-
+////////////////////////////////////////////////////////////////////////////////
+//
+//  Project:   AIMP
+//             Programming Interface
+//
+//  Target:    v5.40 build 2650
+//
+//  Purpose:   Player API
+//
+//  Author:    Artem Izmaylov
+//             © 2006-2025
+//             www.aimp.ru
+//
 #ifndef apiPlayerH
 #define apiPlayerH
 
-#include <windows.h>
 #include <unknwn.h>
 #include "apiObjects.h"
 #include "apiPlaylists.h"
 #include "apiFileManager.h"
+#include "apiTypes.h"
 
 static const GUID IID_IAIMPEqualizerBands = {0x41494D50, 0x4571, 0x4261, 0x6E, 0x64, 0x73, 0x00, 0x00, 0x00, 0x00, 0x00};
 static const GUID IID_IAIMPEqualizerPreset = {0x41494D50, 0x4571, 0x5072, 0x73, 0x74, 0x32, 0x00, 0x00, 0x00, 0x00, 0x00};
@@ -63,6 +64,11 @@ const int AIMP_PLAYER_PROPID_MANUALSWITCHING_CROSSFADE            = 21; // msec
 const int AIMP_PLAYER_PROPID_MANUALSWITCHING_FADEIN               = 22; // msec
 const int AIMP_PLAYER_PROPID_MANUALSWITCHING_FADEOUT              = 23; // msec
 const int AIMP_PLAYER_PROPID_OUTPUT				 				  = 30; // IAIMPString or IAIMPObjectList
+
+// IAIMPServicePlayer.GetState
+const int AIMP_PLAYER_STATE_STOPPED = 0;
+const int AIMP_PLAYER_STATE_PAUSED  = 1;
+const int AIMP_PLAYER_STATE_PLAYING = 2;
 
 #pragma pack(push, 1)
 struct TAIMPWaveformPeakInfo
@@ -112,8 +118,8 @@ class IAIMPExtensionPlayerHook: public IUnknown
 class IAIMPExtensionPlaybackQueue: public IUnknown
 {
 	public:
-		virtual HRESULT WINAPI GetNext(IUnknown* Current, DWORD Flags, IAIMPPlaybackQueueItem* QueueItem) = 0;
-		virtual HRESULT WINAPI GetPrev(IUnknown* Current, DWORD Flags, IAIMPPlaybackQueueItem* QueueItem) = 0;
+		virtual HRESULT WINAPI GetNext(IUnknown* Current, LongWord Flags, IAIMPPlaybackQueueItem* QueueItem) = 0;
+		virtual HRESULT WINAPI GetPrev(IUnknown* Current, LongWord Flags, IAIMPPlaybackQueueItem* QueueItem) = 0;
 		virtual void WINAPI OnSelect(IAIMPPlaylistItem* Item, IAIMPPlaybackQueueItem* QueueItem) = 0;
 };
 
@@ -142,7 +148,7 @@ class IAIMPServicePlayer: public IUnknown // + IAIMPPropertyList
 		virtual HRESULT WINAPI Play(IAIMPPlaybackQueueItem* Item) = 0;
 		virtual HRESULT WINAPI Play2(IAIMPPlaylistItem* Item) = 0;
 		virtual HRESULT WINAPI Play3(IAIMPPlaylist* Playlist) = 0;
-		virtual HRESULT WINAPI Play4(IAIMPString* FileURI, DWORD Flags) = 0;
+		virtual HRESULT WINAPI Play4(IAIMPString* FileURI, LongWord Flags) = 0;
 		// Navigation
 		virtual HRESULT WINAPI GoToNext() = 0;
 		virtual HRESULT WINAPI GoToPrev() = 0;
@@ -156,7 +162,7 @@ class IAIMPServicePlayer: public IUnknown // + IAIMPPropertyList
 		virtual HRESULT WINAPI SetVolume(const float Level) = 0;
 		virtual HRESULT WINAPI GetInfo(IAIMPFileInfo** FileInfo) = 0;
 		virtual HRESULT WINAPI GetPlaylistItem(IAIMPPlaylistItem **Item) = 0;
-		virtual int WINAPI GetState() = 0;
+		virtual int WINAPI GetState() = 0; // AIMP_PLAYER_STATE_XXX
 		virtual HRESULT WINAPI Pause() = 0;
 		virtual HRESULT WINAPI Resume() = 0;
 		virtual HRESULT WINAPI Stop() = 0;
@@ -168,9 +174,9 @@ class IAIMPServicePlayer: public IUnknown // + IAIMPPropertyList
 class IAIMPServicePlayer2: public IAIMPServicePlayer
 {
 	public:
-		virtual HRESULT WINAPI Play(IAIMPPlaybackQueueItem* Item, float offset, DWORD flags) = 0;
-		virtual HRESULT WINAPI Play2(IAIMPPlaylistItem* Item, float offset, DWORD flags) = 0;
-		virtual HRESULT WINAPI Play4(IAIMPString* FileURI, float offset, DWORD flags) = 0;
+		virtual HRESULT WINAPI Play(IAIMPPlaybackQueueItem* Item, float offset, LongWord flags) = 0;
+		virtual HRESULT WINAPI Play2(IAIMPPlaylistItem* Item, float offset, LongWord flags) = 0;
+		virtual HRESULT WINAPI Play4(IAIMPString* FileURI, float offset, LongWord flags) = 0;
 };
 
 

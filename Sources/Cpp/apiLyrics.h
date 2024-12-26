@@ -1,23 +1,24 @@
-/************************************************/
-/*                                              */
-/*          AIMP Programming Interface          */
-/*               v5.30 build 2500               */
-/*                                              */
-/*                Artem Izmaylov                */
-/*                (C) 2006-2023                 */
-/*                 www.aimp.ru                  */
-/*               support@aimp.ru                */
-/*                                              */
-/************************************************/
-
+////////////////////////////////////////////////////////////////////////////////
+//
+//  Project:   AIMP
+//             Programming Interface
+//
+//  Target:    v5.40 build 2650
+//
+//  Purpose:   Lyrics API
+//
+//  Author:    Artem Izmaylov
+//             © 2006-2025
+//             www.aimp.ru
+//
 #ifndef apiLyricsH
 #define apiLyricsH
 
-#include <windows.h>
 #include <unknwn.h>
 #include "apiObjects.h"
 #include "apiFileManager.h"
 #include "apiThreading.h"
+#include "apiTypes.h"
 
 static const GUID IID_IAIMPLyrics = {0x41494D50, 0x4C79, 0x7269, 0x63, 0x73, 0x46, 0x69, 0x6C, 0x65, 0x00, 0x00};
 static const GUID IID_IAIMPExtensionLyricsProvider = {0x41494D50, 0x4578, 0x744C, 0x79, 0x72, 0x69, 0x78, 0x50, 0x72, 0x76, 0x00};
@@ -81,8 +82,8 @@ typedef void (CALLBACK TAIMPServiceLyricsReceiveProc)(IAIMPLyrics *Lyrics, void 
 class IAIMPExtensionLyricsProvider: public IUnknown
 {
 	public:
-		virtual HRESULT WINAPI Get(IAIMPTaskOwner* Owner, IAIMPFileInfo* FileInfo, DWORD Flags, IAIMPLyrics* Lyrics) = 0;
-		virtual DWORD WINAPI GetCategory() = 0;
+		virtual HRESULT WINAPI Get(IAIMPTaskOwner* Owner, IAIMPFileInfo* FileInfo, LongWord Flags, IAIMPLyrics* Lyrics) = 0;
+		virtual LongWord WINAPI GetCategory() = 0;
 };
 
 
@@ -91,8 +92,10 @@ class IAIMPExtensionLyricsProvider: public IUnknown
 class IAIMPServiceLyrics: public IUnknown
 {
 	public:
-		virtual HRESULT WINAPI Get(IAIMPFileInfo* FileInfo, DWORD Flags, TAIMPServiceLyricsReceiveProc *CallbackProc, void *UserData, void **TaskID) = 0;
-		virtual HRESULT WINAPI Cancel(void* TaskID, DWORD Flags) = 0;
+		virtual HRESULT WINAPI Get(IAIMPFileInfo* FileInfo, LongWord Flags, 
+			TAIMPServiceLyricsReceiveProc *CallbackProc, void *UserData, 
+			TTaskHandle *TaskID) = 0;
+		virtual HRESULT WINAPI Cancel(TTaskHandle TaskID, LongWord Flags) = 0;
 };
 
 #endif // !apiLyricsH

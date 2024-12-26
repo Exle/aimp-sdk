@@ -1,21 +1,22 @@
-/************************************************/
-/*                                              */
-/*          AIMP Programming Interface          */
-/*               v5.30 build 2500               */
-/*                                              */
-/*                Artem Izmaylov                */
-/*                (C) 2006-2023                 */
-/*                 www.aimp.ru                  */
-/*               support@aimp.ru                */
-/*                                              */
-/************************************************/
-
+////////////////////////////////////////////////////////////////////////////////
+//
+//  Project:   AIMP
+//             Programming Interface
+//
+//  Target:    v5.40 build 2650
+//
+//  Purpose:   Actions API
+//
+//  Author:    Artem Izmaylov
+//             © 2006-2025
+//             www.aimp.ru
+//
 #ifndef apiActionsH
 #define apiActionsH
 
-#include <windows.h>
 #include <unknwn.h>
 #include "apiObjects.h"
+#include "apiTypes.h"
 
 static const GUID IID_IAIMPAction = {0x41494D50, 0x4163, 0x7469, 0x6F, 0x6E, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
 static const GUID IID_IAIMPActionEvent = {0x41494D50, 0x4163, 0x7469, 0x6F, 0x6E, 0x45, 0x76, 0x65, 0x6E, 0x74, 0x00};

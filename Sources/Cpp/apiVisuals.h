@@ -1,22 +1,23 @@
-/************************************************/
-/*                                              */
-/*          AIMP Programming Interface          */
-/*               v5.30 build 2500               */
-/*                                              */
-/*                Artem Izmaylov                */
-/*                (C) 2006-2023                 */
-/*                 www.aimp.ru                  */
-/*               support@aimp.ru                */
-/*                                              */
-/************************************************/
-
+////////////////////////////////////////////////////////////////////////////////
+//
+//  Project:   AIMP
+//             Programming Interface
+//
+//  Target:    v5.40 build 2650
+//
+//  Purpose:   Visualization API
+//
+//  Author:    Artem Izmaylov
+//             © 2006-2025
+//             www.aimp.ru
+//
 #ifndef apiVisualsH
 #define apiVisualsH
 
-#include <windows.h>
 #include <unknwn.h>
 #include "apiObjects.h"
 #include "apiCore.h"
+#include "apiTypes.h"
 
 static const GUID IID_IAIMPExtensionCustomVisualization = {0x41494D50, 0x4578, 0x7443, 0x73, 0x74, 0x6D, 0x56, 0x69, 0x73, 0x00, 0x00};
 static const GUID IID_IAIMPExtensionEmbeddedVisualization = {0x41494D50, 0x4578, 0x7445, 0x6D, 0x62, 0x64, 0x56, 0x69, 0x73, 0x00, 0x00};
@@ -72,7 +73,7 @@ class IAIMPExtensionEmbeddedVisualization: public IUnknown
 		virtual void WINAPI Finalize() = 0;
 		// Basic functionality
 		virtual void WINAPI Click(int X, int Y, int Button) = 0;
-		virtual void WINAPI Draw(HDC DC, PAIMPVisualData Data) = 0;
+		virtual void WINAPI Draw(HCANVAS Canvas, PAIMPVisualData Data) = 0;
 		virtual void WINAPI Resize(int NewWidth, int NewHeight) = 0;
 };
 

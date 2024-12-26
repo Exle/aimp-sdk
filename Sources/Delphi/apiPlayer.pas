@@ -1,14 +1,18 @@
-﻿{*********************************************}
-{*                                           *}
-{*        AIMP Programming Interface         *}
-{*                v5.30.2500                 *}
-{*                                           *}
-{*            (c) Artem Izmaylov             *}
-{*                 2006-2023                 *}
-{*                www.aimp.ru                *}
-{*                                           *}
-{*********************************************}
-
+﻿////////////////////////////////////////////////////////////////////////////////
+//
+//  Project:   AIMP
+//             Programming Interface
+//
+//  Target:    v5.40 build 2650
+//
+//  Purpose:   Player API
+//
+//  Author:    Artem Izmaylov
+//             © 2006-2025
+//             www.aimp.ru
+//
+//  FPC:       OK
+//
 unit apiPlayer;
 
 {$I apiConfig.inc}
@@ -16,16 +20,10 @@ unit apiPlayer;
 interface
 
 uses
-  // RTL
-  Windows,
-  Math,
-  // API
-  apiCore,
   apiFileManager,
   apiObjects,
   apiPlaylists,
-  apiThreading,
-  apiLyrics;
+  apiThreading;
 
 const
   SID_IAIMPEqualizerBands = '{41494D50-4571-4261-6E64-730000000000}';
@@ -100,6 +98,11 @@ const
   AIMP_PLAYER_PROPID_MANUALSWITCHING_FADEOUT              = 23; // msec
   AIMP_PLAYER_PROPID_OUTPUT                               = 30; // IAIMPString or IAIMPObjectList
 
+  // IAIMPServicePlayer.GetState
+  AIMP_PLAYER_STATE_STOPPED = 0;
+  AIMP_PLAYER_STATE_PAUSED  = 1;
+  AIMP_PLAYER_STATE_PLAYING = 2;
+
 type
   PAIMPWaveformPeakInfo = ^TAIMPWaveformPeakInfo;
   TAIMPWaveformPeakInfo = packed record
@@ -151,8 +154,8 @@ type
 
   IAIMPExtensionPlaybackQueue = interface(IUnknown)
   [SID_IAIMPExtensionPlaybackQueue]
-    function GetNext(Current: IUnknown; Flags: DWORD; QueueItem: IAIMPPlaybackQueueItem): LongBool; stdcall;
-    function GetPrev(Current: IUnknown; Flags: DWORD; QueueItem: IAIMPPlaybackQueueItem): LongBool; stdcall;
+    function GetNext(Current: IUnknown; Flags: LongWord; QueueItem: IAIMPPlaybackQueueItem): LongBool; stdcall;
+    function GetPrev(Current: IUnknown; Flags: LongWord; QueueItem: IAIMPPlaybackQueueItem): LongBool; stdcall;
     procedure OnSelect(Item: IAIMPPlaylistItem; QueueItem: IAIMPPlaybackQueueItem); stdcall;
   end;
 
@@ -183,7 +186,7 @@ type
     function Play(Item: IAIMPPlaybackQueueItem): HRESULT; stdcall;
     function Play2(Item: IAIMPPlaylistItem): HRESULT; stdcall;
     function Play3(Playlist: IAIMPPlaylist): HRESULT; stdcall;
-    function Play4(FileURI: IAIMPString; Flags: DWORD): HRESULT; stdcall;
+    function Play4(FileURI: IAIMPString; Flags: LongWord): HRESULT; stdcall;
 
     // Navigation
     function GoToNext: HRESULT; stdcall;
@@ -199,7 +202,7 @@ type
     function SetVolume(const Level: Single): HRESULT; stdcall;
     function GetInfo(out FileInfo: IAIMPFileInfo): HRESULT; stdcall;
     function GetPlaylistItem(out Item: IAIMPPlaylistItem): HRESULT; stdcall;
-    function GetState: Integer; stdcall;
+    function GetState: Integer; stdcall; // AIMP_PLAYER_STATE_XXX
     function Pause: HRESULT; stdcall;
     function Resume: HRESULT; stdcall;
     function Stop: HRESULT; stdcall;
@@ -210,9 +213,9 @@ type
 
   IAIMPServicePlayer2 = interface(IAIMPServicePlayer)
   [SID_IAIMPServicePlayer2]
-    function Play(Item: IAIMPPlaybackQueueItem; Offset: Single; Flags: DWORD): HRESULT; overload; stdcall;
-    function Play2(Item: IAIMPPlaylistItem; Offset: Single; Flags: DWORD): HRESULT; overload; stdcall;
-    function Play4(FileURI: IAIMPString; Offset: Single; Flags: DWORD): HRESULT; overload; stdcall;
+    function Play(Item: IAIMPPlaybackQueueItem; Offset: Single; Flags: LongWord): HRESULT; overload; stdcall;
+    function Play2(Item: IAIMPPlaylistItem; Offset: Single; Flags: LongWord): HRESULT; overload; stdcall;
+    function Play4(FileURI: IAIMPString; Offset: Single; Flags: LongWord): HRESULT; overload; stdcall;
   end;
 
   { IAIMPServicePlayerEqualizer }
@@ -269,7 +272,9 @@ implementation
 
 function TAIMPWaveformPeakInfo.Max: Word;
 begin
-  Result := Math.Max(MaxPositive, MaxNegative);
+  Result := MaxPositive;
+  if MaxNegative > Result then
+    Result := MaxNegative;
 end;
 
 end.

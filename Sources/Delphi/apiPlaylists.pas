@@ -1,14 +1,18 @@
-﻿{*********************************************}
-{*                                           *}
-{*        AIMP Programming Interface         *}
-{*                v5.30.2500                 *}
-{*                                           *}
-{*            (c) Artem Izmaylov             *}
-{*                 2006-2023                 *}
-{*                www.aimp.ru                *}
-{*                                           *}
-{*********************************************}
-
+﻿////////////////////////////////////////////////////////////////////////////////
+//
+//  Project:   AIMP
+//             Programming Interface
+//
+//  Target:    v5.40 build 2650
+//
+//  Purpose:   Playlists API
+//
+//  Author:    Artem Izmaylov
+//             © 2006-2025
+//             www.aimp.ru
+//
+//  FPC:       OK
+//
 unit apiPlaylists;
 
 {$I apiConfig.inc}
@@ -16,7 +20,9 @@ unit apiPlaylists;
 interface
 
 uses
-  Windows, apiActions, apiObjects, apiThreading;
+  apiObjects,
+  apiThreading,
+  apiTypes;
 
 const
   SID_IAIMPPlaylist = '{41494D50-506C-7300-0000-000000000000}';
@@ -48,6 +54,9 @@ const
 
   SID_IAIMPExtensionPlaylistPreimageFactory = '{41494D50-4578-7453-6D50-6C7346637400}';
   IID_IAIMPExtensionPlaylistPreimageFactory: TGUID = SID_IAIMPExtensionPlaylistPreimageFactory;
+
+  SID_IAIMPPlaylistProperties = '{41494D50-506C-7350-726F-707300000000}';
+  IID_IAIMPPlaylistProperties: TGUID = SID_IAIMPPlaylistProperties;
 
   SID_IAIMPPlaylistPreimage = '{41494D50-536D-504C-5372-630000000000}';
   IID_IAIMPPlaylistPreimage: TGUID = SID_IAIMPPlaylistPreimage;
@@ -95,6 +104,7 @@ const
   AIMP_PLAYLIST_PROPID_READONLY                 = 2;
   AIMP_PLAYLIST_PROPID_FOCUSED_OBJECT           = 3;
   AIMP_PLAYLIST_PROPID_ID                       = 4;
+  AIMP_PLAYLIST_PROPID_GROUPNAME                = 5; // v5.40
   AIMP_PLAYLIST_PROPID_GROUPPING                = 10;
   AIMP_PLAYLIST_PROPID_GROUPPING_OVERRIDEN      = 11;
   AIMP_PLAYLIST_PROPID_GROUPPING_TEMPLATE       = 12;
@@ -115,6 +125,7 @@ const
   AIMP_PLAYLIST_PROPID_PLAYINGINDEX             = 52;
   AIMP_PLAYLIST_PROPID_SIZE                     = 53;
   AIMP_PLAYLIST_PROPID_DURATION                 = 54;
+  AIMP_PLAYLIST_PROPID_DURATION_REMAINING       = 55; // v5.40
   AIMP_PLAYLIST_PROPID_PREIMAGE                 = 60;
 
   // Flags for IAIMPPlaylist.Add & IAIMPPlaylist.AddList
@@ -153,20 +164,22 @@ const
   AIMP_PLAYLIST_RELOADINFO_FLAGS_SELECTED = 2;
 
   // Flags for IAIMPPlaylistListener.Changed
-  AIMP_PLAYLIST_NOTIFY_NAME           = 1;
-  AIMP_PLAYLIST_NOTIFY_SELECTION      = 2;
-  AIMP_PLAYLIST_NOTIFY_PLAYBACKCURSOR = 4;
-  AIMP_PLAYLIST_NOTIFY_READONLY       = 8;
-  AIMP_PLAYLIST_NOTIFY_FOCUSINDEX     = 16;
-  AIMP_PLAYLIST_NOTIFY_CONTENT        = 32;
-  AIMP_PLAYLIST_NOTIFY_FILEINFO       = 64;
-  AIMP_PLAYLIST_NOTIFY_STATISTICS     = 128;
-  AIMP_PLAYLIST_NOTIFY_PLAYINGSWITCHS = 256;
-  AIMP_PLAYLIST_NOTIFY_PREIMAGE       = 512;
-  AIMP_PLAYLIST_NOTIFY_MODIFIED       = 1024;
-  AIMP_PLAYLIST_NOTIFY_DEADSTATE      = 2048;
-  AIMP_PLAYLIST_NOTIFY_MAKEVISIBLE    = 4096;
-  AIMP_PLAYLIST_NOTIFY_PLAYBACKQUEUE  = 8192;
+  AIMP_PLAYLIST_NOTIFY_NAME             = $00000001;
+  AIMP_PLAYLIST_NOTIFY_SELECTION        = $00000002;
+  AIMP_PLAYLIST_NOTIFY_PLAYBACKCURSOR   = $00000004;
+  AIMP_PLAYLIST_NOTIFY_READONLY         = $00000008;
+  AIMP_PLAYLIST_NOTIFY_FOCUSINDEX       = $00000010;
+  AIMP_PLAYLIST_NOTIFY_CONTENT          = $00000020;
+  AIMP_PLAYLIST_NOTIFY_FILEINFO         = $00000040;
+  AIMP_PLAYLIST_NOTIFY_STATISTICS       = $00000080;
+  AIMP_PLAYLIST_NOTIFY_PLAYINGSWITCHS   = $00000100;
+  AIMP_PLAYLIST_NOTIFY_PREIMAGE         = $00000200;
+  AIMP_PLAYLIST_NOTIFY_MODIFIED         = $00000400;
+  AIMP_PLAYLIST_NOTIFY_DEADSTATE        = $00000800;
+  AIMP_PLAYLIST_NOTIFY_MAKEVISIBLE      = $00001000;
+  AIMP_PLAYLIST_NOTIFY_PLAYBACKQUEUE    = $00002000;
+  AIMP_PLAYLIST_NOTIFY_PLAYBACKBOOKMARK = $00004000; // v5.40
+  AIMP_PLAYLIST_NOTIFY_GROUPNAME        = $00008000; // v5.40
 
   // Properties Ids for IAIMPPlaylistPreimage
   AIMP_PLAYLISTPREIMAGE_PROPID_FACTORYID            = 1;
@@ -213,7 +226,7 @@ type
   IAIMPPlaylistListener = interface(IUnknown)
   [SID_IAIMPPlaylistListener]
     procedure Activated; stdcall;
-    procedure Changed(Flags: DWORD); stdcall;
+    procedure Changed(Flags: LongWord); stdcall;
     procedure Removed; stdcall;
   end;
 
@@ -231,15 +244,15 @@ type
   TAIMPPlaylistCompareProc = function (Item1, Item2: IAIMPPlaylistItem; UserData: Pointer): Integer; stdcall;
   TAIMPPlaylistDeleteProc = function (Item: IAIMPPlaylistItem; UserData: Pointer): LongBool; stdcall;
 
-  IAIMPPlaylist = interface(IUnknown) // + IAIMPPropertyList
+  IAIMPPlaylist = interface(IUnknown) // + IAIMPPlaylistProperties
   [SID_IAIMPPlaylist]
     // Adding
-    function Add(Obj: IUnknown; Flags: DWORD; InsertIn: Integer): HRESULT; stdcall;
-    function AddList(ObjList: IAIMPObjectList; Flags: DWORD; InsertIn: Integer): HRESULT; stdcall;
+    function Add(Obj: IUnknown; Flags: LongWord; InsertIn: Integer): HRESULT; stdcall;
+    function AddList(ObjList: IAIMPObjectList; Flags: LongWord; InsertIn: Integer): HRESULT; stdcall;
     // Deleting
     function Delete(Item: IAIMPPlaylistItem): HRESULT; stdcall;
     function Delete2(ItemIndex: Integer): HRESULT; stdcall;
-    function Delete3(Flags: DWORD; Proc: TAIMPPlaylistDeleteProc; UserData: Pointer): HRESULT; stdcall;
+    function Delete3(Flags: LongWord; Proc: TAIMPPlaylistDeleteProc; UserData: Pointer): HRESULT; stdcall;
     function DeleteAll: HRESULT; stdcall;
     // Sorting
     function Sort(Mode: Integer): HRESULT; stdcall;
@@ -249,11 +262,11 @@ type
     function BeginUpdate: HRESULT; stdcall;
     function EndUpdate: HRESULT; stdcall;
     // Other Commands
-    function Close(Flags: DWORD): HRESULT; stdcall;
-    function GetFiles(Flags: DWORD; out List: IAIMPObjectList): HRESULT; stdcall;
+    function Close(Flags: LongWord): HRESULT; stdcall;
+    function GetFiles(Flags: LongWord; out List: IAIMPObjectList): HRESULT; stdcall;
     function MergeGroup(Group: IAIMPPlaylistGroup): HRESULT; stdcall;
     function ReloadFromPreimage: HRESULT; stdcall;
-    function ReloadInfo(Flags: DWORD): HRESULT; stdcall;
+    function ReloadInfo(Flags: LongWord): HRESULT; stdcall;
     // Items
     function GetItem(Index: Integer; const IID: TGUID; out Obj): HRESULT; stdcall;
     function GetItemCount: Integer; stdcall;
@@ -263,6 +276,14 @@ type
     // Listener
     function ListenerAdd(AListener: IAIMPPlaylistListener): HRESULT; stdcall;
     function ListenerRemove(AListener: IAIMPPlaylistListener): HRESULT; stdcall;
+  end;
+
+  { IAIMPPlaylistProperties }
+
+  IAIMPPlaylistProperties = interface(IAIMPPropertyList2)
+  [SID_IAIMPPlaylistProperties]
+    function GetCustomValue(Name: IAIMPString; out Value: IAIMPString): HRESULT; stdcall;
+    function SetCustomValue(Name, Value: IAIMPString): HRESULT; stdcall;
   end;
 
   { IAIMPPlaylistPreimage }
@@ -281,7 +302,8 @@ type
 
   IAIMPPlaylistPreimageDataProvider = interface
   [SID_IAIMPPlaylistPreimageDataProvider]
-    function GetFiles(Owner: IAIMPTaskOwner; out Flags: DWORD; out List: IAIMPObjectList): HRESULT; stdcall;
+    function GetFiles(Owner: IAIMPTaskOwner;
+      out Flags: LongWord; out List: IAIMPObjectList): HRESULT; stdcall;
   end;
 
   { IAIMPPlaylistPreimageListener }
@@ -349,7 +371,7 @@ type
     function CreatePreimage(out Intf: IAIMPPlaylistPreimage): HRESULT; stdcall;
     function GetID(out ID: IAIMPString): HRESULT; stdcall;
     function GetName(out Name: IAIMPString): HRESULT; stdcall;
-    function GetFlags: DWORD; stdcall;
+    function GetFlags: LongWord; stdcall;
   end;
 
   { IAIMPExtensionPlaylistManagerListener }

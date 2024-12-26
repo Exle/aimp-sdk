@@ -1,14 +1,18 @@
-﻿{*********************************************}
-{*                                           *}
-{*        AIMP Programming Interface         *}
-{*                v5.30.2500                 *}
-{*                                           *}
-{*            (c) Artem Izmaylov             *}
-{*                 2006-2023                 *}
-{*                www.aimp.ru                *}
-{*                                           *}
-{*********************************************}
-
+﻿////////////////////////////////////////////////////////////////////////////////
+//
+//  Project:   AIMP
+//             Programming Interface
+//
+//  Target:    v5.40 build 2650
+//
+//  Purpose:   Plugin Header API
+//
+//  Author:    Artem Izmaylov
+//             © 2006-2025
+//             www.aimp.ru
+//
+//  FPC:       OK
+//
 unit apiPlugin;
 
 {$I apiConfig.inc}
@@ -16,14 +20,15 @@ unit apiPlugin;
 interface
 
 uses
-  Windows, apiCore, apiObjects;
+  apiCore, apiTypes;
 
 const
   // IAIMPPlugin.InfoGetCategories
-  AIMP_PLUGIN_CATEGORY_ADDONS   = $1;
-  AIMP_PLUGIN_CATEGORY_DECODERS = $2;
-  AIMP_PLUGIN_CATEGORY_VISUALS  = $4;
-  AIMP_PLUGIN_CATEGORY_DSP	    = $8;
+  AIMP_PLUGIN_CATEGORY_ADDONS   = 1;
+  AIMP_PLUGIN_CATEGORY_DECODERS = 2;
+  AIMP_PLUGIN_CATEGORY_VISUALS  = 4;
+  AIMP_PLUGIN_CATEGORY_DSP	    = 8;
+  AIMP_PLUGIN_CATEGORY_ENCODER  = 16;
 
   // IAIMPPlugin.InfoGet
   AIMP_PLUGIN_INFO_NAME              = $0;
@@ -53,8 +58,8 @@ type
 
   IAIMPPlugin = interface(IUnknown)
     // Information about the plugin
-    function InfoGet(Index: Integer): PWideChar; stdcall;
-    function InfoGetCategories: DWORD; stdcall;
+    function InfoGet(Index: Integer): PChar; stdcall;
+    function InfoGetCategories: LongWord; stdcall;
     // Initialization / Finalization
     function Initialize(Core: IAIMPCore): HRESULT; stdcall;
     procedure Finalize; stdcall;

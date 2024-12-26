@@ -1,14 +1,18 @@
-﻿{*********************************************}
-{*                                           *}
-{*        AIMP Programming Interface         *}
-{*                v5.00.2300                 *}
-{*                                           *}
-{*            (c) Artem Izmaylov             *}
-{*                 2006-2021                 *}
-{*                www.aimp.ru                *}
-{*                                           *}
-{*********************************************}
-
+﻿////////////////////////////////////////////////////////////////////////////////
+//
+//  Project:   AIMP
+//             Programming Interface
+//
+//  Target:    v5.40 build 2650
+//
+//  Purpose:   For compatibility reasons only
+//
+//  Author:    Artem Izmaylov
+//             © 2006-2025
+//             www.aimp.ru
+//
+//  FPC:       OK
+//
 unit apiDeprecated;
 
 {$I apiConfig.inc}
@@ -16,7 +20,7 @@ unit apiDeprecated;
 interface
 
 uses
-  Windows, apiObjects;
+  apiObjects, apiTypes;
 
 const
   AIMP_SCHEDULER_MSG_EVENT_NEARESTTASK = 'AIMP.Scheduler.MSG.NearestTask';
@@ -25,7 +29,7 @@ type
   PAIMPSchedulerTaskInfo = ^TAIMPSchedulerTaskInfo;
   TAIMPSchedulerTaskInfo = record
     cbSize: Cardinal;
-    TaskName: PWideChar;
+    TaskName: PChar;
     TimeRemaining: UInt64;
   end;
 
@@ -50,9 +54,9 @@ type
 
   IAIMPDeprecatedServiceThreadPool = interface(IUnknown)
   ['{41494D50-5372-7654-6872-64506F6F6C00}']
-    function Cancel(TaskHandle: THandle; Flags: DWORD): HRESULT; stdcall;
-    function Execute(Task: IAIMPDeprecatedTask; out TaskHandle: THandle): HRESULT; stdcall;
-    function WaitFor(TaskHandle: THandle): HRESULT; stdcall;
+    function Cancel(TaskHandle: TTaskHandle; Flags: Cardinal): HRESULT; stdcall;
+    function Execute(Task: IAIMPDeprecatedTask; out TaskHandle: TTaskHandle): HRESULT; stdcall;
+    function WaitFor(TaskHandle: TTaskHandle): HRESULT; stdcall;
   end;
 
   { IAIMPDeprecatedEqualizerPreset }

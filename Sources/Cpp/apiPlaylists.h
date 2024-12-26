@@ -1,22 +1,23 @@
-/************************************************/
-/*                                              */
-/*          AIMP Programming Interface          */
-/*               v5.30 build 2500               */
-/*                                              */
-/*                Artem Izmaylov                */
-/*                (C) 2006-2023                 */
-/*                 www.aimp.ru                  */
-/*               support@aimp.ru                */
-/*                                              */
-/************************************************/
-
+////////////////////////////////////////////////////////////////////////////////
+//
+//  Project:   AIMP
+//             Programming Interface
+//
+//  Target:    v5.40 build 2650
+//
+//  Purpose:   Playlists API
+//
+//  Author:    Artem Izmaylov
+//             © 2006-2025
+//             www.aimp.ru
+//
 #ifndef apiPlaylistsH
 #define apiPlaylistsH
 
-#include <windows.h>
 #include <unknwn.h>
 #include "apiObjects.h"
 #include "apiThreading.h"
+#include "apiTypes.h"
 
 static const GUID IID_IAIMPPlaylist = {0x41494D50, 0x506C, 0x7300, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
 static const GUID IID_IAIMPPlaylistGroup = {0x41494D50, 0x506C, 0x7347, 0x72, 0x6F, 0x75, 0x70, 0x00, 0x00, 0x00, 0x00};
@@ -29,6 +30,7 @@ static const GUID IID_IAIMPPlaylistQueueListener = {0x41494D50, 0x506C, 0x7351, 
 static const GUID IID_IAIMPExtensionPlaylistManagerListener = {0x41494D50, 0x4578, 0x7450, 0x6C, 0x73, 0x4D, 0x61, 0x6E, 0x4C, 0x74, 0x72};
 static const GUID IID_IAIMPServicePlaylistManager = {0x41494D50, 0x5372, 0x7650, 0x6C, 0x73, 0x4D, 0x61, 0x6E, 0x00, 0x00, 0x00};
 static const GUID IID_IAIMPServicePlaylistManager2 = {0x41494D50, 0x536D, 0x504C, 0x4D, 0x6E, 0x67, 0x72, 0x32, 0x00, 0x00, 0x00};
+static const GUID IID_IAIMPPlaylistProperties = {0x41494D50, 0x506C, 0x7350, 0x72, 0x6F, 0x70, 0x73, 0x00, 0x00, 0x00, 0x00};
 static const GUID IID_IAIMPPlaylistPreimageFolders = {0x41494D50, 0x536D, 0x504C, 0x53, 0x72, 0x63, 0x46, 0x6C, 0x64, 0x72, 0x73};
 static const GUID IID_IAIMPPlaylistPreimageDataProvider = {0x41494D50, 0x536D, 0x506C, 0x73, 0x44, 0x61, 0x74, 0x61, 0x50, 0x72, 0x76};
 static const GUID IID_IAIMPPlaylistPreimageListener = {0x41494D50, 0x536D, 0x504C, 0x4D, 0x6E, 0x67, 0x72, 0x00, 0x00, 0x00, 0x00};
@@ -63,6 +65,7 @@ const int AIMP_PLAYLIST_PROPID_NAME                     = 1;
 const int AIMP_PLAYLIST_PROPID_READONLY                 = 2;
 const int AIMP_PLAYLIST_PROPID_FOCUSED_OBJECT           = 3;
 const int AIMP_PLAYLIST_PROPID_ID                       = 4;
+const int AIMP_PLAYLIST_PROPID_GROUPNAME				= 5;
 const int AIMP_PLAYLIST_PROPID_GROUPPING                = 10;
 const int AIMP_PLAYLIST_PROPID_GROUPPING_OVERRIDEN      = 11;
 const int AIMP_PLAYLIST_PROPID_GROUPPING_TEMPLATE       = 12;
@@ -83,6 +86,7 @@ const int AIMP_PLAYLIST_PROPID_PLAYBACKCURSOR           = 51;
 const int AIMP_PLAYLIST_PROPID_PLAYINGINDEX             = 52;
 const int AIMP_PLAYLIST_PROPID_SIZE                     = 53;
 const int AIMP_PLAYLIST_PROPID_DURATION                 = 54;
+const int AIMP_PLAYLIST_PROPID_DURATION_REMAINING       = 55; // v5.40
 const int AIMP_PLAYLIST_PROPID_PREIMAGE                 = 60;
 
 // Flags for IAIMPPlaylist.Add & IAIMPPlaylist.AddList
@@ -121,20 +125,22 @@ const int AIMP_PLAYLIST_RELOADINFO_FLAGS_FULL     = 1;
 const int AIMP_PLAYLIST_RELOADINFO_FLAGS_SELECTED = 2;
 
 // Flags for IAIMPPlaylistListener.Changed
-const int AIMP_PLAYLIST_NOTIFY_NAME           = 1;
-const int AIMP_PLAYLIST_NOTIFY_SELECTION      = 2;
-const int AIMP_PLAYLIST_NOTIFY_PLAYBACKCURSOR = 4;
-const int AIMP_PLAYLIST_NOTIFY_READONLY       = 8;
-const int AIMP_PLAYLIST_NOTIFY_FOCUSINDEX     = 16;
-const int AIMP_PLAYLIST_NOTIFY_CONTENT        = 32;
-const int AIMP_PLAYLIST_NOTIFY_FILEINFO       = 64;
-const int AIMP_PLAYLIST_NOTIFY_STATISTICS     = 128;
-const int AIMP_PLAYLIST_NOTIFY_PLAYINGSWITCHS = 256;
-const int AIMP_PLAYLIST_NOTIFY_PREIMAGE       = 512;
-const int AIMP_PLAYLIST_NOTIFY_MODIFIED       = 1024;
-const int AIMP_PLAYLIST_NOTIFY_DEADSTATE      = 2048;
-const int AIMP_PLAYLIST_NOTIFY_MAKEVISIBLE    = 4096;
-const int AIMP_PLAYLIST_NOTIFY_PLAYBACKQUEUE  = 8192;
+const int AIMP_PLAYLIST_NOTIFY_NAME             = 0x00000001;
+const int AIMP_PLAYLIST_NOTIFY_SELECTION        = 0x00000002;
+const int AIMP_PLAYLIST_NOTIFY_PLAYBACKCURSOR   = 0x00000004;
+const int AIMP_PLAYLIST_NOTIFY_READONLY         = 0x00000008;
+const int AIMP_PLAYLIST_NOTIFY_FOCUSINDEX       = 0x00000010;
+const int AIMP_PLAYLIST_NOTIFY_CONTENT          = 0x00000020;
+const int AIMP_PLAYLIST_NOTIFY_FILEINFO         = 0x00000040;
+const int AIMP_PLAYLIST_NOTIFY_STATISTICS       = 0x00000080;
+const int AIMP_PLAYLIST_NOTIFY_PLAYINGSWITCHS   = 0x00000100;
+const int AIMP_PLAYLIST_NOTIFY_PREIMAGE         = 0x00000200;
+const int AIMP_PLAYLIST_NOTIFY_MODIFIED         = 0x00000400;
+const int AIMP_PLAYLIST_NOTIFY_DEADSTATE        = 0x00000800;
+const int AIMP_PLAYLIST_NOTIFY_MAKEVISIBLE      = 0x00001000;
+const int AIMP_PLAYLIST_NOTIFY_PLAYBACKQUEUE    = 0x00002000;
+const int AIMP_PLAYLIST_NOTIFY_PLAYBACKBOOKMARK = 0x00004000; // v5.40
+const int AIMP_PLAYLIST_NOTIFY_GROUPNAME        = 0x00008000; // v5.40
 
 // Properties IDS for IAIMPPlaylistPreimage
 const int AIMP_PLAYLISTPREIMAGE_PROPID_FACTORYID = 1;
@@ -177,7 +183,7 @@ class IAIMPPlaylistListener: public IUnknown
 {
 	public:
 		virtual void WINAPI Activated() = 0;
-		virtual void WINAPI Changed(DWORD Flags) = 0;
+		virtual void WINAPI Changed(LongWord Flags) = 0;
 		virtual void WINAPI Removed() = 0;
 };
 
@@ -201,13 +207,13 @@ class IAIMPPlaylist: public IUnknown
 {
 	public:
 		// Adding
-		virtual HRESULT WINAPI Add(IUnknown* Obj, DWORD Flags, int InsertIn) = 0;
-		virtual HRESULT WINAPI AddList(IAIMPObjectList* ObjList, DWORD Flags, int InsertIn) = 0;
+		virtual HRESULT WINAPI Add(IUnknown* Obj, LongWord Flags, int InsertIn) = 0;
+		virtual HRESULT WINAPI AddList(IAIMPObjectList* ObjList, LongWord Flags, int InsertIn) = 0;
 
 		// Deleting
 		virtual HRESULT WINAPI Delete(IAIMPPlaylistItem* Item) = 0;
 		virtual HRESULT WINAPI Delete2(int ItemIndex) = 0;
-		virtual HRESULT WINAPI Delete3(DWORD Flags, TAIMPPlaylistDeleteProc Proc, void* UserData) = 0;
+		virtual HRESULT WINAPI Delete3(LongWord Flags, TAIMPPlaylistDeleteProc Proc, void* UserData) = 0;
 		virtual HRESULT WINAPI DeleteAll() = 0;
 
 		// Sorting
@@ -220,11 +226,11 @@ class IAIMPPlaylist: public IUnknown
 		virtual HRESULT WINAPI EndUpdate() = 0;
 
 		// Other Commands
-		virtual HRESULT WINAPI Close(DWORD Flags) = 0;
-		virtual HRESULT WINAPI GetFiles(DWORD Flags, IAIMPObjectList **List) = 0;
+		virtual HRESULT WINAPI Close(LongWord Flags) = 0;
+		virtual HRESULT WINAPI GetFiles(LongWord Flags, IAIMPObjectList **List) = 0;
 		virtual HRESULT WINAPI MergeGroup(IAIMPPlaylistGroup* Group) = 0;
 		virtual HRESULT WINAPI ReloadFromPreimage() = 0;
-		virtual HRESULT WINAPI ReloadInfo(DWORD Flags) = 0;
+		virtual HRESULT WINAPI ReloadInfo(LongWord Flags) = 0;
 
 		// Items
 		virtual HRESULT WINAPI GetItem(int Index, REFIID IID, void **Obj) = 0;
@@ -278,6 +284,15 @@ class IAIMPPlaylistQueue2: public IAIMPPlaylistQueue
 		virtual HRESULT WINAPI ListenerRemove(IAIMPPlaylistQueueListener* AListener) = 0;
 };
 
+/* IAIMPPlaylistProperties */
+
+class IAIMPPlaylistProperties : public IAIMPPropertyList2
+{
+	public:
+		virtual HRESULT WINAPI GetCustomValue(IAIMPString* Name, IAIMPString** Value) = 0;
+		virtual HRESULT WINAPI SetCustomValue(IAIMPString* Name, IAIMPString*  Value) = 0;
+};
+
 /* IAIMPPlaylistPreimageListener */
 
 class IAIMPPlaylistPreimageListener : public IUnknown
@@ -305,7 +320,7 @@ class IAIMPPlaylistPreimage: public IAIMPPropertyList
 class IAIMPPlaylistPreimageDataProvider : public IUnknown 
 {
 	public:
-		virtual HRESULT WINAPI GetFiles(IAIMPTaskOwner* Owner, DWORD** Flags, IAIMPObjectList** List) = 0;
+		virtual HRESULT WINAPI GetFiles(IAIMPTaskOwner* Owner, LongWord** Flags, IAIMPObjectList** List) = 0;
 };
 
 /* IAIMPPlaylistPreimageFolders */
@@ -338,7 +353,7 @@ class IAIMPExtensionPlaylistPreimageFactory : public IUnknown
 		virtual HRESULT WINAPI CreatePreimage(IAIMPPlaylistPreimage** preimage) = 0;
 		virtual HRESULT WINAPI GetID(IAIMPString** ID) = 0;
 		virtual HRESULT WINAPI GetName(IAIMPString** Name) = 0;
-		virtual DWORD WINAPI GetFlags() = 0;
+		virtual LongWord WINAPI GetFlags() = 0;
 };
 
 

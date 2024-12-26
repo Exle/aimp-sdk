@@ -1,14 +1,18 @@
-﻿{*********************************************}
-{*                                           *}
-{*        AIMP Programming Interface         *}
-{*                v5.00.2300                 *}
-{*                                           *}
-{*            (c) Artem Izmaylov             *}
-{*                 2006-2021                 *}
-{*                www.aimp.ru                *}
-{*                                           *}
-{*********************************************}
-
+﻿////////////////////////////////////////////////////////////////////////////////
+//
+//  Project:   AIMP
+//             Programming Interface
+//
+//  Target:    v5.40 build 2650
+//
+//  Purpose:   Menu API Wrappers
+//
+//  Author:    Artem Izmaylov
+//             © 2006-2025
+//             www.aimp.ru
+//
+//  FPC:       OK
+//
 unit apiWrappersMenus;
 
 {$I apiConfig.inc}
@@ -24,15 +28,16 @@ uses
   apiMusicLibrary,
   apiObjects,
   apiPlaylists,
-  apiWrappers;
+  apiWrappers,
+  apiTypes;
 
 const
   RT_PNG = 'PNG';
 
 type
-//----------------------------------------------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 // Basic
-//----------------------------------------------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 
   TAIMPUICustomMenuItem = class;
 
@@ -52,7 +57,7 @@ type
   TAIMPUICustomMenuItem = class abstract(TInterfacedObject, IAIMPActionEvent)
   strict private
     FController: IAIMPUIMenuItemController;
-    FID: UnicodeString;
+    FID: string;
   protected
     function GetGlyphResName: string; virtual;
     function GetState: TAIMPUIMenuItemState; virtual;
@@ -66,7 +71,7 @@ type
     property Controller: IAIMPUIMenuItemController read FController;
   public
     constructor Create(AController: IAIMPUIMenuItemController);
-    procedure Register(const ID: UnicodeString; const ParentID: Variant);
+    procedure Register(const ID: string; const ParentID: Variant);
   end;
 
   { TAIMPUILineMenuItem }
@@ -99,9 +104,9 @@ type
     procedure Refresh;
   end;
 
-//----------------------------------------------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 // Files Providers
-//----------------------------------------------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 
   TAIMPFileListClass = class of TAIMPFileList;
   TAIMPFileList = class(TStringList)
@@ -164,7 +169,10 @@ procedure AddSimpleMenuItem(AParent: Integer; const ATitle: string; AEvent: IUnk
 implementation
 
 uses
-  Windows, SysUtils, Variants, Math;
+{$IFDEF MSWINDOWS}
+  Windows,
+{$ENDIF}
+  SysUtils, Variants, Math;
 
 const
   sErrorAlreadyRegistered = 'The instance is already registered as handler for %s menu';
@@ -194,9 +202,9 @@ begin
   end;
 end;
 
-//----------------------------------------------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 // Basic
-//----------------------------------------------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 
 { TAIMPUICustomMenuItem }
 
@@ -205,7 +213,7 @@ begin
   FController := AController;
 end;
 
-procedure TAIMPUICustomMenuItem.Register(const ID: UnicodeString; const ParentID: Variant);
+procedure TAIMPUICustomMenuItem.Register(const ID: string; const ParentID: Variant);
 var
   AHandle: IAIMPMenuItem;
   AParentHandle: IAIMPMenuItem;
@@ -262,7 +270,7 @@ procedure TAIMPUICustomMenuItem.UpdateGlyph(AMenuItem: IAIMPMenuItem);
       if ATargetDPI >= SupportedDPI[AIndex] then
       begin
         Result := GetGlyphResName + IntToStr(SupportedDPI[AIndex]);
-        if FindResource(HInstance, PWideChar(Result), RT_PNG) <> 0 then
+        if FindResource(HInstance, PChar(Result), RT_PNG) <> 0 then
           Exit;
       end;
     Result := GetGlyphResName;
@@ -279,15 +287,16 @@ begin
   try
     CoreCreateObject(IAIMPImage2, AGlyph);
 
-    if Supports(AMenuItem, IAIMPDPIAware, ASourceDPI) and Supports(AGlyph, IAIMPDPIAware, ATargetDPI) then
+    if Supports(AMenuItem, IAIMPDPIAware, ASourceDPI) and
+       Supports(AGlyph, IAIMPDPIAware, ATargetDPI) then
     begin
       ATargetDPI.SetDPI(ASourceDPI.GetDPI);
       if ATargetDPI.GetDPI > 96 then
         AGlyphName := GetActualResName(ATargetDPI.GetDPI);
     end;
 
-    CheckResult(AGlyph.LoadFromResource(HInstance, PWideChar(AGlyphName), RT_PNG));
-    PropListSetObj(AMenuItem, AIMP_MENUITEM_PROPID_GLYPH, AGlyph);
+    AGlyph.LoadFromStream(TAIMPStreamAdapter.CreateFromResource(AGlyphName, RT_PNG));
+    AMenuItem.SetValueAsObject(AIMP_MENUITEM_PROPID_GLYPH, AGlyph);
   except
     // do nothing
   end;
@@ -300,7 +309,8 @@ var
 begin
   if FID <> '' then
   begin
-    if CoreGetService(IAIMPServiceMenuManager, AService) and Succeeded(AService.GetByID(MakeString(FID), AMenuItem)) then
+    if CoreGetService(IAIMPServiceMenuManager, AService) and
+       Succeeded(AService.GetByID(MakeString(FID), AMenuItem)) then
     begin
       UpdateGlyph(AMenuItem);
       UpdateState(AMenuItem);

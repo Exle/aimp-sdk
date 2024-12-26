@@ -1,14 +1,18 @@
-﻿{*********************************************}
-{*                                           *}
-{*             AIMP CDDA Plugin              *}
-{*               Internal API                *}
-{*                                           *}
-{*            (c) Artem Izmaylov             *}
-{*                 2006-2020                 *}
-{*                www.aimp.ru                *}
-{*                                           *}
-{*********************************************}
-
+﻿////////////////////////////////////////////////////////////////////////////////
+//
+//  Project:   AIMP
+//             Programming Interface
+//
+//  Target:    v5.40 build 2650
+//
+//  Purpose:   CDDA Plugin Internal API
+//
+//  Author:    Artem Izmaylov
+//             © 2006-2025
+//             www.aimp.ru
+//
+//  FPC:       OK
+//
 unit apiCDDA;
 
 {$I apiConfig.inc}
@@ -16,7 +20,7 @@ unit apiCDDA;
 interface
 
 uses
-  Windows, apiObjects, apiCore;
+  apiObjects;
 
 const
   SID_IAIMPServiceCompactDiskAudio = '{41494D50-5372-7643-4444-410000000000}';
@@ -35,7 +39,7 @@ type
   [SID_IAIMPCompactDiskAudioDriveInfo]
     function GetDriveFriendlyName(out S: IAIMPString): HRESULT; stdcall;
     function GetDriveIndex: Integer; stdcall;
-    function GetDriveLetter: WideChar; stdcall;
+    function GetDriveLetter: Char; stdcall;
   end;
 
   { IAIMPServiceCompactDiskAudio }
@@ -44,7 +48,7 @@ type
   [SID_IAIMPServiceCompactDiskAudio]
     function PopulateDrives(out List: IAIMPObjectList): HRESULT; stdcall;
     function PopulateFiles(DriveIndex: Integer; out List: IAIMPObjectList): HRESULT; stdcall;
-    function PopulateFiles2(Drive: WideChar; out List: IAIMPObjectList): HRESULT; stdcall;
+    function PopulateFiles2(Drive: Char; out List: IAIMPObjectList): HRESULT; stdcall;
   end;
 
 implementation

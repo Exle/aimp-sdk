@@ -1,14 +1,18 @@
-﻿{*********************************************}
-{*                                           *}
-{*        AIMP Programming Interface         *}
-{*                v5.30.2500                 *}
-{*                                           *}
-{*            (c) Artem Izmaylov             *}
-{*                 2006-2023                 *}
-{*                www.aimp.ru                *}
-{*                                           *}
-{*********************************************}
-
+﻿////////////////////////////////////////////////////////////////////////////////
+//
+//  Project:   AIMP
+//             Programming Interface
+//
+//  Target:    v5.40 build 2650
+//
+//  Purpose:   Options Dialog API
+//
+//  Author:    Artem Izmaylov
+//             © 2006-2025
+//             www.aimp.ru
+//
+//  FPC:       OK
+//
 unit apiOptions;
 
 {$I apiConfig.inc}
@@ -16,7 +20,12 @@ unit apiOptions;
 interface
 
 uses
-  Windows, apiObjects;
+{$IFDEF FPC}
+  LCLType,
+{$ELSE}
+  Windows,
+{$ENDIF}
+  apiObjects;
 
 const
   SID_IAIMPServiceOptionsDialog = '{41494D50-5372-764F-7074-446C67000000}';
@@ -36,6 +45,9 @@ const
   AIMP_SERVICE_OPTIONSDIALOG_NOTIFICATION_SAVE         = 3;
   AIMP_SERVICE_OPTIONSDIALOG_NOTIFICATION_CAN_SAVE     = 4;
   AIMP_SERVICE_OPTIONSDIALOG_NOTIFICATION_RESET        = 5;
+
+  AIMP_OPT_FRAME_ID   = '!\Id';
+  AIMP_OPT_FRAME_PAGE = '!\Page';
 
 type
 
@@ -71,7 +83,8 @@ type
   IAIMPServiceOptionsDialog = interface(IUnknown)
   [SID_IAIMPServiceOptionsDialog]
     function FrameModified(Frame: IAIMPOptionsDialogFrame): HRESULT; stdcall;
-    function FrameShow(Frame: IAIMPOptionsDialogFrame; ForceShow: LongBool): HRESULT; stdcall;
+    function FrameShow(Frame: IUnknown; // IAIMPOptionsDialogFrame, IAIMPConfig
+      ForceShow: LongBool): HRESULT; stdcall;
   end;
 
 implementation

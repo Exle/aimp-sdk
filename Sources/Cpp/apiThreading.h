@@ -1,20 +1,21 @@
-/************************************************/
-/*                                              */
-/*          AIMP Programming Interface          */
-/*               v5.30 build 2500               */
-/*                                              */
-/*                Artem Izmaylov                */
-/*                (C) 2006-2023                 */
-/*                 www.aimp.ru                  */
-/*               support@aimp.ru                */
-/*                                              */
-/************************************************/
-
+////////////////////////////////////////////////////////////////////////////////
+//
+//  Project:   AIMP
+//             Programming Interface
+//
+//  Target:    v5.40 build 2650
+//
+//  Purpose:   ThreadPool API
+//
+//  Author:    Artem Izmaylov
+//             © 2006-2025
+//             www.aimp.ru
+//
 #ifndef apiThreadingH
 #define apiThreadingH
 
-#include <windows.h>
 #include <unknwn.h>
+#include "apiTypes.h"
 
 static const GUID IID_IAIMPTask 		       = {0x41494D50, 0x5461, 0x736B, 0x32, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
 static const GUID IID_IAIMPTaskOwner           = {0x41494D50, 0x5461, 0x736B, 0x4F, 0x77, 0x6E, 0x65, 0x72, 0x32, 0x00, 0x00};
@@ -58,10 +59,10 @@ class IAIMPTaskPriority: public IUnknown
 class IAIMPServiceThreads: public IUnknown
 {
 	public:
-		virtual HRESULT WINAPI ExecuteInMainThread(IAIMPTask* Task, DWORD Flags) = 0;
-		virtual HRESULT WINAPI ExecuteInThread(IAIMPTask* Task, DWORD_PTR *TaskHandle) = 0;
-		virtual HRESULT WINAPI Cancel(DWORD_PTR TaskHandle, DWORD Flags) = 0;
-		virtual HRESULT WINAPI WaitFor(DWORD_PTR TaskHandle) = 0;
+		virtual HRESULT WINAPI ExecuteInMainThread(IAIMPTask* Task, LongWord Flags) = 0;
+		virtual HRESULT WINAPI ExecuteInThread(IAIMPTask* Task, TTaskHandle *TaskHandle) = 0;
+		virtual HRESULT WINAPI Cancel(TTaskHandle TaskHandle, LongWord Flags) = 0;
+		virtual HRESULT WINAPI WaitFor(TTaskHandle TaskHandle) = 0;
 };
 
 #endif // !apiThreadingH

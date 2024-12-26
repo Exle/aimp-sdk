@@ -1,22 +1,31 @@
-﻿{*********************************************}
-{*                                           *}
-{*        AIMP Programming Interface         *}
-{*                v5.30.2500                 *}
-{*                                           *}
-{*            (c) Artem Izmaylov             *}
-{*                 2006-2023                 *}
-{*                www.aimp.ru                *}
-{*                                           *}
-{*********************************************}
-
+﻿////////////////////////////////////////////////////////////////////////////////
+//
+//  Project:   AIMP
+//             Programming Interface
+//
+//  Target:    v5.40 build 2650
+//
+//  Purpose:   Remote Control API
+//
+//  Author:    Artem Izmaylov
+//             © 2006-2025
+//             www.aimp.ru
+//
+//  FPC:       Windows Only!
+//
 unit apiRemote;
 
 interface
 
 {$I apiConfig.inc}
 
+{$IFNDEF MSWINDOWS}
+  {$MESSAGE FATAL 'Remote API is unavailable on this platform'}
+{$ENDIF}
+
 uses
-  Windows, Messages;
+  Messages,
+  Windows;
 
 const
   AIMPRemoteAccessClass = 'AIMP2_RemoteInfo';
@@ -25,22 +34,22 @@ const
 type
   PAIMPRemoteFileInfo = ^TAIMPRemoteFileInfo;
   TAIMPRemoteFileInfo = packed record
-    Deprecated1: DWORD;
+    Deprecated1: LongWord;
     Active: LongBool;
-    BitRate: DWORD;
-    Channels: DWORD;
-    Duration: DWORD;
+    BitRate: LongWord;
+    Channels: LongWord;
+    Duration: LongWord;
     FileSize: Int64;
-    FileMark: DWORD;
-    SampleRate: DWORD;
-    TrackNumber: DWORD;
-    AlbumLength: DWORD;
-    ArtistLength: DWORD;
-    DateLength: DWORD;
-    FileNameLength: DWORD;
-    GenreLength: DWORD;
-    TitleLength: DWORD;
-    Deprecated2: array[0..5] of DWORD;
+    FileMark: LongWord;
+    SampleRate: LongWord;
+    TrackNumber: LongWord;
+    AlbumLength: LongWord;
+    ArtistLength: LongWord;
+    DateLength: LongWord;
+    FileNameLength: LongWord;
+    GenreLength: LongWord;
+    TitleLength: LongWord;
+    Deprecated2: array[0..5] of LongWord;
   end;
 
 const

@@ -1,15 +1,21 @@
-﻿{*********************************************}
-{*                                           *}
-{*           AIMP Scrobbler Plugin           *}
-{*                Internal API               *}
-{*                                           *}
-{*            (c) Artem Izmaylov             *}
-{*                 2020-2021                 *}
-{*                www.aimp.ru                *}
-{*                                           *}
-{*********************************************}
-
+﻿////////////////////////////////////////////////////////////////////////////////
+//
+//  Project:   AIMP
+//             Programming Interface
+//
+//  Target:    v5.40 build 2650
+//
+//  Purpose:   Scrobbler Plugin Internal API
+//
+//  Author:    Artem Izmaylov
+//             © 2006-2025
+//             www.aimp.ru
+//
+//  FPC:       OK
+//
 unit apiScrobbler;
+
+{$I apiConfig.inc}
 
 interface
 

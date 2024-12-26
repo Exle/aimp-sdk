@@ -1,14 +1,18 @@
-﻿{*********************************************}
-{*                                           *}
-{*        AIMP Programming Interface         *}
-{*                v5.30.2500                 *}
-{*                                           *}
-{*            (c) Artem Izmaylov             *}
-{*                 2006-2023                 *}
-{*                www.aimp.ru                *}
-{*                                           *}
-{*********************************************}
-
+﻿////////////////////////////////////////////////////////////////////////////////
+//
+//  Project:   AIMP
+//             Programming Interface
+//
+//  Target:    v5.40 build 2650
+//
+//  Purpose:   Audio Decoders API
+//
+//  Author:    Artem Izmaylov
+//             © 2006-2025
+//             www.aimp.ru
+//
+//  FPC:       OK
+//
 unit apiDecoders;
 
 {$I apiConfig.inc}
@@ -16,7 +20,8 @@ unit apiDecoders;
 interface
 
 uses
-  Windows, apiObjects, apiFileManager, apiCore;
+  apiFileManager,
+  apiObjects;
 
 const
   SID_IAIMPAudioDecoder = '{41494D50-4175-6469-6F44-656300000000}';
@@ -49,6 +54,7 @@ const
   AIMP_DECODER_SAMPLEFORMAT_24BIT      = 3;
   AIMP_DECODER_SAMPLEFORMAT_32BIT      = 4;
   AIMP_DECODER_SAMPLEFORMAT_32BITFLOAT = 5;
+  AIMP_DECODER_SAMPLEFORMAT_64BITFLOAT = 6; // v5.40
 
   // Flags for IAIMPExtensionAudioDecoder / IAIMPExtensionAudioDecoderOld
   AIMP_DECODER_FLAGS_FORCE_CREATE_INSTANCE = $1000;
@@ -102,7 +108,7 @@ type
 
   IAIMPExtensionAudioDecoder = interface(IUnknown)
   [SID_IAIMPExtensionAudioDecoder]
-    function CreateDecoder(Stream: IAIMPStream; Flags: DWORD;
+    function CreateDecoder(Stream: IAIMPStream; Flags: LongWord;
       ErrorInfo: IAIMPErrorInfo; out Decoder: IAIMPAudioDecoder): HRESULT; stdcall;
   end;
 
@@ -110,7 +116,7 @@ type
 
   IAIMPExtensionAudioDecoderOld = interface(IUnknown)
   [SID_IAIMPExtensionAudioDecoderOld]
-    function CreateDecoder(FileName: IAIMPString; Flags: DWORD;
+    function CreateDecoder(FileName: IAIMPString; Flags: LongWord;
       ErrorInfo: IAIMPErrorInfo; out Decoder: IAIMPAudioDecoder): HRESULT; stdcall;
   end;
 
@@ -125,9 +131,9 @@ type
 
   IAIMPServiceAudioDecoders = interface
   [SID_IAIMPServiceAudioDecoders]
-    function CreateDecoderForStream(Stream: IAIMPStream; Flags: DWORD;
+    function CreateDecoderForStream(Stream: IAIMPStream; Flags: LongWord;
       ErrorInfo: IAIMPErrorInfo; out Decoder: IAIMPAudioDecoder): HRESULT; stdcall;
-    function CreateDecoderForFileURI(FileURI: IAIMPString; Flags: DWORD;
+    function CreateDecoderForFileURI(FileURI: IAIMPString; Flags: LongWord;
       ErrorInfo: IAIMPErrorInfo; out Decoder: IAIMPAudioDecoder): HRESULT; stdcall;
   end;
 

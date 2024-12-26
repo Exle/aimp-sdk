@@ -1,22 +1,23 @@
-﻿{*********************************************}
-{*                                           *}
-{*            AIMP Update Plugin             *}
-{*               Internal API                *}
-{*                                           *}
-{*            (c) Artem Izmaylov             *}
-{*                 2013-2020                 *}
-{*                www.aimp.ru                *}
-{*                                           *}
-{*********************************************}
-
+﻿////////////////////////////////////////////////////////////////////////////////
+//
+//  Project:   AIMP
+//             Programming Interface
+//
+//  Target:    v5.40 build 2650
+//
+//  Purpose:   UpdateChecker Internal API
+//
+//  Author:    Artem Izmaylov
+//             © 2006-2025
+//             www.aimp.ru
+//
+//  FPC:       OK
+//
 unit apiUpdater;
 
 {$I apiConfig.inc}
 
 interface
-
-uses
-  Windows, apiObjects, apiCore;
 
 const
   SID_IAIMPServiceUpdater = '{41494D50-5372-7655-7064-617465720000}';

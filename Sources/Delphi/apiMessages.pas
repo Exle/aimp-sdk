@@ -1,14 +1,18 @@
-﻿{*********************************************}
-{*                                           *}
-{*        AIMP Programming Interface         *}
-{*                v5.30.2500                 *}
-{*                                           *}
-{*            (c) Artem Izmaylov             *}
-{*                 2006-2023                 *}
-{*                www.aimp.ru                *}
-{*                                           *}
-{*********************************************}
-
+﻿////////////////////////////////////////////////////////////////////////////////
+//
+//  Project:   AIMP
+//             Programming Interface
+//
+//  Target:    v5.40 build 2650
+//
+//  Purpose:   Messages API
+//
+//  Author:    Artem Izmaylov
+//             © 2006-2025
+//             www.aimp.ru
+//
+//  FPC:       OK
+//
 unit apiMessages;
 
 {$I apiConfig.inc}
@@ -16,13 +20,13 @@ unit apiMessages;
 interface
 
 uses
-  Windows, apiFileManager;
+  apiFileManager, apiTypes, apiPlayer;
 
 const
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 // Commands
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
   AIMP_MSG_CMD_BASE = 0;
   // AParam1: Command ID (see AIMP_MSG_CMD_XXX)
@@ -40,7 +44,7 @@ const
   // Show custom text in display of RunningLine or Text elements
   // AParam1: 0 - Hide text automaticly after 2 seconds
   //          1 - Text will be hidden manually (put nil to AParam2 to hide previous text)
-  // AParam2: Pointer to WideChar array
+  // AParam2: Pointer to char-array
   AIMP_MSG_CMD_SHOW_NOTIFICATION = AIMP_MSG_CMD_BASE + 3;
 
   AIMP_MSG_CMD_TOGGLE_PARTREPEAT = AIMP_MSG_CMD_BASE + 5;
@@ -255,9 +259,9 @@ const
   // AParam1, AParam2: unused
   AIMP_MSG_CMD_PLS_DELETE_SELECTED_FROM_HDD_W_FOLDERS = AIMP_MSG_CMD_BASE + 61;
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 // Properties
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
   AIMP_MSG_PROPERTY_BASE = $1000;
 
@@ -343,9 +347,7 @@ const
   // !!!ReadOnly property
   // AParam1: AIMP_MSG_PROPVALUE_GET
   // AParam2: Pointer to Integer variable
-  //          0 = Stopped
-  //          1 = Paused
-  //          2 = Playing
+  //			    One of the AIMP_PLAYER_STATE_XXX
   // See AIMP_MSG_EVENT_PLAYER_STATE event
   AIMP_MSG_PROPERTY_PLAYER_STATE = AIMP_MSG_PROPERTY_BASE + 16;
 
@@ -465,9 +467,9 @@ const
   // AParam2: Pointer to LongBool (32-bit boolean value) variable
   AIMP_MSG_PROPERTY_AUTOJUMP_TO_NEXT_TRACK = AIMP_MSG_PROPERTY_BASE + 38;
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 // Events
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
   AIMP_MSG_EVENT_BASE = $2000;
 
@@ -489,7 +491,7 @@ const
     AIMP_MES_HAS_NEXT_TRACK  = 4;
 
   // Called, when player state has been changed (Played / Paused / Stopped)
-  // AParam1: 0 = Stopped; 1 = Paused; 2 = Playing
+  // AParam1: One of the AIMP_PLAYER_STATE_XXX
   AIMP_MSG_EVENT_PLAYER_STATE = AIMP_MSG_EVENT_BASE + 6;
 
   // Called, when property value has been changed
@@ -511,12 +513,12 @@ const
 
   // Called, when mark of file has been changed
   // AParam1: New Mark Value (0..5)
-  // AParam2: FileName (Pointer to WideChar)
+  // AParam2: FileName (Pointer to Char)
   // !!!WARNING: You must not fire this event manually!
   AIMP_MSG_EVENT_FILEMARK = AIMP_MSG_EVENT_BASE + 12;
 
   // Called, when statistics of the file changed
-  // AParam2: FileName (Pointer to WideChar)
+  // AParam2: FileName (Pointer to Char)
   // !!!Note: If filename is empty or AParam2 is nil - statistics for all files has been changed
   // !!!WARNING: You must not fire this event manually!
   AIMP_MSG_EVENT_STATISTICS_CHANGED = AIMP_MSG_EVENT_BASE + 14;
@@ -553,7 +555,7 @@ const
 
   // Called, when name of equalizer preset has been changed
   // AParam1: Unused
-  // AParam2: Pointer to WideChar array, can be = nil (ReadOnly!)
+  // AParam2: Pointer to char-array, can be = nil (ReadOnly!)
   AIMP_MSG_EVENT_EQUALIZER_PRESET_NAME = AIMP_MSG_EVENT_BASE + 22;
 
   // Callen, when playback queue changed
@@ -569,9 +571,9 @@ const
   // Called, after chaning the accent color or night/day mode
   AIMP_MSG_EVENT_UI_MODE = AIMP_MSG_EVENT_BASE + 25;
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 // Quick File Info
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
 const
   AIMP_QFI_ANIMATION_NONE = 0;
@@ -591,9 +593,9 @@ type
     FileInfo: IAIMPFileInfo; // file information to display
   end;
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 // General
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
 const
   SID_IAIMPMessageHook = '{FC6FB524-A959-4089-AA0A-EA40AB7374CD}';
@@ -608,16 +610,16 @@ type
 
   IAIMPMessageHook = interface(IUnknown)
   [SID_IAIMPMessageHook]
-    procedure CoreMessage(Message: DWORD; Param1: Integer; Param2: Pointer; var Result: HRESULT); stdcall;
+    procedure CoreMessage(Message: LongWord; Param1: Integer; Param2: Pointer; var Result: HRESULT); stdcall;
   end;
 
   { IAIMPServiceMessageDispatcher }
 
   IAIMPServiceMessageDispatcher = interface(IUnknown)
   [SID_IAIMPServiceMessageDispatcher]
-    function Send(Message: DWORD; Param1: Integer; Param2: Pointer): HRESULT; stdcall;
+    function Send(Message: LongWord; Param1: Integer; Param2: Pointer): HRESULT; stdcall;
     // Custom Messages
-    function Register(MessageName: PWideChar): DWORD; stdcall;
+    function Register(MessageName: PChar): LongWord; stdcall;
     // Hook
     function Hook(Hook: IAIMPMessageHook): HRESULT; stdcall;
     function Unhook(Hook: IAIMPMessageHook): HRESULT; stdcall;

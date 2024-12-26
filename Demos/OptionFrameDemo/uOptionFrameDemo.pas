@@ -38,14 +38,9 @@ uses
 { TAIMPDemoPluginOptionFrame }
 
 function TAIMPDemoPluginOptionFrame.CreateFrame(ParentWnd: HWND): HWND;
-var
-  R: Trect;
 begin
   FFrame := TfrmOptionFrameDemo.CreateParented(ParentWnd);
   FFrame.OnModified := HandlerModified;
-  GetWindowRect(ParentWnd, R);
-  OffsetRect(R, -R.Left, -R.Top);
-  FFrame.BoundsRect := R;
   FFrame.Visible := True;
   Result := FFrame.Handle;
 end;

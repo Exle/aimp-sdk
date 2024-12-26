@@ -1,14 +1,18 @@
-﻿{*********************************************}
-{*                                           *}
-{*        AIMP Programming Interface         *}
-{*                v5.30.2500                 *}
-{*                                           *}
-{*            (c) Artem Izmaylov             *}
-{*                 2006-2023                 *}
-{*                www.aimp.ru                *}
-{*                                           *}
-{*********************************************}
-
+﻿////////////////////////////////////////////////////////////////////////////////
+//
+//  Project:   AIMP
+//             Programming Interface
+//
+//  Target:    v5.40 build 2650
+//
+//  Purpose:   Internet API
+//
+//  Author:    Artem Izmaylov
+//             © 2006-2025
+//             www.aimp.ru
+//
+//  FPC:       OK
+//
 unit apiInternet;
 
 {$I apiConfig.inc}
@@ -16,7 +20,7 @@ unit apiInternet;
 interface
 
 uses
-  Windows, apiObjects, apiCore;
+  apiObjects, apiTypes;
 
 const
   SID_IAIMPServiceConnectionSettings = '{4941494D-5053-7276-436F-6E6E43666700}';
@@ -27,6 +31,9 @@ const
 
   SID_IAIMPServiceHTTPClient2 = '{41494D50-5372-7648-7474-70436C743200}';
   IID_IAIMPServiceHTTPClient2: TGUID = SID_IAIMPServiceHTTPClient2;
+
+  SID_IAIMPServiceHTTPClient3 = '{41494D50-5372-7648-7474-70436C743300}';
+  IID_IAIMPServiceHTTPClient3: TGUID = SID_IAIMPServiceHTTPClient3;
 
   SID_IAIMPHTTPClientEvents = '{41494D50-4874-7470-436C-744576747300}';
   IID_IAIMPHTTPClientEvents: TGUID = SID_IAIMPHTTPClientEvents;
@@ -48,7 +55,7 @@ const
   AIMP_SERVICE_CONSET_CONNECTIONTYPE_PROXY          = 1;
   AIMP_SERVICE_CONSET_CONNECTIONTYPE_SYSTEMDEFAULTS = 2;
 
-  // Flags for HTTPClient
+  // Flags for any IAIMPServiceHTTPClient
   AIMP_SERVICE_HTTPCLIENT_FLAGS_WAITFOR         = 1;
   AIMP_SERVICE_HTTPCLIENT_FLAGS_UTF8            = 2;
   AIMP_SERVICE_HTTPCLIENT_FLAGS_PRIORITY_NORMAL = 0;
@@ -56,11 +63,11 @@ const
   AIMP_SERVICE_HTTPCLIENT_FLAGS_PRIORITY_HIGH   = 8;
 
   // Methods for IAIMPServiceHTTPClient2.Request
-  AIMP_SERVICE_HTTPCLIENT_METHOD_GET    = 0;
-  AIMP_SERVICE_HTTPCLIENT_METHOD_POST   = 1;
-  AIMP_SERVICE_HTTPCLIENT_METHOD_PUT    = 2;
-  AIMP_SERVICE_HTTPCLIENT_METHOD_DELETE = 3;
-  AIMP_SERVICE_HTTPCLIENT_METHOD_HEAD   = 4;
+  AIMP_SERVICE_HTTPCLIENT_METHOD_GET      = 0;
+  AIMP_SERVICE_HTTPCLIENT_METHOD_POST     = 1;
+  AIMP_SERVICE_HTTPCLIENT_METHOD_PUT      = 2;
+  AIMP_SERVICE_HTTPCLIENT_METHOD_DELETE   = 3;
+  AIMP_SERVICE_HTTPCLIENT_METHOD_HEAD     = 4;
 
 type
 
@@ -77,7 +84,7 @@ type
 
   IAIMPHTTPClientEvents2 = interface(IUnknown)
   [SID_IAIMPHTTPClientEvents2]
-    procedure OnAcceptHeaders(Header: IAIMPString; var Accept: LongBool); stdcall;
+    procedure OnAcceptHeaders(Headers: IAIMPString; var Accept: LongBool); stdcall;
   end;
 
   { IAIMPServiceConnectionSettings }
@@ -90,20 +97,31 @@ type
 
   IAIMPServiceHTTPClient = interface(IUnknown)
   [SID_IAIMPServiceHTTPClient]
-    function Get(URL: IAIMPString; Flags: DWORD; AnswerData: IAIMPStream;
-      EventsHandler: IAIMPHTTPClientEvents; Params: IAIMPConfig; out TaskID: Pointer): HRESULT; stdcall;
-    function Post(URL: IAIMPString; Flags: DWORD; AnswerData, PostData: IAIMPStream;
-      EventsHandler: IAIMPHTTPClientEvents; Params: IAIMPConfig; out TaskID: Pointer): HRESULT; stdcall;
-    function Cancel(TaskID: Pointer; Flags: DWORD): HRESULT; stdcall;
+    function Get(URL: IAIMPString; Flags: LongWord; AnswerData: IAIMPStream;
+      EventsHandler: IAIMPHTTPClientEvents; Params: IAIMPConfig; out Task: TTaskHandle): HRESULT; stdcall;
+    function Post(URL: IAIMPString; Flags: LongWord; AnswerData, PostData: IAIMPStream;
+      EventsHandler: IAIMPHTTPClientEvents; Params: IAIMPConfig; out Task: TTaskHandle): HRESULT; stdcall;
+    function Cancel(Task: TTaskHandle; Flags: LongWord): HRESULT; stdcall;
   end;
 
   { IAIMPServiceHTTPClient2 }
 
   IAIMPServiceHTTPClient2 = interface(IUnknown)
   [SID_IAIMPServiceHTTPClient2]
-    function Request(URL: IAIMPString; Method, Flags: DWORD; AnswerData, PostData: IAIMPStream;
-      EventsHandler: IAIMPHTTPClientEvents; Params: IAIMPConfig; out TaskID: Pointer): HRESULT; stdcall;
-    function Cancel(TaskID: Pointer; Flags: DWORD): HRESULT; stdcall;
+    function Request(URL: IAIMPString; Method, Flags: LongWord;
+      AnswerData, PostData: IAIMPStream; EventsHandler: IAIMPHTTPClientEvents;
+      Params: IAIMPConfig; out Task: TTaskHandle): HRESULT; stdcall;
+    function Cancel(Task: TTaskHandle; Flags: LongWord): HRESULT; stdcall;
+  end;
+
+  { IAIMPServiceHTTPClient3 }
+
+  IAIMPServiceHTTPClient3 = interface(IUnknown)
+  [SID_IAIMPServiceHTTPClient3]
+    function Request(URL, Method: IAIMPString; Flags: LongWord;
+      AnswerData, PostData: IAIMPStream; EventsHandler: IAIMPHTTPClientEvents;
+      Params: IAIMPConfig; out Task: TTaskHandle): HRESULT; stdcall;
+    function Cancel(Task: TTaskHandle; Flags: LongWord): HRESULT; stdcall;
   end;
 
 implementation

@@ -1,23 +1,24 @@
-/************************************************/
-/*                                              */
-/*          AIMP Programming Interface          */
-/*               v5.30 build 2500               */
-/*                                              */
-/*                Artem Izmaylov                */
-/*                (C) 2006-2023                 */
-/*                 www.aimp.ru                  */
-/*               support@aimp.ru                */
-/*                                              */
-/************************************************/
-
+////////////////////////////////////////////////////////////////////////////////
+//
+//  Project:   AIMP
+//             Programming Interface
+//
+//  Target:    v5.40 build 2650
+//
+//  Purpose:   Audio Decoders API
+//
+//  Author:    Artem Izmaylov
+//             © 2006-2025
+//             www.aimp.ru
+//
 #ifndef apiDecodersH
 #define apiDecodersH
 
-#include <windows.h>
 #include <unknwn.h>
 #include "apiCore.h"
 #include "apiObjects.h"
 #include "apiFileManager.h"
+#include "apiTypes.h"
 
 static const GUID IID_IAIMPAudioDecoder = {0x41494D50, 0x4175, 0x6469, 0x6F, 0x44, 0x65, 0x63, 0x00, 0x00, 0x00, 0x00};
 static const GUID IID_IAIMPAudioDecoderBufferingProgress = {0x41494D50, 0x4175, 0x6469, 0x6F, 0x44, 0x65, 0x63, 0x42, 0x75, 0x66, 0x66};
@@ -33,6 +34,7 @@ const int AIMP_DECODER_SAMPLEFORMAT_16BIT      = 2;
 const int AIMP_DECODER_SAMPLEFORMAT_24BIT      = 3;
 const int AIMP_DECODER_SAMPLEFORMAT_32BIT      = 4;
 const int AIMP_DECODER_SAMPLEFORMAT_32BITFLOAT = 5;
+const int AIMP_DECODER_SAMPLEFORMAT_64BITFLOAT = 6; // v5.40
 
 // Flags for IAIMPExtensionAudioDecoder / IAIMPExtensionAudioDecoderOld
 const int AIMP_DECODER_FLAGS_FORCE_CREATE_INSTANCE = 0x1000;
@@ -88,7 +90,7 @@ class IAIMPAudioDecoderNotifications: public IUnknown
 class IAIMPExtensionAudioDecoder: public IUnknown
 {
 	public:
-		virtual HRESULT WINAPI CreateDecoder(IAIMPStream *Stream, DWORD Flags,
+		virtual HRESULT WINAPI CreateDecoder(IAIMPStream *Stream, LongWord Flags,
 			IAIMPErrorInfo *ErrorInfo, IAIMPAudioDecoder **Decoder) = 0;
 };
 
@@ -97,7 +99,7 @@ class IAIMPExtensionAudioDecoder: public IUnknown
 class IAIMPExtensionAudioDecoderOld: public IUnknown
 {
 	public:
-		virtual HRESULT WINAPI CreateDecoder(IAIMPString *FileName, DWORD Flags,
+		virtual HRESULT WINAPI CreateDecoder(IAIMPString *FileName, LongWord Flags,
 			IAIMPErrorInfo *ErrorInfo, IAIMPAudioDecoder **Decoder) = 0;
 };
 
@@ -114,9 +116,9 @@ class IAIMPExtensionAudioDecoderPriority: public IUnknown
 class IAIMPServiceAudioDecoders: public IUnknown
 {
 	public:
-		virtual HRESULT WINAPI CreateDecoderForStream(IAIMPStream *Stream, DWORD Flags,
+		virtual HRESULT WINAPI CreateDecoderForStream(IAIMPStream *Stream, LongWord Flags,
 			IAIMPErrorInfo *ErrorInfo, IAIMPAudioDecoder **Decoder) = 0;
-		virtual HRESULT WINAPI CreateDecoderForFileURI(IAIMPString *FileURI, DWORD Flags,
+		virtual HRESULT WINAPI CreateDecoderForFileURI(IAIMPString *FileURI, LongWord Flags,
 			IAIMPErrorInfo *ErrorInfo, IAIMPAudioDecoder **Decoder) = 0;
 };
 #endif

@@ -1,14 +1,18 @@
-﻿{*********************************************}
-{*                                           *}
-{*        AIMP Programming Interface         *}
-{*                v5.00.2300                 *}
-{*                                           *}
-{*            (c) Artem Izmaylov             *}
-{*                 2006-2021                 *}
-{*                www.aimp.ru                *}
-{*                                           *}
-{*********************************************}
-
+﻿////////////////////////////////////////////////////////////////////////////////
+//
+//  Project:   AIMP
+//             Programming Interface
+//
+//  Target:    v5.40 build 2650
+//
+//  Purpose:   General Wrappers
+//
+//  Author:    Artem Izmaylov
+//             © 2006-2025
+//             www.aimp.ru
+//
+//  FPC:       OK
+//
 unit apiWrappers;
 
 {$I apiConfig.inc}
@@ -16,7 +20,23 @@ unit apiWrappers;
 interface
 
 uses
-  Windows, SysUtils, Classes, apiCore, apiObjects, apiFileManager, apiMUI;
+{$IFDEF FPC}
+  LCLIntf,
+  LCLType,
+{$ELSE}
+  Windows,
+{$ENDIF}
+  // System
+  Classes,
+  Math,
+  SysUtils,
+  Types,
+  // API
+  apiCore,
+  apiObjects,
+  apiFileManager,
+  apiMUI,
+  apiTypes;
 
 type
 
@@ -27,9 +47,10 @@ type
     FRefCount: Integer;
   protected
     // IUnknown
-    function QueryInterface(const IID: TGUID; out Obj): HRESULT; virtual; stdcall;
-    function _AddRef: Integer; stdcall;
-    function _Release: Integer; stdcall;
+    function QueryInterface({$IFDEF FPC}constref{$ELSE}const{$ENDIF}
+      IID: TGUID; out Obj): HRESULT; virtual; {$IFDEF MSWINDOWS}stdcall{$ELSE}cdecl{$ENDIF};
+    function _AddRef: Integer; {$IFDEF MSWINDOWS}stdcall{$ELSE}cdecl{$ENDIF};
+    function _Release: Integer; {$IFDEF MSWINDOWS}stdcall{$ELSE}cdecl{$ENDIF};
   public
     procedure AfterConstruction; override;
     procedure BeforeDestruction; override;
@@ -49,11 +70,12 @@ type
 
   TAIMPExtensionFileFormat = class(TInterfacedObjectEx, IAIMPExtensionFileFormat)
   private
-    FDescription: UnicodeString;
-    FExtList: UnicodeString;
+    FDescription: string;
+    FExtList: string;
     FFlags: Cardinal;
   public
-    constructor Create(const ADescription, AExtList: UnicodeString; AFlags: Cardinal = AIMP_SERVICE_FILEFORMATS_CATEGORY_AUDIO);
+    constructor Create(const ADescription, AExtList: string;
+      AFlags: Cardinal = AIMP_SERVICE_FILEFORMATS_CATEGORY_AUDIO);
     // IAIMPExtensionFileFormat
     function GetDescription(out S: IAIMPString): HRESULT; stdcall;
     function GetExtList(out S: IAIMPString): HRESULT; stdcall;
@@ -68,7 +90,7 @@ type
   protected
     FCustomObject: IUnknown;
 
-    function CheckAccess(var AResult: HRESULT): Boolean; virtual;
+    function CheckAccess(out AResult: HRESULT): Boolean; virtual;
     // IAIMPPropertyList
     procedure DoBeginUpdate; virtual;
     procedure DoEndUpdate; virtual;
@@ -109,20 +131,20 @@ type
   public
     constructor Create;
     // Deleting
-    procedure Delete(const AKeyPath: UnicodeString);
+    procedure Delete(const AKeyPath: string);
     // Reading
-    function ReadBool(const AKeyPath: UnicodeString; const ADefault: Boolean = False): Boolean;
-    function ReadFloat(const AKeyPath: UnicodeString; const ADefault: Double = 0): Double;
-    function ReadInt64(const AKeyPath: UnicodeString; const ADefault: Int64 = 0): Int64;
-    function ReadInteger(const AKeyPath: UnicodeString; const ADefault: Integer = 0): Integer;
-    function ReadString(const AKeyPath: UnicodeString; const ADefault: UnicodeString = ''): UnicodeString;
+    function ReadBool(const AKeyPath: string; const ADefault: Boolean = False): Boolean;
+    function ReadFloat(const AKeyPath: string; const ADefault: Double = 0): Double;
+    function ReadInt64(const AKeyPath: string; const ADefault: Int64 = 0): Int64;
+    function ReadInteger(const AKeyPath: string; const ADefault: Integer = 0): Integer;
+    function ReadString(const AKeyPath: string; const ADefault: string = ''): string;
     // Writing
-    procedure WriteBool(const AKeyPath: UnicodeString; const AValue: Boolean);
-    procedure WriteFloat(const AKeyPath: UnicodeString; const AValue: Double);
-    procedure WriteInt64(const AKeyPath: UnicodeString; const AValue: Int64);
-    procedure WriteInteger(const AKeyPath: UnicodeString; const AValue: Integer);
-    procedure WriteString(const AKeyPath: UnicodeString; const AValue: UnicodeString);
-    //
+    procedure WriteBool(const AKeyPath: string; const AValue: Boolean);
+    procedure WriteFloat(const AKeyPath: string; const AValue: Double);
+    procedure WriteInt64(const AKeyPath: string; const AValue: Int64);
+    procedure WriteInteger(const AKeyPath: string; const AValue: Integer);
+    procedure WriteString(const AKeyPath: string; const AValue: string);
+    // Properties
     property Service: IAIMPServiceConfig read FService;
   end;
 
@@ -156,10 +178,11 @@ type
     function SetSize(const Value: Int64): HRESULT; stdcall;
     function GetPosition: Int64; stdcall;
     function Seek(const Offset: Int64; Mode: Integer): HRESULT; stdcall;
-    function Read(Buffer: PByte; Count: DWORD): Integer; virtual; stdcall;
-    function Write(Buffer: PByte; Count: DWORD; Written: PDWORD = nil): HRESULT; stdcall;
+    function Read(Buffer: PByte; Count: LongWord): Integer; virtual; stdcall;
+    function Write(Buffer: PByte; Count: LongWord; Written: PLongWord = nil): HRESULT; stdcall;
   public
     constructor Create(ASource: TStream; AOwnership: TStreamOwnership = soOwned);
+    constructor CreateFromResource(const AName: string; AType: PChar);
     destructor Destroy; override;
   end;
 
@@ -178,7 +201,7 @@ type
 
   TAIMPFileStreamAdapter = class(TAIMPStreamAdapter, IAIMPFileStream)
   protected
-    function CreateStream(const AFileName: UnicodeString; AMode: Integer): TStream; virtual;
+    function CreateStream(const AFileName: string; AMode: Integer): TStream; virtual;
     function Read(Buffer: PByte; Count: DWORD): Integer; override;
     function TestSource(ASource: TStream): Boolean; override;
     // IAIMPFileStream
@@ -186,17 +209,17 @@ type
     function GetFileName(out S: IAIMPString): HRESULT; virtual; stdcall;
   public
     constructor Create(const AFileName: IAIMPString; AMode: Integer); overload;
-    constructor Create(const AFileName: UnicodeString; AMode: Integer); overload;
+    constructor Create(const AFileName: string; AMode: Integer); overload;
   end;
 
 var
-  FInternalConverter: function (const AString: IAIMPString): UnicodeString = nil;
+  FInternalConverter: function (const AString: IAIMPString): string = nil;
 
 procedure CheckResult(R: HRESULT; const AMessage: string = '%d');
 
 // Core
 procedure CoreCreateObject(const IID: TGUID; out Obj);
-function CoreGetProfilePath: UnicodeString;
+function CoreGetProfilePath: string;
 function CoreGetService(const IID: TGUID; out Obj): LongBool;
 function CoreIntf: IAIMPCore;
 function CoreProcessException(const E: Exception; ErrorInfo: IAIMPErrorInfo): HRESULT;
@@ -205,35 +228,33 @@ function CoreProcessException(const E: Exception; ErrorInfo: IAIMPErrorInfo): HR
 function MainWindowGetHandle: HWND;
 
 // Localizations
-function LangGetName: UnicodeString;
-function LangLoadString(const KeyPath: UnicodeString): UnicodeString; overload;
-function LangLoadString(const KeyPath: UnicodeString; APartIndex: Integer): UnicodeString; overload;
-function LangLoadString(const KeyPath: UnicodeString; APartIndex: Integer; out AValue: IAIMPString): HRESULT; overload;
-function LangLoadString(const KeyPath: UnicodeString; out AValue: IAIMPString): HRESULT; overload;
-function LangLoadStringEx(const KeyPath: UnicodeString): IAIMPString; overload;
-function LangLoadStringEx(const KeyPath: UnicodeString; APartIndex: Integer): IAIMPString; overload;
+function LangGetName: string;
+function LangLoadString(const KeyPath: string): string; overload;
+function LangLoadString(const KeyPath: string; APartIndex: Integer): string; overload;
+function LangLoadString(const KeyPath: string; APartIndex: Integer; out AValue: IAIMPString): HRESULT; overload;
+function LangLoadString(const KeyPath: string; out AValue: IAIMPString): HRESULT; overload;
+function LangLoadStringEx(const KeyPath: string): IAIMPString; overload;
+function LangLoadStringEx(const KeyPath: string; APartIndex: Integer): IAIMPString; overload;
+function LangLoadStringEx(const KeyPath: string; const Args: array of const): IAIMPString; overload;
 
 // Strings
-function IAIMPStringToString(const S: IAIMPString): UnicodeString; inline;
-function MakeString(const S: PWideChar; ALength: Integer): IAIMPString; overload;
-function MakeString(const S: PWideChar; ALength: Integer; out R: IAIMPString): HRESULT; overload;
-function MakeString(const S: UnicodeString): IAIMPString; overload; inline;
-function MakeString(const S: UnicodeString; out R: IAIMPString): HRESULT; overload; inline;
+function IAIMPStringToString(const S: IAIMPString): string; inline;
+function MakeString(const S: string): IAIMPString;
 
 function PropListGetBool(const List: IAIMPPropertyList; ID: Integer; const ADefault: LongBool = False): LongBool;
 function PropListGetFloat(const List: IAIMPPropertyList; ID: Integer; const ADefault: Double = 0): Double;
-function PropListGetInt32(const List: IAIMPPropertyList; ID: Integer; const ADefault: Integer = 0): Integer; inline;
+function PropListGetInt32(const List: IAIMPPropertyList; ID: Integer; const ADefault: Integer = 0): Integer;
 function PropListGetInt64(const List: IAIMPPropertyList; ID: Integer; const ADefault: Int64 = 0): Int64;
 function PropListGetObj(const List: IAIMPPropertyList; ID: Integer): IUnknown;
-function PropListGetStr(const List: IAIMPPropertyList; ID: Integer): UnicodeString; overload; inline;
-function PropListGetStr(const List: IAIMPPropertyList; ID: Integer; out S: IAIMPString): LongBool; overload; inline;
-function PropListGetStr(const List: IAIMPPropertyList; ID: Integer; out S: UnicodeString): LongBool; overload; inline;
+function PropListGetStr(const List: IAIMPPropertyList; ID: Integer): string; overload;
+function PropListGetStr(const List: IAIMPPropertyList; ID: Integer; out S: IAIMPString): LongBool; overload;
+function PropListGetStr(const List: IAIMPPropertyList; ID: Integer; out S: string): LongBool; overload;
 procedure PropListSetBool(const List: IAIMPPropertyList; ID: Integer; const Value: LongBool);
 procedure PropListSetFloat(const List: IAIMPPropertyList; ID: Integer; const Value: Double);
 procedure PropListSetInt32(const List: IAIMPPropertyList; ID: Integer; const Value: Integer);
 procedure PropListSetInt64(const List: IAIMPPropertyList; ID: Integer; const Value: Int64);
 procedure PropListSetObj(const List: IAIMPPropertyList; ID: Integer; S: IUnknown);
-procedure PropListSetStr(const List: IAIMPPropertyList; ID: Integer; const S: UnicodeString);
+procedure PropListSetStr(const List: IAIMPPropertyList; ID: Integer; const S: string);
 
 // Message Dispatcher
 function ApplicationIsLoaded: LongBool;
@@ -247,7 +268,6 @@ uses
 
 const
   sErrorCannotCreateObject = 'Cannot create object (%d)';
-  sErrorCannotSetDataToString = 'Cannot set data to IAIMPString (%d)';
   sErrorNoCore = 'Plugin was not initialized';
 
 var
@@ -273,7 +293,7 @@ begin
   Result := CoreIntf.CreateObject(IID, Obj);
 end;
 
-function CoreGetProfilePath: UnicodeString;
+function CoreGetProfilePath: string;
 var
   S: IAIMPString;
 begin
@@ -317,7 +337,7 @@ end;
 // Localization
 //----------------------------------------------------------------------------------------------------------------------
 
-function LangGetName: UnicodeString;
+function LangGetName: string;
 var
   AService: IAIMPServiceMUI;
   AValue: IAIMPString;
@@ -328,7 +348,7 @@ begin
     Result := '';
 end;
 
-function LangLoadString(const KeyPath: UnicodeString): UnicodeString;
+function LangLoadString(const KeyPath: string): string;
 var
   AValue: IAIMPString;
 begin
@@ -338,7 +358,7 @@ begin
     Result := '';
 end;
 
-function LangLoadString(const KeyPath: UnicodeString; out AValue: IAIMPString): HRESULT;
+function LangLoadString(const KeyPath: string; out AValue: IAIMPString): HRESULT;
 var
   AService: IAIMPServiceMUI;
 begin
@@ -348,19 +368,24 @@ begin
     Result := E_NOINTERFACE;
 end;
 
-function LangLoadStringEx(const KeyPath: UnicodeString): IAIMPString;
+function LangLoadStringEx(const KeyPath: string): IAIMPString;
 begin
   if Failed(LangLoadString(KeyPath, Result)) then
     Result := MakeString('');
 end;
 
-function LangLoadStringEx(const KeyPath: UnicodeString; APartIndex: Integer): IAIMPString;
+function LangLoadStringEx(const KeyPath: string; APartIndex: Integer): IAIMPString;
 begin
   if Failed(LangLoadString(KeyPath, APartIndex, Result)) then
     Result := MakeString('');
 end;
 
-function LangLoadString(const KeyPath: UnicodeString; APartIndex: Integer): UnicodeString;
+function LangLoadStringEx(const KeyPath: string; const Args: array of const): IAIMPString;
+begin
+  Result := MakeString(Format(LangLoadString(KeyPath), Args));
+end;
+
+function LangLoadString(const KeyPath: string; APartIndex: Integer): string;
 var
   AValue: IAIMPString;
 begin
@@ -370,7 +395,7 @@ begin
     Result := '';
 end;
 
-function LangLoadString(const KeyPath: UnicodeString; APartIndex: Integer; out AValue: IAIMPString): HRESULT;
+function LangLoadString(const KeyPath: string; APartIndex: Integer; out AValue: IAIMPString): HRESULT;
 var
   AService: IAIMPServiceMUI;
 begin
@@ -384,7 +409,7 @@ end;
 // Strings
 //----------------------------------------------------------------------------------------------------------------------
 
-function IAIMPStringToString(const S: IAIMPString): UnicodeString;
+function IAIMPStringToString(const S: IAIMPString): string;
 begin
   if Assigned(FInternalConverter) then
     Result := FInternalConverter(S)
@@ -392,38 +417,13 @@ begin
     if S <> nil then
       SetString(Result, S.GetData, S.GetLength)
     else
-      Result := EmptyStr;
+      Result := '';
 end;
 
-function MakeString(const S: PWideChar; ALength: Integer): IAIMPString;
+function MakeString(const S: string): IAIMPString;
 begin
   CoreCreateObject(IID_IAIMPString, Result);
-  CheckResult(Result.SetData(S, ALength), sErrorCannotSetDataToString);
-end;
-
-function MakeString(const S: PWideChar; ALength: Integer; out R: IAIMPString): HRESULT;
-begin
-  try
-    R := MakeString(S, ALength);
-    Result := S_OK;
-  except
-    Result := E_UNEXPECTED;
-  end;
-end;
-
-function MakeString(const S: UnicodeString): IAIMPString;
-begin
-  Result := MakeString(PWideChar(S), Length(S));
-end;
-
-function MakeString(const S: UnicodeString; out R: IAIMPString): HRESULT;
-begin
-  try
-    R := MakeString(S);
-    Result := S_OK;
-  except
-    Result := E_UNEXPECTED;
-  end;
+  Result.SetData(PChar(S), Length(S));
 end;
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -471,7 +471,7 @@ begin
     Result := nil;
 end;
 
-function PropListGetStr(const List: IAIMPPropertyList; ID: Integer): UnicodeString;
+function PropListGetStr(const List: IAIMPPropertyList; ID: Integer): string;
 begin
   if not PropListGetStr(List, ID, Result) then
     Result := '';
@@ -479,10 +479,10 @@ end;
 
 function PropListGetStr(const List: IAIMPPropertyList; ID: Integer; out S: IAIMPString): LongBool;
 begin
-  Result := (List <> nil) and Succeeded(List.GetValueAsObject(ID, IID_IAIMPString, S));
+  Result := (List <> nil) and Succeeded(List.GetValueAsObject(ID, IAIMPString, S));
 end;
 
-function PropListGetStr(const List: IAIMPPropertyList; ID: Integer; out S: UnicodeString): LongBool;
+function PropListGetStr(const List: IAIMPPropertyList; ID: Integer; out S: string): LongBool;
 var
   AStrIntf: IAIMPString;
 begin
@@ -493,7 +493,7 @@ end;
 
 procedure PropListSetBool(const List: IAIMPPropertyList; ID: Integer; const Value: LongBool);
 begin
-  PropListSetInt32(List, ID, Ord(Value));
+  PropListSetInt32(List, ID, IfThen(Value, 1, 0));
 end;
 
 procedure PropListSetFloat(const List: IAIMPPropertyList; ID: Integer; const Value: Double);
@@ -516,7 +516,7 @@ begin
   CheckResult(EnsurePropListNotNil(List).SetValueAsObject(ID, S));
 end;
 
-procedure PropListSetStr(const List: IAIMPPropertyList; ID: Integer; const S: UnicodeString);
+procedure PropListSetStr(const List: IAIMPPropertyList; ID: Integer; const S: string);
 begin
   CheckResult(EnsurePropListNotNil(List).SetValueAsObject(ID, MakeString(S)));
 end;
@@ -574,7 +574,7 @@ begin
   TInterfacedObjectEx(Result).FRefCount := 1;
 end;
 
-function TInterfacedObjectEx.QueryInterface(const IID: TGUID; out Obj): HResult;
+function TInterfacedObjectEx.QueryInterface;
 begin
   if GetInterface(IID, Obj) then
     Result := 0
@@ -608,7 +608,7 @@ end;
 
 { TAIMPExtensionFileFormat }
 
-constructor TAIMPExtensionFileFormat.Create(const ADescription, AExtList: UnicodeString;
+constructor TAIMPExtensionFileFormat.Create(const ADescription, AExtList: string;
   AFlags: Cardinal = AIMP_SERVICE_FILEFORMATS_CATEGORY_AUDIO);
 begin
   inherited Create;
@@ -649,7 +649,7 @@ end;
 
 { TAIMPPropertyList }
 
-function TAIMPPropertyList.CheckAccess(var AResult: HRESULT): Boolean;
+function TAIMPPropertyList.CheckAccess(out AResult: HRESULT): Boolean;
 begin
   Result := True;
   AResult := S_OK;
@@ -898,35 +898,35 @@ begin
     raise Exception.Create('The IAIMPServiceConfig is not supported');
 end;
 
-procedure TAIMPServiceConfig.Delete(const AKeyPath: UnicodeString);
+procedure TAIMPServiceConfig.Delete(const AKeyPath: string);
 begin
   FService.Delete(MakeString(AKeyPath));
 end;
 
-function TAIMPServiceConfig.ReadBool(const AKeyPath: UnicodeString; const ADefault: Boolean): Boolean;
+function TAIMPServiceConfig.ReadBool(const AKeyPath: string; const ADefault: Boolean): Boolean;
 begin
   Result := ReadInteger(AKeyPath, Ord(ADefault)) <> 0;
 end;
 
-function TAIMPServiceConfig.ReadFloat(const AKeyPath: UnicodeString; const ADefault: Double = 0): Double;
+function TAIMPServiceConfig.ReadFloat(const AKeyPath: string; const ADefault: Double = 0): Double;
 begin
   if Failed(FService.GetValueAsFloat(MakeString(AKeyPath), Result)) then
     Result := ADefault;
 end;
 
-function TAIMPServiceConfig.ReadInt64(const AKeyPath: UnicodeString; const ADefault: Int64 = 0): Int64;
+function TAIMPServiceConfig.ReadInt64(const AKeyPath: string; const ADefault: Int64 = 0): Int64;
 begin
   if Failed(FService.GetValueAsInt64(MakeString(AKeyPath), Result)) then
     Result := ADefault;
 end;
 
-function TAIMPServiceConfig.ReadInteger(const AKeyPath: UnicodeString; const ADefault: Integer = 0): Integer;
+function TAIMPServiceConfig.ReadInteger(const AKeyPath: string; const ADefault: Integer = 0): Integer;
 begin
   if Failed(FService.GetValueAsInt32(MakeString(AKeyPath), Result)) then
     Result := ADefault;
 end;
 
-function TAIMPServiceConfig.ReadString(const AKeyPath: UnicodeString; const ADefault: UnicodeString = ''): UnicodeString;
+function TAIMPServiceConfig.ReadString(const AKeyPath: string; const ADefault: string = ''): string;
 var
   AValue: IAIMPString;
 begin
@@ -936,27 +936,27 @@ begin
     Result := ADefault;
 end;
 
-procedure TAIMPServiceConfig.WriteBool(const AKeyPath: UnicodeString; const AValue: Boolean);
+procedure TAIMPServiceConfig.WriteBool(const AKeyPath: string; const AValue: Boolean);
 begin
   WriteInteger(AKeyPath, Ord(AValue));
 end;
 
-procedure TAIMPServiceConfig.WriteFloat(const AKeyPath: UnicodeString; const AValue: Double);
+procedure TAIMPServiceConfig.WriteFloat(const AKeyPath: string; const AValue: Double);
 begin
   FService.SetValueAsFloat(MakeString(AKeyPath), AValue);
 end;
 
-procedure TAIMPServiceConfig.WriteInt64(const AKeyPath: UnicodeString; const AValue: Int64);
+procedure TAIMPServiceConfig.WriteInt64(const AKeyPath: string; const AValue: Int64);
 begin
   FService.SetValueAsInt64(MakeString(AKeyPath), AValue);
 end;
 
-procedure TAIMPServiceConfig.WriteInteger(const AKeyPath: UnicodeString; const AValue: Integer);
+procedure TAIMPServiceConfig.WriteInteger(const AKeyPath: string; const AValue: Integer);
 begin
   FService.SetValueAsInt32(MakeString(AKeyPath), AValue);
 end;
 
-procedure TAIMPServiceConfig.WriteString(const AKeyPath: UnicodeString; const AValue: UnicodeString);
+procedure TAIMPServiceConfig.WriteString(const AKeyPath: string; const AValue: string);
 begin
   FService.SetValueAsString(MakeString(AKeyPath), MakeString(AValue));
 end;
@@ -1017,6 +1017,11 @@ begin
     raise EStreamError.Create('Unsupported stream class');
   FSource := ASource;
   FOwnership := AOwnership;
+end;
+
+constructor TAIMPStreamAdapter.CreateFromResource(const AName: string; AType: PChar);
+begin
+  Create(TResourceStream.Create(HINSTANCE, AName, AType));
 end;
 
 destructor TAIMPStreamAdapter.Destroy;
@@ -1088,7 +1093,7 @@ begin
     end;
 end;
 
-function TAIMPStreamAdapter.Write(Buffer: PByte; Count: DWORD; Written: PDWORD = nil): HRESULT;
+function TAIMPStreamAdapter.Write(Buffer: PByte; Count: LongWord; Written: PLongWord = nil): HRESULT;
 begin
   if FSourceIsReadOnly then
     Result := E_NOTIMPL
@@ -1122,7 +1127,7 @@ end;
 
 { TAIMPFileStreamAdapter }
 
-constructor TAIMPFileStreamAdapter.Create(const AFileName: UnicodeString; AMode: Integer);
+constructor TAIMPFileStreamAdapter.Create(const AFileName: string; AMode: Integer);
 begin
   Create(CreateStream(AFileName, AMode));
 end;
@@ -1145,7 +1150,8 @@ end;
 function TAIMPFileStreamAdapter.GetFileName(out S: IAIMPString): HRESULT;
 begin
   try
-    Result := MakeString(TFileStream(FSource).FileName, S);
+    S := MakeString(TFileStream(FSource).FileName);
+    Result := S_OK;
   except
     Result := E_UNEXPECTED;
   end;
@@ -1155,7 +1161,7 @@ function TAIMPFileStreamAdapter.Read(Buffer: PByte; Count: DWORD): Integer;
 begin
   try
     Result := FSource.Read(Buffer^, Count);
-    if (Result = 0) and (Count > 0) and (GetLastError <> ERROR_SUCCESS) then
+    if (Result = 0) and (Count > 0){$IFDEF MSWINDOWS}and (GetLastError <> ERROR_SUCCESS){$ENDIF} then
     begin
       if FSource.Position <> FSource.Size then
         Result := -1;
@@ -1166,7 +1172,7 @@ begin
   end;
 end;
 
-function TAIMPFileStreamAdapter.CreateStream(const AFileName: UnicodeString; AMode: Integer): TStream;
+function TAIMPFileStreamAdapter.CreateStream(const AFileName: string; AMode: Integer): TStream;
 begin
   Result := TFileStream.Create(AFileName, AMode);
 end;
