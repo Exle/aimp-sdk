@@ -124,11 +124,23 @@ type
   TAIMPUINotifyEventAdapter = class(TAIMPUICustomEventAdapter, IAIMPActionEvent, IAIMPUIChangeEvents)
   private
     FEvent: TAIMPUINotifyEvent;
-
+    FEvent2: TThreadMethod;
     // IAIMPActionEvent
     procedure OnExecute(Data: IInterface); stdcall;
     // IAIMPUIChangeEvents
     procedure OnChanged(Sender: IUnknown); stdcall;
+  public
+    constructor Create(AEvent: TAIMPUINotifyEvent; AMasterAdapter: IUnknown = nil); overload;
+    constructor Create(AEvent: TThreadMethod; AMasterAdapter: IUnknown = nil); overload;
+  end;
+
+  { TAIMPUIContextPopupAdapter }
+
+  TAIMPUIContextPopupAdapter = class(TAIMPUICustomEventAdapter, IAIMPUIPopupMenuEvents)
+  private
+    FEvent: TAIMPUINotifyEvent;
+    // IAIMPUIPopupMenuEvents
+    function OnContextPopup(Sender: IUnknown; X, Y: Integer): LongBool; stdcall;
   public
     constructor Create(AEvent: TAIMPUINotifyEvent; AMasterAdapter: IUnknown = nil);
   end;
@@ -136,7 +148,8 @@ type
 function ModifiersToShiftState(Modifiers: Word): TShiftState;
 
 function uiMessageBox(AOwner: IAIMPUIForm; AMessage: IAIMPString; AFlags: Cardinal): Integer;
-function uiWrap(AEvent: TAIMPUINotifyEvent; AMasterAdapter: IUnknown = nil): IUnknown;
+function uiWrap(AEvent: TThreadMethod; AMasterAdapter: IUnknown = nil): IUnknown; overload;
+function uiWrap(AEvent: TAIMPUINotifyEvent; AMasterAdapter: IUnknown = nil): IUnknown; overload;
 implementation
 
 function ModifiersToShiftState(Modifiers: Word): TShiftState;
@@ -161,6 +174,11 @@ begin
     AOwner.GetValueAsObject(AIMPUI_FORM_PROPID_CAPTION, IAIMPString, LCaption);
     Result := LService.Execute(AOwner.GetHandle, LCaption, AMessage, AFlags);
   end;
+end;
+
+function uiWrap(AEvent: TThreadMethod; AMasterAdapter: IUnknown = nil): IUnknown;
+begin
+  Result := TAIMPUINotifyEventAdapter.Create(AEvent, AMasterAdapter);
 end;
 
 function uiWrap(AEvent: TAIMPUINotifyEvent; AMasterAdapter: IUnknown = nil): IUnknown;
@@ -320,10 +338,32 @@ begin
   OnChanged(Data);
 end;
 
+constructor TAIMPUINotifyEventAdapter.Create(AEvent: TThreadMethod; AMasterAdapter: IInterface);
+begin
+  inherited Create(AMasterAdapter);
+  FEvent2 := AEvent;
+end;
+
 procedure TAIMPUINotifyEventAdapter.OnChanged(Sender: IInterface);
 begin
-  if Assigned(FEvent) then
-    FEvent(Sender);
+  if Assigned(FEvent)  then FEvent(Sender);
+  if Assigned(FEvent2) then FEvent2();
+end;
+
+{ TAIMPUIContextPopupAdapter }
+
+constructor TAIMPUIContextPopupAdapter.Create(
+  AEvent: TAIMPUINotifyEvent; AMasterAdapter: IInterface);
+begin
+  inherited Create(AMasterAdapter);
+  FEvent := AEvent;
+end;
+
+function TAIMPUIContextPopupAdapter.OnContextPopup(
+  Sender: IInterface; X, Y: Integer): LongBool;
+begin
+  FEvent(Sender);
+  Result := False;
 end;
 
 end.

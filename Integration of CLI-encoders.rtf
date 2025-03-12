@@ -27,7 +27,7 @@ x64\\*.*\tab\tab  - \cf2 all 64-bit binaries\cf0\par
 \tab\cf3 name\cf0 =\cf2 "\cf1 plugin name\cf2 " \par
 \tab\cf3 info\cf0 =\cf2 "\cf1 plugin description\cf2 "\par
 >\par
-\tab <encoder \cf3 Name\cf0 =\cf2 "\cf1 Encoder Name\cf2 " App\cf0 =\cf2 "\cf1 cmd-line-encoder.exe\cf2 ">\par
+\tab <encoder \cf3 Name\cf0 =\cf2 "\cf1 Encoder Name\cf2 " App\cf0 =\cf2 "\cf1 cmd-line-encoder.exe\cf2 "\f1\lang1033  debug="\cf1 0\cf2 "\f0\lang1049 >\par
 \tab\tab <description>\par
 \tab\tab\tab <inputformats \cf3 type\cf2 ="\cf1 autogen\cf2 ">\par
 \tab\tab\tab\tab <autogen \par
@@ -73,7 +73,10 @@ x64\\*.*\tab\tab  - \cf2 all 64-bit binaries\cf0\par
 
 \pard{\pntext\f2\'B7\tab}{\*\pn\pnlvlblt\pnf2\pnindent0{\pntxtb\'B7}}\nowidctlpar\fi-360\li720\sl276\slmult1\cf2\b0 encoder\f1\lang1033 s \cf0 - \ul at least one\ulnone  \cf2 encoder\cf0  entry.\b\par
 {\pntext\f2\'B7\tab}\cf2\b0 encoder\cf0  - \ul MUST\ulnone  contains \cf2 description \cf0 and \cf2 presets\cf0  entries.\b\par
-{\pntext\f2\'B7\tab}\cf2\b0 description\cf0  - \ul MUST\ulnone  contains \ul one\ulnone  \cf2 inputformats\cf0  and \ul one or more\ulnone  \cf2 property\cf0  entries.\b\par
+
+\pard{\pntext\f2\'B7\tab}{\*\pn\pnlvlblt\pnf2\pnindent0{\pntxtb\'B7}}\nowidctlpar\fi-360\li1136\sl276\slmult1\cf2\b0 debug\cf0  - set to \cf1 1\cf0  to display encoder console output, \ul optional\ulnone .\b\par
+
+\pard{\pntext\f2\'B7\tab}{\*\pn\pnlvlblt\pnf2\pnindent0{\pntxtb\'B7}}\nowidctlpar\fi-360\li720\sl276\slmult1\cf2\b0 description\cf0  - \ul MUST\ulnone  contains \ul one\ulnone  \cf2 inputformats\cf0  and \ul one or more\ulnone  \cf2 property\cf0  entries.\b\par
 
 \pard{\pntext\f2\'B7\tab}{\*\pn\pnlvlblt\pnf2\pnindent0{\pntxtb\'B7}}\nowidctlpar\fi-360\li1070\sl276\slmult1\tx1278\cf2\b0 inputformats\cf0  may be defined in two ways according to value of \cf2 type \cf0 attribute:\b\par
 
@@ -88,6 +91,8 @@ x64\\*.*\tab\tab  - \cf2 all 64-bit binaries\cf0\par
 {\pntext\f2\'B7\tab}\cf2\b0 InputMegaByteMax\cf0  - specifies how many bytes can be send into the encoder. \ul Optional\ulnone , default is 4GB (limit of WAVE header that uses for pipe transfering).\b\par
 {\pntext\f2\'B7\tab}\cf2\b0 IgnoreLength\cf0  - specifies that the encoder ignores length defined in WAVE header. Its means, more than 4GB can be transfered via pipe. \b\line\ul\b0 Optional\ulnone , default is 0.\b\par
 {\pntext\f2\'B7\tab}\cf2\b0 OutputMegaBytesMax\cf0  - specifies how many bytes can be written to a file of used format. \b\line\ul\b0 Optional\ulnone , output will be unlimited if property is not specified.\b\par
+{\pntext\f2\'B7\tab}\cf2\b0 ID3\cf0  - set to \cf1 "1"\cf0  if the encoder expects ID3v2 tag header in beginning of data stream. \ul Optional\ulnone , default is 0.\b\par
+{\pntext\f2\'B7\tab}\cf2\b0 RequiresLength\cf0  - set to \cf1 "1"\cf0  if the encoder requires correct length defined in WAVE header. By default, AIMP set length to 0 that usually interpreted by encoders like unknown length.\b\par
 
 \pard{\pntext\f2\'B7\tab}{\*\pn\pnlvlblt\pnf2\pnindent0{\pntxtb\'B7}}\nowidctlpar\fi-360\li710\sl276\slmult1\tx1278\cf2\b0 presets \cf0 - contains \ul at least one\ulnone  \cf2 preset\cf0  entry.\b\par
 

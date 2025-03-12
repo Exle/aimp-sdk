@@ -190,6 +190,22 @@ static const GUID IID_IAIMPUIWndProcEvents = {0x61756957, 0x6E64, 0x5072, 0x6F, 
   const int AIMPUI_COMBOBOX_STYLE_EDIT = 0;
   const int AIMPUI_COMBOBOX_STYLE_LIST = 1;
 
+  // CheckModes
+  const int AIMPUI_CHECKMODE_NONE 	  	    = 0;
+  const int AIMPUI_CHECKMODE_CUSTOM  	    = 1;
+  const int AIMPUI_CHECKMODE_TOGGLE_ENABLED = 2;
+
+  // Alignment
+  const int AIMPUI_ALIGN_NEAR   = 0; // left/top
+  const int AIMPUI_ALIGN_FAR    = 1; // right/bottom
+  const int AIMPUI_ALIGN_CENTER = 2; // center
+
+  // ValidationLabel's glyph indexes
+  const int AIMPUI_VALIDATIONLABEL_GLYPH_OK               = 0;
+  const int AIMPUI_VALIDATIONLABEL_GLYPH_WARNING          = 1;
+  const int AIMPUI_VALIDATIONLABEL_GLYPH_ERROR            = 2;
+  const int AIMPUI_VALIDATIONLABEL_GLYPH_CRITICAL_WARNING = 3;
+
 /*----------------------------------------------------------------------------------------------------------------------*/
 /* Property IDs																											   */
 /*----------------------------------------------------------------------------------------------------------------------*/
@@ -244,7 +260,7 @@ static const GUID IID_IAIMPUIWndProcEvents = {0x61756957, 0x6E64, 0x5072, 0x6F, 
   const int AIMPUI_BUTTON_PROPID_IMAGELIST    = AIMPUI_WINCONTROL_MAX_PROPID + 6;
   const int AIMPUI_BUTTON_PROPID_MODALRESULT  = AIMPUI_WINCONTROL_MAX_PROPID + 7;
   const int AIMPUI_BUTTON_PROPID_STYLE        = AIMPUI_WINCONTROL_MAX_PROPID + 8;
-  const int AIMPUI_BUTTON_PROPID_TEXTSTYLE    = AIMPUI_WINCONTROL_MAX_PROPID + 9;
+  const int AIMPUI_BUTTON_PROPID_TEXTSTYLE    = AIMPUI_WINCONTROL_MAX_PROPID + 9;  // v5.40
 
   // PropID for IAIMPUIBaseButtonnedEdit
   const int AIMPUI_BUTTONEDEDIT_PROPID_BUTTONSIMAGES = AIMPUI_BASEEDIT_MAX_PROPID + 1;
@@ -288,7 +304,7 @@ static const GUID IID_IAIMPUIWndProcEvents = {0x61756957, 0x6E64, 0x5072, 0x6F, 
   const int AIMPUI_GROUPBOX_PROPID_AUTOSIZE    = AIMPUI_WINCONTROL_MAX_PROPID + 1;
   const int AIMPUI_GROUPBOX_PROPID_BORDERS     = AIMPUI_WINCONTROL_MAX_PROPID + 2;
   const int AIMPUI_GROUPBOX_PROPID_TRANSPARENT = AIMPUI_WINCONTROL_MAX_PROPID + 3;
-  const int AIMPUI_GROUPBOX_PROPID_CHECKMODE   = AIMPUI_WINCONTROL_MAX_PROPID + 4;
+  const int AIMPUI_GROUPBOX_PROPID_CHECKMODE   = AIMPUI_WINCONTROL_MAX_PROPID + 4; // ref.AIMPUI_CHECKMODE_XXX
   const int AIMPUI_GROUPBOX_PROPID_CHECKED     = AIMPUI_WINCONTROL_MAX_PROPID + 5; // ref.AIMPUI_CHECKSTATE_XXX
   const int AIMPUI_GROUPBOX_PROPID_CAPTION     = AIMPUI_WINCONTROL_MAX_PROPID + 6;
 
@@ -306,8 +322,8 @@ static const GUID IID_IAIMPUIWndProcEvents = {0x61756957, 0x6E64, 0x5072, 0x6F, 
   const int AIMPUI_LABEL_PROPID_AUTOSIZE       = AIMPUI_CONTROL_MAX_PROPID + 1;
   const int AIMPUI_LABEL_PROPID_LINE           = AIMPUI_CONTROL_MAX_PROPID + 2;
   const int AIMPUI_LABEL_PROPID_TEXT           = AIMPUI_CONTROL_MAX_PROPID + 3;
-  const int AIMPUI_LABEL_PROPID_TEXTALIGN      = AIMPUI_CONTROL_MAX_PROPID + 4; 
-  const int AIMPUI_LABEL_PROPID_TEXTALIGNVERT  = AIMPUI_CONTROL_MAX_PROPID + 5; 
+  const int AIMPUI_LABEL_PROPID_TEXTALIGN      = AIMPUI_CONTROL_MAX_PROPID + 4; // ref.AIMPUI_ALIGN_XXX
+  const int AIMPUI_LABEL_PROPID_TEXTALIGNVERT  = AIMPUI_CONTROL_MAX_PROPID + 5; // ref.AIMPUI_ALIGN_XXX
   const int AIMPUI_LABEL_PROPID_TEXTCOLOR      = AIMPUI_CONTROL_MAX_PROPID + 6;
   const int AIMPUI_LABEL_PROPID_TEXTSTYLE      = AIMPUI_CONTROL_MAX_PROPID + 7;
   const int AIMPUI_LABEL_PROPID_TRANSPARENT    = AIMPUI_CONTROL_MAX_PROPID + 8;
@@ -429,7 +445,7 @@ static const GUID IID_IAIMPUIWndProcEvents = {0x61756957, 0x6E64, 0x5072, 0x6F, 
   const int AIMPUI_TL_PROPID_SORTING_MODE               = AIMPUI_WINCONTROL_MAX_PROPID + 30;
 
   // PropID for IAIMPUIValidationLabel
-  const int AIMPUI_VALIDATIONLABEL_PROPID_GLYPH = AIMPUI_LABEL_MAX_PROPID + 1;
+  const int AIMPUI_VALIDATIONLABEL_PROPID_GLYPH = AIMPUI_LABEL_MAX_PROPID + 1; // ref.AIMPUI_VALIDATIONLABEL_GLYPH_XXX
 
   // PropID for IAIMPUIForm
   const int AIMPUI_FORM_PROPID_BORDERICONS   = AIMPUI_WINCONTROL_MAX_PROPID + 1;
@@ -451,13 +467,17 @@ static const GUID IID_IAIMPUIWndProcEvents = {0x61756957, 0x6E64, 0x5072, 0x6F, 
   const int AIMPUI_MODE_PROPID_DPI    = 2;
   const int AIMPUI_MODE_PROPID_STYLE  = 3;
 
-  // TrayIcon
-  const int AIMPUI_TRAYICON_ID        = 1; // IAIMPString
-  const int AIMPUI_TRAYICON_HINT      = 2; // IAIMPString
-  const int AIMPUI_TRAYICON_ICON      = 3; // IAIMPImage or IAIMPImageContainer or IAIMPStream
-  const int AIMPUI_TRAYICON_MENU      = 4; // IAIMPUIPopupMenu
-  const int AIMPUI_TRAYICON_VISIBLE	  = 5;
+  // PropID for IAIMPUITrayIcon
+  const int AIMPUI_TRAYICON_PROPID_ID        = 1; // IAIMPString
+  const int AIMPUI_TRAYICON_PROPID_HINT      = 2; // IAIMPString
+  const int AIMPUI_TRAYICON_PROPID_ICON      = 3; // IAIMPImage or IAIMPImageContainer or IAIMPStream
+  const int AIMPUI_TRAYICON_PROPID_MENU      = 4; // IAIMPUIPopupMenu
+  const int AIMPUI_TRAYICON_PROPID_VISIBLE	 = 5; // Int32
 
+  // Flags for IAIMPUITrayIcon.Notify
+  const int AIMPUI_TRAYICON_NOTIFY_FLAGS_INFO    = 0;
+  const int AIMPUI_TRAYICON_NOTIFY_FLAGS_ERROR   = 1;
+  const int AIMPUI_TRAYICON_NOTIFY_FLAGS_WARNING = 2;
 /*----------------------------------------------------------------------------------------------------------------------*/
 /* Basic Interfaces																								   */
 /*----------------------------------------------------------------------------------------------------------------------*/
@@ -676,7 +696,7 @@ static const GUID IID_IAIMPUIWndProcEvents = {0x61756957, 0x6E64, 0x5072, 0x6F, 
 
   /* IAIMPUIImageList2 */
 
-  class IAIMPUIImageList2: public IAIMPUIImageList
+  class IAIMPUIImageList2: public IUnknown
   {
 	  public:
 	 		virtual HRESULT WINAPI DrawEx(HCANVAS Canvas, int Index, const RECT R, BOOL Enabled) = 0;
@@ -712,7 +732,7 @@ static const GUID IID_IAIMPUIWndProcEvents = {0x61756957, 0x6E64, 0x5072, 0x6F, 
   class IAIMPUITrayIcon: public IAIMPPropertyList
   {
 	public:
-		virtual HRESULT WINAPI Notify(IAIMPString* Title, IAIMPString* Message, int Reserved) = 0;
+		virtual HRESULT WINAPI Notify(IAIMPString* Title, IAIMPString* Message, int Flags, IUnknown* Events) = 0;
   };
 
 /*----------------------------------------------------------------------------------------------------------------------*/
@@ -1163,9 +1183,9 @@ static const GUID IID_IAIMPUIWndProcEvents = {0x61756957, 0x6E64, 0x5072, 0x6F, 
 /* Dialogs																				 						        */
 /*----------------------------------------------------------------------------------------------------------------------*/
 
-  { IAIMPUIAuthDialog }
+  /* IAIMPUIAuthDialog */
 
-  class IAIMPUIAuthDialog: public IUnknown
+  class IAIMPUIAuthDialog: public IUnknown // v5.40
   {
 		public:
 			virtual HRESULT WINAPI Execute(HWND OwnerWnd, IAIMPString* Title, IAIMPString* Text, IUnknown* EventsHandler, LongWord Flags) = 0;
@@ -1173,7 +1193,7 @@ static const GUID IID_IAIMPUIWndProcEvents = {0x61756957, 0x6E64, 0x5072, 0x6F, 
 
   /* IAIMPUIAuthDialogEvents */
 
-  class IAIMPUIAuthDialogEvents: public IUnknown
+  class IAIMPUIAuthDialogEvents: public IUnknown // v5.40
   {
 		public:
 			virtual HRESULT WINAPI OnParse(IAIMPString* Params, IAIMPString** ErrorText) = 0;

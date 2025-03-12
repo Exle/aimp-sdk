@@ -240,6 +240,8 @@ function LangLoadStringEx(const KeyPath: string; const Args: array of const): IA
 // Strings
 function IAIMPStringToString(const S: IAIMPString): string; inline;
 function MakeString(const S: string): IAIMPString;
+function StrCompare(const S1: IAIMPString; const S2: IAIMPString; IgnoreCase: Boolean = False): Integer; overload;
+function StrCompare(const S1: IAIMPString; const S2: string; IgnoreCase: Boolean = False): Integer; overload;
 
 function PropListGetBool(const List: IAIMPPropertyList; ID: Integer; const ADefault: LongBool = False): LongBool;
 function PropListGetFloat(const List: IAIMPPropertyList; ID: Integer; const ADefault: Double = 0): Double;
@@ -424,6 +426,28 @@ function MakeString(const S: string): IAIMPString;
 begin
   CoreCreateObject(IID_IAIMPString, Result);
   Result.SetData(PChar(S), Length(S));
+end;
+
+function StrCompare(const S1: IAIMPString; const S2: IAIMPString; IgnoreCase: Boolean): Integer;
+begin
+  if (S1 <> nil) and (S2 <> nil) then
+    S1.Compare(S2, Result, IgnoreCase)
+  else if S1 <> nil then
+    Result := 1
+  else if S2 <> nil then
+    Result := -1
+  else
+    Result := 0
+end;
+
+function StrCompare(const S1: IAIMPString; const S2: string; IgnoreCase: Boolean): Integer;
+begin
+  if S1 <> nil then
+    S1.Compare2(PChar(S2), Length(S2), Result, IgnoreCase)
+  else if S2 <> '' then
+    Result := -1
+  else
+    Result := 0;
 end;
 
 //----------------------------------------------------------------------------------------------------------------------

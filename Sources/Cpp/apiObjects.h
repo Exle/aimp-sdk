@@ -110,28 +110,28 @@ class IAIMPString: public IUnknown
 		virtual int WINAPI GetLength() = 0;
 		virtual int WINAPI GetHashCode() = 0;
 		virtual HRESULT WINAPI SetChar(int Index, TChar Char) = 0;
-		virtual HRESULT WINAPI SetData(TChar* Chars, int CharsCount) = 0;
+		virtual HRESULT WINAPI SetData(TChar* Chars, int CharCount) = 0;
 
 		virtual HRESULT WINAPI Add(IAIMPString* S) = 0;
-		virtual HRESULT WINAPI Add2(TChar* Chars, int CharsCount) = 0;
+		virtual HRESULT WINAPI Add2(TChar* Chars, int CharCount) = 0;
 
 		virtual HRESULT WINAPI ChangeCase(int Mode) = 0;
 		virtual HRESULT WINAPI Clone(IAIMPString **S) = 0;
 
 		virtual HRESULT WINAPI Compare(IAIMPString* S, int* CompareResult, BOOL IgnoreCase) = 0;
-		virtual HRESULT WINAPI Compare2(TChar* Chars, int CharsCount, int* CompareResult, BOOL IgnoreCase) = 0;
+		virtual HRESULT WINAPI Compare2(TChar* Chars, int CharCount, int* CompareResult, BOOL IgnoreCase) = 0;
 
 		virtual HRESULT WINAPI Delete(int Index, int Count) = 0;
 
 		virtual HRESULT WINAPI Find(IAIMPString* S, int *Index, int Flags, int StartFromIndex) = 0;
-		virtual HRESULT WINAPI Find2(TChar *Chars, int CharsCount, int *Index, int Flags, int StartFromIndex) = 0;
+		virtual HRESULT WINAPI Find2(TChar *Chars, int CharCount, int *Index, int Flags, int StartFromIndex) = 0;
 
 		virtual HRESULT WINAPI Insert(int Index, IAIMPString *S) = 0;
-		virtual HRESULT WINAPI Insert2(int Index, TChar *Chars, int CharsCount) = 0;
+		virtual HRESULT WINAPI Insert2(int Index, TChar *Chars, int CharCount) = 0;
 
 		virtual HRESULT WINAPI Replace(IAIMPString *OldPattern, IAIMPString *NewPattern, int Flags) = 0;
-		virtual HRESULT WINAPI Replace2(TChar *OldPatternChars, int OldPatternCharsCount,
-			TChar *NewPatternChars, int NewPatternCharsCount, int Flags) = 0;
+		virtual HRESULT WINAPI Replace2(TChar *OldPatternChars, int OldPatternCharCount,
+			TChar *NewPatternChars, int NewPatternCharCount, int Flags) = 0;
 
 		virtual HRESULT WINAPI SubString(int Index, int Count, IAIMPString **S) = 0;
 };

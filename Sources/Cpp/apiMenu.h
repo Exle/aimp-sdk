@@ -26,7 +26,7 @@ static const GUID IID_IAIMPServiceMenuManager = {0x41494D50, 0x5372, 0x764D, 0x6
 const int AIMP_MENUITEM_PROPID_CUSTOM       = 0;
 const int AIMP_MENUITEM_PROPID_ACTION       = 1;
 const int AIMP_MENUITEM_PROPID_ID           = 2;
-const int AIMP_MENUITEM_PROPID_NAME         = 3;
+const int AIMP_MENUITEM_PROPID_CAPTION      = 3;
 const int AIMP_MENUITEM_PROPID_ENABLED      = 4;
 const int AIMP_MENUITEM_PROPID_STYLE        = 5; // One of the AIMP_MENUITEM_STYLE_XXX
 const int AIMP_MENUITEM_PROPID_EVENT        = 6;
@@ -37,6 +37,8 @@ const int AIMP_MENUITEM_PROPID_VISIBLE      = 12;
 const int AIMP_MENUITEM_PROPID_CHECKED		= 13;
 const int AIMP_MENUITEM_PROPID_DEFAULT      = 14;
 const int AIMP_MENUITEM_PROPID_SHORTCUT     = 15;
+
+const int AIMP_MENUITEM_PROPID_NAME         = 3; // deprecated
 
 // Styles for the AIMP_MENUITEM_PROPID_STYLE property
 const int AIMP_MENUITEM_STYLE_NORMAL   = 0;

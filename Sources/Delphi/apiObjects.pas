@@ -280,7 +280,7 @@ type
     function GetLength: Integer; stdcall;
     function GetHashCode: Integer; stdcall;
     function SetChar(Index: Integer; Char: Char): HRESULT; stdcall;
-    function SetData(Chars: PChar; CharsCount: Integer): HRESULT; stdcall;
+    function SetData(Chars: PChar; CharCount: Integer): HRESULT; stdcall;
 
     function Add(S: IAIMPString): HRESULT; stdcall;
     function Add2(Chars: PChar; Count: Integer): HRESULT; stdcall;
@@ -288,24 +288,25 @@ type
     function ChangeCase(Mode: Integer): HRESULT; stdcall;
     function Clone(out S: IAIMPString): HRESULT; stdcall;
 
+    // Ref.to apiWrappes.StrCompare
     function Compare(S: IAIMPString;
       out CompareResult: Integer; IgnoreCase: LongBool): HRESULT; stdcall;
-    function Compare2(Chars: PChar; CharsCount: Integer;
+    function Compare2(Chars: PChar; CharCount: Integer;
       out CompareResult: Integer; IgnoreCase: LongBool): HRESULT; stdcall;
 
     function Delete(Index, Count: Integer): HRESULT; stdcall;
 
     function Find(S: IAIMPString; out Index: Integer;
       Flags: Integer; StartFromIndex: Integer = 0): HRESULT; stdcall;
-    function Find2(Chars: PChar; CharsCount: Integer;
+    function Find2(Chars: PChar; CharCount: Integer;
       out Index: Integer; Flags: Integer; StartFromIndex: Integer = 0): HRESULT; stdcall;
 
     function Insert(Index: Integer; S: IAIMPString): HRESULT; stdcall;
-    function Insert2(Index: Integer; Chars: PChar; CharsCount: Integer): HRESULT; stdcall;
+    function Insert2(Index: Integer; Chars: PChar; CharCount: Integer): HRESULT; stdcall;
 
     function Replace(OldPattern, NewPattern: IAIMPString; Flags: Integer): HRESULT; stdcall;
-    function Replace2(OldPatternChars: PChar; OldPatternCharsCount: Integer;
-      NewPatternChars: PChar; NewPatternCharsCount: Integer; Flags: Integer): HRESULT; stdcall;
+    function Replace2(OldPatternChars: PChar; OldPatternCharCount: Integer;
+      NewPatternChars: PChar; NewPatternCharCount: Integer; Flags: Integer): HRESULT; stdcall;
 
     function SubString(Index, Count: Integer; out S: IAIMPString): HRESULT; stdcall;
   end;
