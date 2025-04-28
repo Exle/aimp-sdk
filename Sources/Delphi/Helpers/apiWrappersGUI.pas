@@ -21,6 +21,7 @@ interface
 
 uses
   Classes,
+  SysUtils,
   Types,
   // API
   apiActions,
@@ -31,12 +32,17 @@ uses
   apiTypes;
 
 type
-  TAIMPUIDrawEvent = procedure (const Sender: IUnknown; Canvas: HCANVAS; const R: TRect) of object;
-  TAIMPUIKeyEvent = procedure (const Sender: IUnknown; var Key: Word; Modifiers: TShiftState) of object;
+  TAIMPUIDrawEvent = procedure (const Sender: IUnknown;
+    Canvas: HCANVAS; const R: TRect) of object;
+  TAIMPUIKeyEvent = procedure (const Sender: IUnknown;
+    var Key: Word; Modifiers: TShiftState) of object;
   TAIMPUIKeyPressEvent = procedure (const Sender: IUnknown; var Key: WideChar) of object;
-  TAIMPUIMouseEvent = procedure (const Sender: IUnknown; Button: TAIMPUIMouseButton; Shift: TShiftState; X, Y: Integer) of object;
-  TAIMPUIMouseMoveEvent = procedure (const Sender: IUnknown; Shift: TShiftState; X, Y: Integer) of object;
-  TAIMPUIMouseWheelEvent = procedure (const Sender: IUnknown; Shift: TShiftState; Delta, X, Y: Integer; var Handled: LongBool) of object;
+  TAIMPUIMouseEvent = procedure (const Sender: IUnknown;
+    Button: TAIMPUIMouseButton; Shift: TShiftState; X, Y: Integer) of object;
+  TAIMPUIMouseMoveEvent = procedure (const Sender: IUnknown;
+    Shift: TShiftState; X, Y: Integer) of object;
+  TAIMPUIMouseWheelEvent = procedure (const Sender: IUnknown;
+    Shift: TShiftState; Delta, X, Y: Integer; var Handled: LongBool) of object;
   TAIMPUINotifyEvent = procedure (const Sender: IUnknown) of object;
 
   { TAIMPUICustomEventAdapter }
@@ -147,6 +153,10 @@ type
 
 function ModifiersToShiftState(Modifiers: Word): TShiftState;
 
+function uiCreateAction(const ID: string; const Event: IUnknown): IAIMPAction; overload;
+function uiCreateAction(const ID, Name, Group: string; const Event: IUnknown): IAIMPAction; overload;
+function uiCreateAction(const Name, Group: string; const Event: IUnknown): IAIMPAction; overload;
+function uiMakeActionId(const PluginName, ActionName: string): string;
 function uiMessageBox(AOwner: IAIMPUIForm; AMessage: IAIMPString; AFlags: Cardinal): Integer;
 function uiWrap(AEvent: TThreadMethod; AMasterAdapter: IUnknown = nil): IUnknown; overload;
 function uiWrap(AEvent: TAIMPUINotifyEvent; AMasterAdapter: IUnknown = nil): IUnknown; overload;
@@ -161,6 +171,34 @@ begin
     Include(Result, ssAlt);
   if Modifiers and AIMPUI_FLAGS_MOD_SHIFT <> 0 then
     Include(Result, ssShift);
+end;
+
+function uiCreateAction(const Name, Group: string; const Event: IUnknown): IAIMPAction;
+begin
+  Result := uiCreateAction(uiMakeActionId(Group, Name), Name, Group, Event);
+end;
+
+function uiCreateAction(const ID: string; const Event: IUnknown): IAIMPAction;
+begin
+  Result := uiCreateAction(ID, '', '', Event);
+end;
+
+function uiCreateAction(const ID, Name, Group: string; const Event: IUnknown): IAIMPAction;
+begin
+  CoreCreateObject(IAIMPAction, Result);
+  PropListSetStr(Result, AIMP_ACTION_PROPID_ID, ID);
+  PropListSetObj(Result, AIMP_ACTION_PROPID_EVENT, Event);
+  if Name <> '' then
+    PropListSetStr(Result, AIMP_ACTION_PROPID_NAME, Name);
+  if Group <> '' then
+    PropListSetStr(Result, AIMP_ACTION_PROPID_GROUPNAME, Group);
+end;
+
+function uiMakeActionId(const PluginName, ActionName: string): string;
+begin
+  Result := Format('aimp.%s.action.%s', [
+    StringReplace(LowerCase(PluginName), ' ', '_', [rfReplaceAll]),
+    StringReplace(LowerCase(ActionName), ' ', '_', [rfReplaceAll])]);
 end;
 
 function uiMessageBox(AOwner: IAIMPUIForm; AMessage: IAIMPString; AFlags: Cardinal): Integer;
