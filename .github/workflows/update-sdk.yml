@@ -1,0 +1,152 @@
+name: Update AIMP SDK
+
+on:
+  schedule:
+    - cron: '0 */6 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+
+    outputs:
+      update: ${{ steps.check.outputs.update }}
+      url: ${{ steps.metadata.outputs.url }}
+      version: ${{ steps.metadata.outputs.version }}
+      date: ${{ steps.metadata.outputs.date }}
+      tag: ${{ steps.metadata.outputs.tag }}
+      md5: ${{ steps.metadata.outputs.md5 }}
+      sha256: ${{ steps.metadata.outputs.sha256 }}
+    
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Read SDK Metadata
+        id: metadata
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          html=$(curl -fsSL "${{ vars.AIMP_SDK_URL }}")
+
+          block=$(echo "$html" \
+            | tr -d '\n' \
+            | grep -oP '<li class="link">.*?</li>' \
+            | grep -v "Beta" \
+            | head -n1)
+          
+          [[ -n "$block" ]]
+
+          date=$(echo "$html" \
+            | grep -oP 'Release date:\s*\K[0-9.]+' \
+            | head -n1)
+          
+          url=$(echo "$block" \
+            | grep -oP 'href="\K/\?do=download\.file[^"]+?(id=[0-9]+)' \
+            | sed 's/&amp;/\&/g;s|^/|https://aimp.ru/|')
+
+          version=$(echo "$block" \
+            | grep -oP '^.*</a>\K.*?(?=<h3)' \
+            | xargs)
+
+          md5=$(echo "$block" \
+            | grep -oP '<nobr>MD5:\s*\K[a-f0-9]{32}')
+
+          sha256=$(echo "$block" \
+            | grep -oP '<nobr>SHA256:\s*\K[a-f0-9]{64}')
+
+          tag="$(echo "$version" | tr ' ' '-')-${sha256:0:12}"
+
+          {
+            echo "url=$url"
+            echo "version=$version"
+            echo "date=$date"
+            echo "md5=$md5"
+            echo "sha256=$sha256"
+            echo "tag=$tag"
+          } >> "$GITHUB_OUTPUT"
+      
+      - name: Check Release
+        id: check
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          if gh release view "${{ steps.metadata.outputs.tag }}" >/dev/null 2>&1; then
+            echo "update=false" >> "$GITHUB_OUTPUT"
+            echo "SDK is up to date"
+          else
+            echo "update=true" >> "$GITHUB_OUTPUT"
+            echo "New SDK found"
+          fi
+
+  update:
+    runs-on: ubuntu-latest
+
+    needs: check
+
+    if: needs.check.outputs.update == 'true'
+
+    env:
+      SDK_DIR: /tmp/sdk
+      SDK_FILE: /tmp/sdk/aimp-sdk.zip
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Configure Git
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+      - name: Download SDK
+        run: |
+          mkdir -p "$SDK_DIR"
+          curl -fsSL \
+            "${{ needs.check.outputs.url }}" \
+            -o "$SDK_FILE"
+      
+      - name: Extract SDK
+        run: |
+          find . -maxdepth 1 \
+            ! -name "." \
+            ! -name ".git" \
+            ! -name ".github" \
+            -exec rm -rf {} +
+
+          unzip -qq "$SDK_FILE"
+          cp "$SDK_FILE" ./aimp-sdk.zip
+
+      - name: Commit changes
+        run: |
+          git add .
+
+          git rm --cached aimp-sdk.zip 2>/dev/null || true
+
+          git commit \
+            -m "feat(sdk): ${{ needs.check.outputs.version }} (${{ needs.check.outputs.date }})" \
+            || exit 0
+
+          git push origin main
+
+      - name: Create Release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          cat > release.md <<EOF
+            ### ${{ needs.check.outputs.version }}
+
+            Release date: ${{ needs.check.outputs.date }}
+
+            - **MD5:** ${{ needs.check.outputs.md5 }}
+            - **SHA256:** ${{ needs.check.outputs.sha256 }}
+          EOF
+
+          gh release create \
+            "${{ needs.check.outputs.tag }}" \
+            ./aimp-sdk.zip \
+            --target main \
+            --title "AIMP SDK ${{ needs.check.outputs.version }} (${{ needs.check.outputs.date }})" \
+            --notes-file release.md
