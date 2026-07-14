@@ -120,6 +120,7 @@ jobs:
         id: check
         env:
           GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
           STABLE_TAG: ${{ steps.metadata.outputs.stable_tag }}
           BETA_TAG: ${{ steps.metadata.outputs.beta_tag }}
         run: |
