@@ -2,151 +2,165 @@ name: Update AIMP SDK
 
 on:
   schedule:
-    - cron: '0 */6 * * *'
+    - cron: "0 */6 * * *"
   workflow_dispatch:
+
+defaults:
+  run:
+    shell: bash -euo pipefail {0}
 
 permissions:
   contents: write
 
+concurrency:
+  group: update-sdk
+  cancel-in-progress: false
+
 jobs:
   check:
     runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: read
 
     outputs:
-      update: ${{ steps.check.outputs.update }}
-      url: ${{ steps.metadata.outputs.url }}
-      version: ${{ steps.metadata.outputs.version }}
-      date: ${{ steps.metadata.outputs.date }}
-      tag: ${{ steps.metadata.outputs.tag }}
-      md5: ${{ steps.metadata.outputs.md5 }}
-      sha256: ${{ steps.metadata.outputs.sha256 }}
-    
+      stable_update: ${{ steps.check.outputs.stable_update }}
+      beta_update: ${{ steps.check.outputs.beta_update }}
+
+      stable_url: ${{ steps.metadata.outputs.stable_url }}
+      stable_version: ${{ steps.metadata.outputs.stable_version }}
+      stable_date: ${{ steps.metadata.outputs.stable_date }}
+      stable_tag: ${{ steps.metadata.outputs.stable_tag }}
+      stable_md5: ${{ steps.metadata.outputs.stable_md5 }}
+      stable_sha256: ${{ steps.metadata.outputs.stable_sha256 }}
+
+      beta_url: ${{ steps.metadata.outputs.beta_url }}
+      beta_version: ${{ steps.metadata.outputs.beta_version }}
+      beta_date: ${{ steps.metadata.outputs.beta_date }}
+      beta_tag: ${{ steps.metadata.outputs.beta_tag }}
+      beta_md5: ${{ steps.metadata.outputs.beta_md5 }}
+      beta_sha256: ${{ steps.metadata.outputs.beta_sha256 }}
+
     steps:
-      - uses: actions/checkout@v4
-
-      - name: Read SDK Metadata
+      - name: Read SDK metadata
         id: metadata
-        shell: bash
+        env:
+          SDK_PAGE_URL: ${{ vars.AIMP_SDK_URL }}
         run: |
-          set -euo pipefail
+          : "${SDK_PAGE_URL:?vars.AIMP_SDK_URL is not set}"
 
-          html=$(curl -fsSL "${{ vars.AIMP_SDK_URL }}")
+          parse_block() {
+            local block="$1"
+            local channel url version md5 sha256 tag
 
-          block=$(echo "$html" \
-            | tr -d '\n' \
-            | grep -oP '<li class="link">.*?</li>' \
-            | grep -v "Beta" \
-            | head -n1)
-          
-          [[ -n "$block" ]]
+            if grep -qi "beta" <<<"$block"; then
+              channel="beta"
+            else
+              channel="stable"
+            fi
 
-          date=$(echo "$html" \
-            | grep -oP 'Release date:\s*\K[0-9.]+' \
-            | head -n1)
-          
-          url=$(echo "$block" \
-            | grep -oP 'href="\K/\?do=download\.file[^"]+?(id=[0-9]+)' \
-            | sed 's/&amp;/\&/g;s|^/|https://aimp.ru/|')
+            url=$(grep -m1 -oP 'class="button link_full"[^>]*href="\K[^"]+' <<<"$block" || true)
+            : "${url:?Failed to parse download URL}"
+            url=$(sed 's/&amp;/\&/g;s|^/|https://aimp.ru/|' <<<"$url")
 
-          version=$(echo "$block" \
-            | grep -oP '^.*</a>\K.*?(?=<h3)' \
-            | xargs)
+            version=$(grep -oP '^.*</a>\K.*?(?=<h3)' <<<"$block" | xargs || true)
+            : "${version:?Failed to parse version}"
 
-          md5=$(echo "$block" \
-            | grep -oP '<nobr>MD5:\s*\K[a-f0-9]{32}')
+            md5=$(grep -m1 -oP '<nobr>MD5:\s*\K[a-f0-9]{32}' <<<"$block" || true)
+            : "${md5:?Failed to parse MD5}"
 
-          sha256=$(echo "$block" \
-            | grep -oP '<nobr>SHA256:\s*\K[a-f0-9]{64}')
+            sha256=$(grep -m1 -oP '<nobr>SHA256:\s*\K[a-f0-9]{64}' <<<"$block" || true)
+            : "${sha256:?Failed to parse SHA256}"
 
-          tag="$(echo "$version" | tr ' ' '-')-${sha256:0:12}"
+            tag="${channel}-${version// /-}-${sha256:0:12}"
+
+            {
+              echo "${channel}_url=$url"
+              echo "${channel}_version=$version"
+              echo "${channel}_md5=$md5"
+              echo "${channel}_sha256=$sha256"
+              echo "${channel}_tag=$tag"
+            } >> "$GITHUB_OUTPUT"
+
+            FOUND[$channel]=1
+          }
+
+          declare -A FOUND
+
+          html=$(curl -fsSL --retry 3 --retry-delay 5 --max-time 60 "$SDK_PAGE_URL")
+
+          mapfile -t blocks < <(
+            tr -d '\n' <<<"$html" |
+            grep -oP '<li class="link">.*?</li>'
+          )
+
+          (( ${#blocks[@]} > 0 )) || {
+            echo "::error::No SDK entries found"
+            exit 1
+          }
+
+          for block in "${blocks[@]}"; do
+            parse_block "$block"
+          done
+
+          [[ -n "${FOUND[stable]-}" && -n "${FOUND[beta]-}" ]] || {
+            echo "::error::Stable or beta SDK entry not found"
+            exit 1
+          }
+
+          date=$(grep -m1 -oP 'Release date:\s*\K[0-9.]+' <<<"$html" || true)
+          : "${date:?Failed to parse release date}"
 
           {
-            echo "url=$url"
-            echo "version=$version"
-            echo "date=$date"
-            echo "md5=$md5"
-            echo "sha256=$sha256"
-            echo "tag=$tag"
+            echo "stable_date=$date"
+            echo "beta_date=$date"
           } >> "$GITHUB_OUTPUT"
-      
-      - name: Check Release
+
+      - name: Check existing releases
         id: check
         env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_TOKEN: ${{ github.token }}
+          STABLE_TAG: ${{ steps.metadata.outputs.stable_tag }}
+          BETA_TAG: ${{ steps.metadata.outputs.beta_tag }}
         run: |
-          if gh release view "${{ steps.metadata.outputs.tag }}" >/dev/null 2>&1; then
-            echo "update=false" >> "$GITHUB_OUTPUT"
-            echo "SDK is up to date"
-          else
-            echo "update=true" >> "$GITHUB_OUTPUT"
-            echo "New SDK found"
-          fi
+          check_channel() {
+            local tag="$1"
+            local output="$2"
 
-  update:
-    runs-on: ubuntu-latest
+            if gh release view "$tag" >/dev/null 2>&1; then
+              echo "$output=false" >> "$GITHUB_OUTPUT"
+            else
+              echo "$output=true" >> "$GITHUB_OUTPUT"
+            fi
+          }
 
+          check_channel "$STABLE_TAG" stable_update
+          check_channel "$BETA_TAG" beta_update
+
+  update-stable:
     needs: check
+    if: needs.check.outputs.stable_update == 'true'
+    uses: ./.github/workflows/update-channel.yml
+    with:
+      channel: stable
+      branch: main
+      sdk_url: ${{ needs.check.outputs.stable_url }}
+      sdk_version: ${{ needs.check.outputs.stable_version }}
+      sdk_date: ${{ needs.check.outputs.stable_date }}
+      sdk_tag: ${{ needs.check.outputs.stable_tag }}
+      expected_md5: ${{ needs.check.outputs.stable_md5 }}
+      expected_sha256: ${{ needs.check.outputs.stable_sha256 }}
 
-    if: needs.check.outputs.update == 'true'
-
-    env:
-      SDK_DIR: /tmp/sdk
-      SDK_FILE: /tmp/sdk/aimp-sdk.zip
-
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Configure Git
-        run: |
-          git config --global user.name "github-actions[bot]"
-          git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
-
-      - name: Download SDK
-        run: |
-          mkdir -p "$SDK_DIR"
-          curl -fsSL \
-            "${{ needs.check.outputs.url }}" \
-            -o "$SDK_FILE"
-      
-      - name: Extract SDK
-        run: |
-          find . -maxdepth 1 \
-            ! -name "." \
-            ! -name ".git" \
-            ! -name ".github" \
-            -exec rm -rf {} +
-
-          unzip -qq "$SDK_FILE"
-          cp "$SDK_FILE" ./aimp-sdk.zip
-
-      - name: Commit changes
-        run: |
-          git add .
-
-          git rm --cached aimp-sdk.zip 2>/dev/null || true
-
-          git commit \
-            -m "feat(sdk): ${{ needs.check.outputs.version }} (${{ needs.check.outputs.date }})" \
-            || exit 0
-
-          git push origin main
-
-      - name: Create Release
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          cat > release.md <<EOF
-            ### ${{ needs.check.outputs.version }}
-
-            Release date: ${{ needs.check.outputs.date }}
-
-            - **MD5:** ${{ needs.check.outputs.md5 }}
-            - **SHA256:** ${{ needs.check.outputs.sha256 }}
-          EOF
-
-          gh release create \
-            "${{ needs.check.outputs.tag }}" \
-            ./aimp-sdk.zip \
-            --target main \
-            --title "AIMP SDK ${{ needs.check.outputs.version }} (${{ needs.check.outputs.date }})" \
-            --notes-file release.md
+  update-beta:
+    needs: check
+    if: needs.check.outputs.beta_update == 'true'
+    uses: ./.github/workflows/update-channel.yml
+    with:
+      channel: beta
+      branch: beta
+      sdk_url: ${{ needs.check.outputs.beta_url }}
+      sdk_version: ${{ needs.check.outputs.beta_version }}
+      sdk_date: ${{ needs.check.outputs.beta_date }}
+      sdk_tag: ${{ needs.check.outputs.beta_tag }}
+      expected_md5: ${{ needs.check.outputs.beta_md5 }}
+      expected_sha256: ${{ needs.check.outputs.beta_sha256 }}

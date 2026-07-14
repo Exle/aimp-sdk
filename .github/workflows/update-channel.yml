@@ -1,0 +1,132 @@
+name: Update SDK Channel
+
+on:
+  workflow_call:
+    inputs:
+      channel:
+        description: SDK channel (stable/beta)
+        required: true
+        type: string
+
+      branch:
+        description: Target branch
+        required: true
+        type: string
+
+      sdk_url:
+        description: SDK download URL
+        required: true
+        type: string
+
+      sdk_version:
+        description: SDK version
+        required: true
+        type: string
+
+      sdk_date:
+        description: SDK release date
+        required: true
+        type: string
+
+      sdk_tag:
+        description: Release tag
+        required: true
+        type: string
+
+      expected_md5:
+        description: Expected MD5
+        required: true
+        type: string
+
+      expected_sha256:
+        description: Expected SHA256
+        required: true
+        type: string
+
+defaults:
+  run:
+    shell: bash -euo pipefail {0}
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      SDK_FILE: /tmp/sdk/aimp-sdk.zip
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.branch }}
+
+      - name: Configure Git
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+      - name: Download and verify SDK
+        env:
+          SDK_URL: ${{ inputs.sdk_url }}
+          EXPECTED_MD5: ${{ inputs.expected_md5 }}
+          EXPECTED_SHA256: ${{ inputs.expected_sha256 }}
+        run: |
+          mkdir -p /tmp/sdk
+          curl -fsSL --retry 3 --retry-delay 5 --max-time 60 "$SDK_URL" -o "$SDK_FILE"
+
+          actual_md5=$(md5sum "$SDK_FILE" | cut -d' ' -f1)
+          actual_sha256=$(sha256sum "$SDK_FILE" | cut -d' ' -f1)
+
+          if [ "$EXPECTED_MD5" != "$actual_md5" ]; then
+            echo "::error::MD5 mismatch: expected=$EXPECTED_MD5 actual=$actual_md5"
+            exit 1
+          fi
+          if [ "$EXPECTED_SHA256" != "$actual_sha256" ]; then
+            echo "::error::SHA256 mismatch: expected=$EXPECTED_SHA256 actual=$actual_sha256"
+            exit 1
+          fi
+
+      - name: Extract SDK
+        run: |
+          find . -maxdepth 1 ! -name "." ! -name ".git" ! -name ".github" -exec rm -rf {} +
+          unzip -qq -o "$SDK_FILE"
+          cp "$SDK_FILE" ./aimp-sdk.zip
+
+      - name: Commit changes
+        env:
+          SDK_VERSION: ${{ inputs.sdk_version }}
+          SDK_DATE: ${{ inputs.sdk_date }}
+        run: |
+          git add .
+          git rm --cached aimp-sdk.zip 2>/dev/null || true
+          git commit -m "feat(sdk): $SDK_VERSION ($SDK_DATE)" || exit 0
+          git push origin HEAD:${{ inputs.branch }}
+
+      - name: Create Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          SDK_VERSION: ${{ inputs.sdk_version }}
+          SDK_DATE: ${{ inputs.sdk_date }}
+          SDK_TAG: ${{ inputs.sdk_tag }}
+          EXPECTED_MD5: ${{ inputs.expected_md5 }}
+          EXPECTED_SHA256: ${{ inputs.expected_sha256 }}
+          IS_PRERELEASE: ${{ inputs.channel == 'beta' }}
+        run: |
+          cat > release.md <<EOF
+          ### $SDK_VERSION
+
+          Release date: $SDK_DATE
+
+          - **MD5:** $EXPECTED_MD5
+          - **SHA256:** $EXPECTED_SHA256
+          EOF
+
+          extra_args=()
+          if [ "$IS_PRERELEASE" = "true" ]; then
+            extra_args+=(--prerelease)
+          fi
+
+          gh release create "$SDK_TAG" ./aimp-sdk.zip \
+            --target ${{ inputs.branch }} \
+            --title "AIMP SDK $SDK_VERSION ($SDK_DATE)" \
+            --notes-file release.md \
+            "${extra_args[@]}"
