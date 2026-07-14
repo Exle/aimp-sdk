@@ -3,18 +3,17 @@
 //  Project:   AIMP
 //             Programming Interface
 //
-//  Target:    v5.40 build 2650
+//  Target:    v6.00 build 3000
 //
 //  Purpose:   ThreadPool API
 //
 //  Author:    Artem Izmaylov
-//             © 2006-2025
+//             Â© 2006-2026
 //             www.aimp.ru
 //
 #ifndef apiThreadingH
 #define apiThreadingH
 
-#include <unknwn.h>
 #include "apiTypes.h"
 
 static const GUID IID_IAIMPTask 		       = {0x41494D50, 0x5461, 0x736B, 0x32, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
@@ -59,9 +58,9 @@ class IAIMPTaskPriority: public IUnknown
 class IAIMPServiceThreads: public IUnknown
 {
 	public:
-		virtual HRESULT WINAPI ExecuteInMainThread(IAIMPTask* Task, LongWord Flags) = 0;
+		virtual HRESULT WINAPI ExecuteInMainThread(IAIMPTask* Task, DWORD Flags) = 0;
 		virtual HRESULT WINAPI ExecuteInThread(IAIMPTask* Task, TTaskHandle *TaskHandle) = 0;
-		virtual HRESULT WINAPI Cancel(TTaskHandle TaskHandle, LongWord Flags) = 0;
+		virtual HRESULT WINAPI Cancel(TTaskHandle TaskHandle, DWORD Flags) = 0;
 		virtual HRESULT WINAPI WaitFor(TTaskHandle TaskHandle) = 0;
 };
 

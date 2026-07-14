@@ -105,19 +105,20 @@ Built-in keys are:\par
 {\listtext\f0 3\tab}\cf2\lang1033 Flags \cf0 - determines individual view and behavior settings of the playlist. Value is combination of following flags:\lang9\par
 
 \pard 
-{\listtext\f0\u10625?\tab}\ls3\ilvl8\fi-360\li1080\sl276\slmult1\lang1033 ContinuousTrackNumeration\f1\lang1049  (\f0\lang1033 1\f1\lang1049 )\f0\lang1033\par
-{\listtext\f0 1\tab}AllowGroups (2)\par
-{\listtext\f0 2\tab}ShowDurationColumn (4)\par
-{\listtext\f0 3\tab}ShowNumbersColumn (8)\par
-{\listtext\f0 4\tab}ShowSwitchesColumn (16)\par
-{\listtext\f0 5\tab}ShowSecondaryLine (32)\par
-{\listtext\f0 6\tab}UseGlobalFormattingSettings (64)\par
-{\listtext\f0 7\tab}UseGlobalGrouppingSettings (128)\par
-{\listtext\f0 8\tab}UseGlobalLayoutSettings (256)\par
-{\listtext\f0 9\tab}ShowExpandButtons (512)\par
-{\listtext\f0 10\tab}ShowRating (1024)\par
-{\listtext\f0 11\tab}MergeGroups (2048)\par
-{\listtext\f0 12\tab}CollapseUnusedGroups (4096)\lang9\par
+{\listtext\f0\u10625?\tab}\ls3\ilvl8\fi-360\li1080\sl276\slmult1\lang1033 0x0001 - ContinuousTrackNumeration\par
+{\listtext\f0 1\tab}0x0002 - AllowGroups\par
+{\listtext\f0 2\tab}0x0004 - ShowDurationColumn\par
+{\listtext\f0 3\tab}0x0008 - ShowNumbersColumn\par
+{\listtext\f0 4\tab}0x0010 - ShowSwitchesColumn\par
+{\listtext\f0 5\tab}0x0020 - ShowSecondaryLine\par
+{\listtext\f0 6\tab}0x0040 - UseGlobalFormattingSettings\par
+{\listtext\f0 7\tab}0x0080 - UseGlobalGrouppingSettings\par
+{\listtext\f0 8\tab}0x0100 - UseGlobalLayoutSettings\par
+{\listtext\f0 9\tab}0x0200 - ShowExpandButtons\par
+{\listtext\f0 10\tab}0x0400 - ShowRating\par
+{\listtext\f0 11\tab}0x0800 - MergeGroups\par
+{\listtext\f0 12\tab}0x1000 - CollapseUnusedGroups\lang9\par
+{\listtext\f0 13\tab}\lang1033 0x2000 - ShowThumbnails (requires the ShowSecondaryLine flag too)\lang9\par
 
 \pard\sl276\slmult1\par
 The summary entry can contains user-provided keys.\par

@@ -1,11 +1,22 @@
 ﻿unit MenuAndActionsDemoUnit;
 
-interface
-
+{$I apiConfig.inc}
 {$R MenuAndActionsDemoUnit.res}
 
+interface
+
 uses
-  Windows, AIMPCustomPlugin, apiCore, apiMenu, apiActions, apiObjects;
+  apiActions,
+  apiCore,
+  apiObjects,
+  apiMenu,
+  apiGUI,
+  apiPlugin,
+  apiTypes,
+  apiWrappers,
+  apiWrappersGUI,
+  apiWrappers.Streams,
+  AIMPCustomPlugin;
 
 type
 
@@ -13,14 +24,12 @@ type
 
   TAIMPMenuAndActionsPlugin = class(TAIMPCustomPlugin)
   private
-    function CreateGlyph(const ResName: string): IAIMPImage;
-    function GetBuiltInMenu(ID: Integer): IAIMPMenuItem;
-
     procedure CreateMenuWithSubItemsAndWithoutAction;
     procedure CreateSimpleMenuWithAction;
     procedure CreateSimpleMenuWithoutAction;
+    function GetBuiltInMenu(ID: Integer): IAIMPMenuItem;
   protected
-    function InfoGet(Index: Integer): PWideChar; override; stdcall;
+    function InfoGet(Index: Integer): PChar; override; stdcall;
     function InfoGetCategories: Cardinal; override; stdcall;
     function Initialize(Core: IAIMPCore): HRESULT; override; stdcall;
   end;
@@ -42,11 +51,11 @@ type
 implementation
 
 uses
-  apiPlugin, Classes, apiWrappers;
+  Classes;
 
 { TAIMPMenuAndActionsPlugin }
 
-function TAIMPMenuAndActionsPlugin.InfoGet(Index: Integer): PWideChar;
+function TAIMPMenuAndActionsPlugin.InfoGet(Index: Integer): PChar;
 begin
   case Index of
     AIMP_PLUGIN_INFO_NAME:
@@ -83,22 +92,6 @@ begin
   end;
 end;
 
-function TAIMPMenuAndActionsPlugin.CreateGlyph(const ResName: string): IAIMPImage;
-var
-  AContainer: IAIMPImageContainer;
-  AResStream: TResourceStream;
-begin
-  CheckResult(CoreIntf.CreateObject(IID_IAIMPImageContainer, AContainer));
-  AResStream := TResourceStream.Create(HInstance, ResName, RT_RCDATA);
-  try
-    CheckResult(AContainer.SetDataSize(AResStream.Size));
-    AResStream.ReadBuffer(AContainer.GetData^, AContainer.GetDataSize);
-    CheckResult(AContainer.CreateImage(Result));
-  finally
-    AResStream.Free;
-  end;
-end;
-
 procedure TAIMPMenuAndActionsPlugin.CreateMenuWithSubItemsAndWithoutAction;
 var
   AMenuItem: IAIMPMenuItem;
@@ -110,7 +103,7 @@ begin
   CheckResult(AMenuItem.SetValueAsObject(AIMP_MENUITEM_PROPID_ID, MakeString('aimp.MenuAndActionsDemo.menuitem.2')));
   CheckResult(AMenuItem.SetValueAsObject(AIMP_MENUITEM_PROPID_NAME, MakeString('This menu has sub items')));
   CheckResult(AMenuItem.SetValueAsObject(AIMP_MENUITEM_PROPID_PARENT, GetBuiltInMenu(AIMP_MENUID_PLAYER_MAIN_FUNCTIONS)));
-  CheckResult(AMenuItem.SetValueAsObject(AIMP_MENUITEM_PROPID_GLYPH, CreateGlyph('AIMP3LOGO')));
+  CheckResult(AMenuItem.SetValueAsObject(AIMP_MENUITEM_PROPID_GLYPH, uiLoadGlyphFromResource('AIMP3LOGO')));
   // Register the menu item in manager
   CoreIntf.RegisterExtension(IID_IAIMPServiceMenuManager, AMenuItem);
 
@@ -158,7 +151,7 @@ begin
   CheckResult(AMenuItem.SetValueAsObject(AIMP_MENUITEM_PROPID_NAME, MakeString('Menu item with linked action')));
   CheckResult(AMenuItem.SetValueAsObject(AIMP_MENUITEM_PROPID_ACTION, AAction));
   CheckResult(AMenuItem.SetValueAsObject(AIMP_MENUITEM_PROPID_PARENT, GetBuiltInMenu(AIMP_MENUID_PLAYER_MAIN_OPTIONS)));
-  CheckResult(AMenuItem.SetValueAsObject(AIMP_MENUITEM_PROPID_GLYPH, CreateGlyph('AIMP3LOGO')));
+  CheckResult(AMenuItem.SetValueAsObject(AIMP_MENUITEM_PROPID_GLYPH, uiLoadGlyphFromResource('AIMP3LOGO')));
   // Register the menu item in manager
   CoreIntf.RegisterExtension(IID_IAIMPServiceMenuManager, AMenuItem);
 end;
@@ -174,7 +167,7 @@ begin
   CheckResult(AMenuItem.SetValueAsObject(AIMP_MENUITEM_PROPID_NAME, MakeString('Simple menu title')));
   CheckResult(AMenuItem.SetValueAsObject(AIMP_MENUITEM_PROPID_EVENT, TAIMPMenuItemEventHandler.Create));
   CheckResult(AMenuItem.SetValueAsObject(AIMP_MENUITEM_PROPID_PARENT, GetBuiltInMenu(AIMP_MENUID_COMMON_UTILITIES)));
-  CheckResult(AMenuItem.SetValueAsObject(AIMP_MENUITEM_PROPID_GLYPH, CreateGlyph('AIMP3LOGO')));
+  CheckResult(AMenuItem.SetValueAsObject(AIMP_MENUITEM_PROPID_GLYPH, uiLoadGlyphFromResource('AIMP3LOGO')));
   // Register the menu item in manager
   CoreIntf.RegisterExtension(IID_IAIMPServiceMenuManager, AMenuItem);
 end;
@@ -190,15 +183,21 @@ end;
 { TAIMPActionEventHandler }
 
 procedure TAIMPActionEventHandler.OnExecute(Data: IInterface);
+var
+  LService: IAIMPUIMessageDialog;
 begin
-  MessageBox(0, 'Action executed', 'Demo', 0);
+  if CoreGetService(IAIMPUIMessageDialog, LService) then
+    LService.Execute(0, MakeString('Demo'), MakeString('Action executed'), 0);
 end;
 
 { TAIMPMenuItemEventHandler }
 
 procedure TAIMPMenuItemEventHandler.OnExecute(Data: IInterface);
+var
+  LService: IAIMPUIMessageDialog;
 begin
-  MessageBox(0, 'Menu item clicked', 'Demo', 0);
+  if CoreGetService(IAIMPUIMessageDialog, LService) then
+    LService.Execute(0, MakeString('Demo'), MakeString('Menu item clicked'), 0);
 end;
 
 end.

@@ -3,22 +3,21 @@
 //  Project:   AIMP
 //             Programming Interface
 //
-//  Target:    v5.40 build 2650
+//  Target:    v6.00 build 3000
 //
 //  Purpose:   AlbumArts API
 //
 //  Author:    Artem Izmaylov
-//             © 2006-2025
+//             Â© 2006-2026
 //             www.aimp.ru
 //
 #ifndef apiAlbumArtH
 #define apiAlbumArtH
 
-#include <unknwn.h>
+#include "apiTypes.h"
 #include "apiObjects.h"
 #include "apiCore.h"
 #include "apiFileManager.h"
-#include "apiTypes.h"
 
 static const GUID IID_IAIMPAlbumArtRequest = {0x41494D50, 0x416C, 0x6241, 0x72, 0x74, 0x52, 0x65, 0x71, 0x73, 0x74, 0x00};
 static const GUID IID_IAIMPExtensionAlbumArtCatalog   = {0x41494D50, 0x4578, 0x7441, 0x6C, 0x62, 0x41, 0x72, 0x74, 0x43, 0x61, 0x74};
@@ -51,7 +50,7 @@ const int AIMP_SERVICE_ALBUMART_FLAGS_ORIGINAL = 2;
 const int AIMP_SERVICE_ALBUMART_FLAGS_WAITFOR  = 4;
 const int AIMP_SERVICE_ALBUMART_FLAGS_OFFLINE  = 8;
 
-typedef void (CALLBACK TAIMPServiceAlbumArtReceiveProc)(IAIMPImage *image, IAIMPImageContainer *imageContainer, void *UserData);
+typedef void (WINAPI TAIMPServiceAlbumArtReceiveProc)(IAIMPImage *image, IAIMPImageContainer *imageContainer, void *UserData);
 
 /* IAIMPAlbumArtRequest */
 
@@ -69,7 +68,7 @@ class IAIMPAlbumArtRequest: public IAIMPPropertyList
 class IAIMPExtensionAlbumArtCatalog: public IUnknown
 {
 	public:
-		virtual HRESULT WINAPI GetIcon(IIconData *Image) = 0;
+		virtual HRESULT WINAPI GetIcon(HICON *Image) = 0; // deprecated
 		virtual HRESULT WINAPI GetName(IAIMPString **Name) = 0;
 		virtual HRESULT WINAPI Show(IAIMPString *FileURI, IAIMPString *Artist, IAIMPString *Album, IAIMPImageContainer **Image) = 0;
 };
@@ -90,7 +89,7 @@ class IAIMPExtensionAlbumArtProvider: public IUnknown
 		virtual HRESULT WINAPI Get(IAIMPString *FileURI, IAIMPString *Artist, 
 			IAIMPString *Album, IAIMPPropertyList *Options, 
 			IAIMPImageContainer **Image) = 0;
-		virtual LongWord WINAPI GetCategory() = 0;
+		virtual DWORD WINAPI GetCategory() = 0;
 };
 
 /* IAIMPExtensionAlbumArtProvider2 */
@@ -107,7 +106,7 @@ class IAIMPExtensionAlbumArtProvider3: public IUnknown
 {
 	public:
 		virtual HRESULT WINAPI Get(IAIMPFileInfo *FileURI, IAIMPAlbumArtRequest *Request, IAIMPImageContainer **Image) = 0;
-		virtual LongWord WINAPI GetCategory() = 0;
+		virtual DWORD WINAPI GetCategory() = 0;
 };
 
 /* IAIMPServiceAlbumArt */
@@ -116,10 +115,10 @@ class IAIMPServiceAlbumArt: public IUnknown
 {
 	public:
 		virtual HRESULT WINAPI Get(IAIMPString *FileURI, IAIMPString *Artist, IAIMPString *Album, 
-			LongWord Flags, TAIMPServiceAlbumArtReceiveProc *CallbackProc, void *UserData, TTaskHandle *TaskID) = 0;
-		virtual HRESULT WINAPI Get2(IAIMPFileInfo *FileInfo, LongWord Flags, 
+			DWORD Flags, TAIMPServiceAlbumArtReceiveProc *CallbackProc, void *UserData, TTaskHandle *TaskID) = 0;
+		virtual HRESULT WINAPI Get2(IAIMPFileInfo *FileInfo, DWORD Flags, 
 			TAIMPServiceAlbumArtReceiveProc *CallbackProc, void *UserData, TTaskHandle *TaskID) = 0;
-		virtual HRESULT WINAPI Cancel(TTaskHandle TaskID, LongWord Flags) = 0;
+		virtual HRESULT WINAPI Cancel(TTaskHandle TaskID, DWORD Flags) = 0;
 };
 
 /* IAIMPServiceAlbumArtCache */
@@ -131,7 +130,7 @@ class IAIMPServiceAlbumArtCache: public IUnknown
 		virtual HRESULT WINAPI Get(IAIMPString *Key, IAIMPImageContainer **ImageContainer) = 0;
 		virtual HRESULT WINAPI Put(IAIMPString *Key, IAIMPImageContainer **ImageContainer) = 0;
 		virtual HRESULT WINAPI Remove(IAIMPString *Key) = 0;
-		virtual HRESULT WINAPI Stat(INT64* Size, LongWord* NumberOfEntires) = 0;
+		virtual HRESULT WINAPI Stat(INT64* Size, DWORD* NumberOfEntires) = 0;
 };
 
 #endif // !apiAlbumArtH

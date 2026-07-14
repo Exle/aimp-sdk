@@ -3,12 +3,12 @@
 //  Project:   AIMP
 //             Programming Interface
 //
-//  Target:    v5.40 build 2650
+//  Target:    v6.00 build 3000
 //
 //  Purpose:   AlbumArts API
 //
 //  Author:    Artem Izmaylov
-//             © 2006-2025
+//             © 2006-2026
 //             www.aimp.ru
 //
 //  FPC:       OK
@@ -77,11 +77,6 @@ const
   AIMP_SERVICE_ALBUMART_FLAGS_OFFLINE  = 8;
 
 type
-{$IFDEF MSWINDOWS}
-  IIconData = HICON;
-{$ELSE}
-  IIconData = IAIMPStream; {$MESSAGE WARN 'TODO - apiCrossPlatform,DOC'}
-{$ENDIF}
 
   { IAIMPAlbumArtRequest }
 
@@ -97,7 +92,7 @@ type
 
   IAIMPExtensionAlbumArtCatalog = interface(IUnknown)
   [SID_IAIMPExtensionAlbumArtCatalog]
-    function GetIcon(out Icon: IIconData): HRESULT; stdcall;
+    function GetIcon(out Icon: HICON): HRESULT; stdcall; // deprecated
     function GetName(out Name: IAIMPString): HRESULT; stdcall;
     function Show(FileURI, Artist, Album: IAIMPString; out Image: IAIMPImageContainer): HRESULT; stdcall;
   end;

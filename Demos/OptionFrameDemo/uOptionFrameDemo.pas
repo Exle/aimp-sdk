@@ -1,18 +1,49 @@
 ﻿unit uOptionFrameDemo;
 
+{$I apiConfig.inc}
+
 interface
 
 uses
-  Windows, AIMPCustomPlugin, Forms, uOptionFrameDemoForm,  apiOptions, apiObjects, apiCore;
+  Classes,
+  SysUtils,
+  apiCore,
+  apiOptions,
+  apiObjects,
+  apiGUI,
+  apiTypes,
+  AIMPCustomPlugin;
 
 type
+
+  { TAIMPDemoPluginOptionForm }
+
+  TAIMPDemoPluginOptionForm = class
+  strict private
+    FCheckbox: IAIMPUICheckBox;
+    FForm: IAIMPUIForm;
+
+    procedure HandlerChanged(const Sender: IUnknown);
+  protected
+    procedure CreateControls(const AService: IAIMPServiceUI);
+  public
+    OnModified: TThreadMethod;
+    constructor Create(AParentWnd: HWND);
+    destructor Destroy; override;
+    function GetHandle: HWND;
+    // External Events
+    procedure ApplyLocalization;
+    procedure ConfigLoad;
+    procedure ConfigSave;
+  end;
 
   { TAIMPDemoPluginOptionFrame }
 
   TAIMPDemoPluginOptionFrame = class(TInterfacedObject, IAIMPOptionsDialogFrame)
   strict private
-    FFrame: TfrmOptionFrameDemo;
-    procedure HandlerModified(Sender: TObject);
+    FForm: TAIMPDemoPluginOptionForm;
+
+    procedure HandlerModified;
   protected
     // IAIMPOptionsDialogFrame
     function CreateFrame(ParentWnd: HWND): HWND; stdcall;
@@ -25,29 +56,31 @@ type
 
   TAIMPDemoPlugin = class(TAIMPCustomPlugin)
   protected
-    function InfoGet(Index: Integer): PWideChar; override; stdcall;
+    function InfoGet(Index: Integer): PChar; override; stdcall;
     function InfoGetCategories: Cardinal; override; stdcall;
     function Initialize(Core: IAIMPCore): HRESULT; override; stdcall;
   end;
 
+var
+  GlobalSettingsOption1: Boolean = False;
+
 implementation
 
 uses
-  apiWrappers, SysUtils, apiPlugin;
+  apiWrappers, apiPlugin, apiWrappersGUI, apiMUI;
 
 { TAIMPDemoPluginOptionFrame }
 
 function TAIMPDemoPluginOptionFrame.CreateFrame(ParentWnd: HWND): HWND;
 begin
-  FFrame := TfrmOptionFrameDemo.CreateParented(ParentWnd);
-  FFrame.OnModified := HandlerModified;
-  FFrame.Visible := True;
-  Result := FFrame.Handle;
+  FForm := TAIMPDemoPluginOptionForm.Create(ParentWnd);
+  FForm.OnModified := HandlerModified;
+  Result := FForm.GetHandle;
 end;
 
 procedure TAIMPDemoPluginOptionFrame.DestroyFrame;
 begin
-  FreeAndNil(FFrame);
+  FreeAndNil(FForm);
 end;
 
 function TAIMPDemoPluginOptionFrame.GetName(out S: IAIMPString): HRESULT;
@@ -62,18 +95,18 @@ end;
 
 procedure TAIMPDemoPluginOptionFrame.Notification(ID: Integer);
 begin
-  if FFrame <> nil then
+  if FForm <> nil then
     case ID of
       AIMP_SERVICE_OPTIONSDIALOG_NOTIFICATION_LOCALIZATION:
-        TfrmOptionFrameDemo(FFrame).ApplyLocalization;
+        FForm.ApplyLocalization;
       AIMP_SERVICE_OPTIONSDIALOG_NOTIFICATION_LOAD:
-        TfrmOptionFrameDemo(FFrame).ConfigLoad;
+        FForm.ConfigLoad;
       AIMP_SERVICE_OPTIONSDIALOG_NOTIFICATION_SAVE:
-        TfrmOptionFrameDemo(FFrame).ConfigSave;
+        FForm.ConfigSave;
     end;
 end;
 
-procedure TAIMPDemoPluginOptionFrame.HandlerModified(Sender: TObject);
+procedure TAIMPDemoPluginOptionFrame.HandlerModified;
 var
   AServiceOptions: IAIMPServiceOptionsDialog;
 begin
@@ -83,7 +116,7 @@ end;
 
 { TAIMPDemoPlugin }
 
-function TAIMPDemoPlugin.InfoGet(Index: Integer): PWideChar;
+function TAIMPDemoPlugin.InfoGet(Index: Integer): PChar;
 begin
   case Index of
     AIMP_PLUGIN_INFO_NAME:
@@ -91,7 +124,7 @@ begin
     AIMP_PLUGIN_INFO_AUTHOR:
       Result := 'Artem Izmaylov';
     AIMP_PLUGIN_INFO_SHORT_DESCRIPTION:
-      Result := 'This plugin show how to use Options API';
+      Result := 'This plugin show how to use both Options and GUI api';
   else
     Result := nil;
   end;
@@ -107,6 +140,55 @@ begin
   Result := inherited Initialize(Core);
   if Succeeded(Result) then
     Core.RegisterExtension(IID_IAIMPServiceOptionsDialog, TAIMPDemoPluginOptionFrame.Create);
+end;
+
+{ TAIMPDemoPluginOptionForm }
+
+constructor TAIMPDemoPluginOptionForm.Create(AParentWnd: HWND);
+var
+  AService: IAIMPServiceUI;
+begin
+  CoreGetService(IAIMPServiceUI, AService);
+  CheckResult(AService.CreateForm(AParentWnd, AIMPUI_SERVICE_CREATEFORM_FLAGS_CHILD, MakeString('DemoForm'), nil, FForm));
+  CheckResult(FForm.SetValueAsInt32(AIMPUI_FORM_PROPID_BORDERSTYLE, AIMPUI_FLAGS_BORDERSTYLE_NONE));
+  CreateControls(AService);
+end;
+
+destructor TAIMPDemoPluginOptionForm.Destroy;
+begin
+  FForm.Release(False);
+  FForm := nil;
+  inherited;
+end;
+
+function TAIMPDemoPluginOptionForm.GetHandle: HWND;
+begin
+  Result := FForm.GetHandle;
+end;
+
+procedure TAIMPDemoPluginOptionForm.ApplyLocalization;
+begin
+  FCheckbox.SetValueAsObject(AIMPUI_CHECKBOX_PROPID_CAPTION, LangLoadStringEx('AIMP\acPlaylistCopySelectedToClipboard'));
+end;
+
+procedure TAIMPDemoPluginOptionForm.ConfigLoad;
+begin
+  PropListSetInt32(FCheckbox, AIMPUI_CHECKBOX_PROPID_STATE, Ord(GlobalSettingsOption1));
+end;
+
+procedure TAIMPDemoPluginOptionForm.ConfigSave;
+begin
+  GlobalSettingsOption1 := PropListGetInt32(FCheckbox, AIMPUI_CHECKBOX_PROPID_STATE) <> 0;
+end;
+
+procedure TAIMPDemoPluginOptionForm.CreateControls(const AService: IAIMPServiceUI);
+begin
+  AService.CreateControl(FForm, FForm, nil, TAIMPUINotifyEventAdapter.Create(HandlerChanged), IAIMPUICheckBox, FCheckbox);
+end;
+
+procedure TAIMPDemoPluginOptionForm.HandlerChanged(const Sender: IInterface);
+begin
+  if Assigned(OnModified) then OnModified();
 end;
 
 end.

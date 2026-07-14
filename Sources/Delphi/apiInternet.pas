@@ -3,12 +3,12 @@
 //  Project:   AIMP
 //             Programming Interface
 //
-//  Target:    v5.40 build 2650
+//  Target:    v6.00 build 3000
 //
 //  Purpose:   Internet API
 //
 //  Author:    Artem Izmaylov
-//             © 2006-2025
+//             © 2006-2026
 //             www.aimp.ru
 //
 //  FPC:       OK
@@ -61,6 +61,9 @@ const
   AIMP_SERVICE_HTTPCLIENT_FLAGS_PRIORITY_NORMAL = 0;
   AIMP_SERVICE_HTTPCLIENT_FLAGS_PRIORITY_LOW    = 4;
   AIMP_SERVICE_HTTPCLIENT_FLAGS_PRIORITY_HIGH   = 8;
+  AIMP_SERVICE_HTTPCLIENT_FLAGS_ASYNC_ACCEPT    = 16; // v6.0
+  AIMP_SERVICE_HTTPCLIENT_FLAGS_ASYNC_PROGRESS  = 32; // v6.0
+  AIMP_SERVICE_HTTPCLIENT_FLAGS_ASYNC_COMPLETE  = 64; // v6.0
 
   // Methods for IAIMPServiceHTTPClient2.Request
   AIMP_SERVICE_HTTPCLIENT_METHOD_GET      = 0;

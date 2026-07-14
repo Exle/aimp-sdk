@@ -3,21 +3,20 @@
 //  Project:   AIMP
 //             Programming Interface
 //
-//  Target:    v5.40 build 2650
+//  Target:    v6.00 build 3000
 //
 //  Purpose:   Menus API
 //
 //  Author:    Artem Izmaylov
-//             © 2006-2025
+//             © 2006-2026
 //             www.aimp.ru
 //
 #ifndef apiMenuH
 #define apiMenuH
 
-#include <unknwn.h>
+#include "apiTypes.h"
 #include "apiActions.h"
 #include "apiObjects.h"
-#include "apiTypes.h"
 
 static const GUID IID_IAIMPMenuItem = {0x41494D50, 0x4D65, 0x6E75, 0x49, 0x74, 0x65, 0x6D, 0x00, 0x00, 0x00, 0x00};
 static const GUID IID_IAIMPServiceMenuManager = {0x41494D50, 0x5372, 0x764D, 0x65, 0x6E, 0x75, 0x4D, 0x6E, 0x67, 0x72, 0x00};
@@ -31,6 +30,8 @@ const int AIMP_MENUITEM_PROPID_ENABLED      = 4;
 const int AIMP_MENUITEM_PROPID_STYLE        = 5; // One of the AIMP_MENUITEM_STYLE_XXX
 const int AIMP_MENUITEM_PROPID_EVENT        = 6;
 const int AIMP_MENUITEM_PROPID_EVENT_ONSHOW = 7;
+const int AIMP_MENUITEM_PROPID_HINT         = 8; // v6.0
+const int AIMP_MENUITEM_PROPID_TAG			= 9; // v6.0
 const int AIMP_MENUITEM_PROPID_GLYPH        = 10;
 const int AIMP_MENUITEM_PROPID_PARENT       = 11;
 const int AIMP_MENUITEM_PROPID_VISIBLE      = 12;
@@ -89,7 +90,7 @@ class IAIMPMenuItem: public IAIMPPropertyList
 class IAIMPServiceMenuManager: public IUnknown
 {
 	public:
-		virtual HRESULT WINAPI GetBuiltIn(int ID, IAIMPMenuItem **MenuItem) = 0;
+		virtual HRESULT WINAPI GetBuiltIn(INT32 ID, IAIMPMenuItem **MenuItem) = 0;
 		virtual HRESULT WINAPI GetByID(IAIMPString *ID, IAIMPMenuItem **MenuItem) = 0;
 };
 

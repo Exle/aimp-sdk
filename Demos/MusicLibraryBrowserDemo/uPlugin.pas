@@ -1,16 +1,18 @@
 ﻿unit uPlugin;
 
+{$I apiConfig.inc}
+
 interface
 
 uses
-  Windows,
   AIMPCustomPlugin,
-  //
+  // API
   apiCore,
   apiGUI,
   apiPlugin,
+  apiTypes,
   apiWrappers,
-  //
+  // Plugin
   uDemoForm,
   uDataProvider;
 
@@ -25,8 +27,8 @@ type
     function Initialize(Core: IAIMPCore): HRESULT; override; stdcall;
     procedure Finalize; override; stdcall;
   public
-    function InfoGet(Index: Integer): PWideChar; override;
-    function InfoGetCategories: DWORD; override;
+    function InfoGet(Index: Integer): PChar; override;
+    function InfoGetCategories: Cardinal; override;
     // IAIMPExternalSettingsDialog
     procedure Show(ParentWindow: HWND); stdcall;
   end;
@@ -42,7 +44,7 @@ begin
   FDataProvider := nil;
 end;
 
-function TAIMPMusicLibraryBrowserDemoPlugin.InfoGet(Index: Integer): PWideChar;
+function TAIMPMusicLibraryBrowserDemoPlugin.InfoGet(Index: Integer): PChar;
 begin
   case Index of
     AIMP_PLUGIN_INFO_NAME:
@@ -56,15 +58,21 @@ begin
   end;
 end;
 
-function TAIMPMusicLibraryBrowserDemoPlugin.InfoGetCategories: DWORD;
+function TAIMPMusicLibraryBrowserDemoPlugin.InfoGetCategories: Cardinal;
 begin
   Result := AIMP_PLUGIN_CATEGORY_ADDONS;
 end;
 
 function TAIMPMusicLibraryBrowserDemoPlugin.Initialize(Core: IAIMPCore): HRESULT;
 begin
-  Result := inherited;
-  FDataProvider := TMLDataProvider.Create;
+  if CoreCheckVersion(Core, 6000) then // We use the API that was introduced in v6.0
+  begin
+    Result := inherited;
+    if Succeeded(Result) then
+      FDataProvider := TMLDataProvider.Create;
+  end
+  else
+    Result := E_FAIL;
 end;
 
 procedure TAIMPMusicLibraryBrowserDemoPlugin.Show(ParentWindow: HWND);

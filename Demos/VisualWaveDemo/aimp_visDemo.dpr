@@ -5,8 +5,6 @@ uses
   apiVisuals,
   aimp_visDemoMain in 'aimp_visDemoMain.pas';
 
-{$R *.res}
-
   function AIMPPluginGetHeader(out Header: IAIMPPlugin): HRESULT; stdcall;
   begin
     try

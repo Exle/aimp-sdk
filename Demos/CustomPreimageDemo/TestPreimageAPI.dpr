@@ -4,8 +4,6 @@ uses
   apiPlugin,
   TestPreimageAPIUnit in 'TestPreimageAPIUnit.pas' {frmTestPreimage};
 
-{$R *.res}
-
   function AIMPPluginGetHeader(out Header: IAIMPPlugin): HRESULT; stdcall;
   begin
     try

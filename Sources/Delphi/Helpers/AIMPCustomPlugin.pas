@@ -3,10 +3,10 @@
 //  Project:   AIMP
 //             Programming Interface
 //
-//  Target:    v5.40 build 2650
+//  Target:    v6.00 build 3000
 //
 //  Author:    Artem Izmaylov
-//             © 2006-2025
+//             © 2006-2026
 //             www.aimp.ru
 //
 unit AIMPCustomPlugin;
@@ -16,7 +16,10 @@ unit AIMPCustomPlugin;
 interface
 
 uses
-  apiCore, apiObjects, apiPlugin, apiWrappers;
+  apiCore,
+  apiObjects,
+  apiPlugin,
+  apiWrappers;
 
 type
 
@@ -30,9 +33,6 @@ type
     function Initialize(Core: IAIMPCore): HRESULT; virtual; stdcall;
     procedure Finalize; virtual; stdcall;
     procedure SystemNotification(NotifyID: Integer; Data: IUnknown); virtual; stdcall;
-  public
-    // Services
-    function ServiceGetConfig: TAIMPServiceConfig;
   end;
 
 implementation
@@ -41,11 +41,6 @@ uses
   SysUtils, apiMUI;
 
 { TAIMPCustomPlugin }
-
-function TAIMPCustomPlugin.ServiceGetConfig: TAIMPServiceConfig;
-begin
-  Result := TAIMPServiceConfig.Create;
-end;
 
 procedure TAIMPCustomPlugin.Finalize;
 begin

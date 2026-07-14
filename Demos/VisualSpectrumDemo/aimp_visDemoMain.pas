@@ -1,21 +1,25 @@
 ﻿unit aimp_visDemoMain;
 
+{$I apiConfig.inc}
+
 interface
 
 uses
+{$IFDEF MSWINDOWS}
   Windows,
-  // System
-  System.Classes,
-  System.Math,
-  System.SysUtils,
-  // VCL
-  Vcl.Graphics,
+{$ELSE}
+  Cairo,
+{$ENDIF}
+  Math,
+  Types,
+  SysUtils,
   // SDK
   apiCore,
   apiObjects,
   apiPlugin,
-  apiWrappers,
+  apiTypes,
   apiVisuals,
+  apiWrappers,
   AIMPCustomPlugin;
 
 type
@@ -24,7 +28,7 @@ type
 
   TVisualPlugin = class(TAIMPCustomPlugin)
   protected
-    function InfoGet(Index: Integer): PWideChar; override;
+    function InfoGet(Index: Integer): PChar; override;
     function InfoGetCategories: Cardinal; override;
     function Initialize(Core: IAIMPCore): HRESULT; override;
   end;
@@ -34,9 +38,11 @@ type
   TVisualization = class(TInterfacedObject,
     IAIMPExtensionEmbeddedVisualization)
   strict private
-    FCanvas: TCanvas;
+  {$IFDEF MSWINDOWS}
+    FBrush: HBRUSH;
+  {$ENDIF}
     FWidth, FHeight: Integer;
-    procedure DrawSpectrum(const Data: TAIMPVisualDataSpectrum; Area: TRect);
+    procedure DrawSpectrum(DC: HCANVAS; const Data: TAIMPVisualDataSpectrum; Area: TRect);
   public
     // IAIMPExtensionEmbeddedVisualization
     function GetFlags: Integer; stdcall;
@@ -47,7 +53,7 @@ type
     procedure Finalize; stdcall;
     // Basic functionality
     procedure Click(X, Y: Integer; Button: Integer); stdcall;
-    procedure Draw(DC: HDC; Data: PAIMPVisualData); stdcall;
+    procedure Draw(DC: HCANVAS; Data: PAIMPVisualData); stdcall;
     procedure Resize(NewWidth, NewHeight: Integer); stdcall;
   end;
 
@@ -55,7 +61,7 @@ implementation
 
 { TVisualPlugin }
 
-function TVisualPlugin.InfoGet(Index: Integer): PWideChar;
+function TVisualPlugin.InfoGet(Index: Integer): PChar;
 begin
   case Index of
     AIMP_PLUGIN_INFO_NAME:
@@ -85,40 +91,52 @@ begin
   // do nothing
 end;
 
-procedure TVisualization.Draw(DC: HDC; Data: PAIMPVisualData);
+procedure TVisualization.Draw(DC: HCANVAS; Data: PAIMPVisualData);
 begin
-  FCanvas.Handle := DC;
-  try
-    // fill the background
-    FCanvas.Brush.Color := clBlack;
-    FCanvas.FillRect(Rect(0, 0, FWidth, FHeight));
-    // draw spectrums
-    FCanvas.Brush.Color := clWhite;
-    DrawSpectrum(Data^.Spectrum[0], Rect(0, 0, FWidth, FHeight div 2));
-    DrawSpectrum(Data^.Spectrum[1], Rect(0, FHeight div 2, FWidth, FHeight));
-  finally
-    FCanvas.Handle := 0;
-  end;
+  // fill the background
+{$IFDEF MSWINDOWS}
+  FillRect(DC, Rect(0, 0, FWidth, FHeight), GetStockObject(BLACK_BRUSH));
+{$ELSE}
+  cairo_set_source_rgb(DC, 0, 0, 0); // Black
+  cairo_rectangle(DC, 0, 0, FWidth, FHeight);
+  cairo_fill(DC);
+{$ENDIF}
+
+  // draw spectrums
+  DrawSpectrum(DC, Data^.Spectrum[0], Rect(0, 0, FWidth, FHeight div 2));
+  DrawSpectrum(DC, Data^.Spectrum[1], Rect(0, FHeight div 2, FWidth, FHeight));
 end;
 
-procedure TVisualization.DrawSpectrum(const Data: TAIMPVisualDataSpectrum; Area: TRect);
+procedure TVisualization.DrawSpectrum(DC: HCANVAS; const Data: TAIMPVisualDataSpectrum; Area: TRect);
 var
   I: Integer;
   LBar: TRect;
 begin
+{$IFNDEF MSWINDOWS}
+  cairo_set_source_rgb(DC, 1, 1, 1); // White
+{$ENDIF}
+
   Area.Width := Max(1, Area.Width div AIMP_VISUAL_SPECTRUM_SIZE);
   for I := 0 to AIMP_VISUAL_SPECTRUM_SIZE - 1 do
   begin
     LBar := Area;
     LBar.Top := LBar.Bottom - Round(Data[I] * LBar.Height);
-    FCanvas.FillRect(LBar);
     Area.Offset(Area.Width, 0);
+
+  {$IFDEF MSWINDOWS}
+    FillRect(DC, LBar, FBrush);
+  {$ELSE}
+    cairo_rectangle(DC, LBar.Left, LBar.Top, LBar.Width, LBar.Height);
+    cairo_fill(DC);
+  {$ENDIF}
   end;
 end;
 
 procedure TVisualization.Finalize;
 begin
-  FreeAndNil(FCanvas);
+{$IFDEF MSWINDOWS}
+  DeleteObject(FBrush);
+{$ENDIF}
 end;
 
 function TVisualization.GetFlags: Integer;
@@ -139,7 +157,9 @@ end;
 
 function TVisualization.Initialize(Width, Height: Integer): HRESULT;
 begin
-  FCanvas := TCanvas.Create;
+{$IFDEF MSWINDOWS}
+  FBrush := CreateSolidBrush(RGB(255, 255, 255)); // White
+{$ENDIF}
   Resize(Width, Height);
   Result := S_OK;
 end;

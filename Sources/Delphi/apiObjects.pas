@@ -3,12 +3,12 @@
 //  Project:   AIMP
 //             Programming Interface
 //
-//  Target:    v5.40 build 2650
+//  Target:    v6.00 build 3000
 //
 //  Purpose:   General API Objects
 //
 //  Author:    Artem Izmaylov
-//             © 2006-2025
+//             © 2006-2026
 //             www.aimp.ru
 //
 //  FPC:       OK
@@ -25,6 +25,9 @@ uses
 const
   SID_IAIMPConfig = '{41494D50-436F-6E66-6967-000000000000}';
   IID_IAIMPConfig: TGUID = SID_IAIMPConfig;
+
+  SID_IAIMPConfigFile = '{41494D50-436F-6E66-6967-46696C650000}';
+  IID_IAIMPConfigFile: TGUID = SID_IAIMPConfigFile;
 
   SID_IAIMPErrorInfo = '{41494D50-4572-7249-6E66-6F0000000000}';
   IID_IAIMPErrorInfo: TGUID = SID_IAIMPErrorInfo;
@@ -44,6 +47,9 @@ const
   SID_IAIMPImage2 = '{41494D50-496D-6167-6532-000000000000}';
   IID_IAIMPImage2: TGUID = SID_IAIMPImage2;
 
+  SID_IAIMPImage3 = '{41494D50-496D-6167-6533-000000000000}';
+  IID_IAIMPImage3: TGUID = SID_IAIMPImage3;
+
   SID_IAIMPImageContainer = '{41494D50-496D-6167-6543-6F6E746E7200}';
   IID_IAIMPImageContainer: TGUID = SID_IAIMPImageContainer;
 
@@ -52,6 +58,9 @@ const
 
   SID_IAIMPObjectList = '{41494D50-4F62-6A4C-6973-740000000000}';
   IID_IAIMPObjectList: TGUID = SID_IAIMPObjectList;
+
+  SID_IAIMPObjectList2 = '{41494D50-4F62-6A4C-6973-743200000000}';
+  IID_IAIMPObjectList2: TGUID = SID_IAIMPObjectList2;
 
   SID_IAIMPProgressCallback = '{41494D50-5072-6F67-7265-737343420000}';
   IID_IAIMPProgressCallback: TGUID = SID_IAIMPProgressCallback;
@@ -67,6 +76,15 @@ const
 
   SID_IAIMPString = '{41494D50-5374-7269-6E67-000000000000}';
   IID_IAIMPString: TGUID = SID_IAIMPString;
+
+//  SID_IAIMPStringUCS4 = '{41494D50-5374-7269-6E67-554353340000}';
+//  IID_IAIMPStringUCS4: TGUID = SID_IAIMPStringUCS4;
+//
+//  [SID_IAIMPStringUCS4]
+//  static const GUID IID_IAIMPStringUCS4 = {0x41494D50, 0x5374, 0x7269, 0x6E, 0x67, 0x55, 0x43, 0x53, 0x34, 0x00, 0x00};
+
+  SID_IAIMPNamedContainer = '{41494D50-4E61-6D65-6443-6E7472000000}';
+  IID_IAIMPNamedContainer: TGUID = SID_IAIMPNamedContainer;
 
 const
   // IAIMPImage and IAIMPImageContainer FormatID
@@ -127,6 +145,17 @@ type
     function SetValueAsString(KeyPath: IAIMPString; Value: IAIMPString): HRESULT; stdcall;
   end;
 
+  { IAIMPConfigFile }
+
+  IAIMPConfigFile = interface(IAIMPConfig) // v6.0
+  [SID_IAIMPConfigFile]
+    // I/O
+    function LoadFromFile(FileName: IAIMPString): HRESULT; stdcall;
+    function LoadFromStream(Stream: IAIMPStream): HRESULT; stdcall;
+    function SaveToFile(FileName: IAIMPString): HRESULT; stdcall;
+    function SaveToStream(Stream: IAIMPStream): HRESULT; stdcall;
+  end;
+
   { IAIMPErrorInfo }
 
   IAIMPErrorInfo = interface(IUnknown)
@@ -185,6 +214,13 @@ type
     function PasteFromClipboard: HRESULT; stdcall;
   end;
 
+  { IAIMPImage3 }
+
+  IAIMPImage3 = interface(IAIMPImage2)
+  [SID_IAIMPImage3]
+    function SaveToBits(Bits: PRGBQuad): HRESULT; stdcall;
+  end;
+
   { IAIMPImageContainer }
 
   IAIMPImageContainer = interface(IUnknown)
@@ -209,6 +245,14 @@ type
     function GetObject(Index: Integer; const IID: TGUID; out Obj): HRESULT; stdcall;
     function SetObject(Index: Integer; Obj: IUnknown): HRESULT; stdcall;
   end;
+
+  { IAIMPObjectList2 }
+
+  IAIMPObjectList2 = interface(IAIMPObjectList)
+  [SID_IAIMPObjectList2]
+    function IndexOf(Obj: IUnknown): Integer; stdcall;
+  end; // v6.00
+
 
   { IAIMPProgressCallback }
 
@@ -240,8 +284,8 @@ type
 
   IAIMPPropertyList2 = interface(IAIMPPropertyList)
   [SID_IAIMPPropertyList2]
-    function GetValueAsVariant(PropertyID: Integer; out Value: OleVariant): HRESULT; stdcall;
-    function SetValueAsVariant(PropertyID: Integer; const Value: OleVariant): HRESULT; stdcall;
+    function GetValueAsVariant(PropertyID: Integer; out Value: VarValue): HRESULT; stdcall;
+    function SetValueAsVariant(PropertyID: Integer; const Value: VarValue): HRESULT; stdcall;
   end;
 
   { IAIMPStream }
@@ -275,15 +319,15 @@ type
 
   IAIMPString = interface(IUnknown)
   [SID_IAIMPString]
-    function GetChar(Index: Integer; out Char: Char): HRESULT; stdcall;
+    function Get(Index: Integer; out Item: Char): HRESULT; stdcall;
     function GetData: PChar; stdcall;
     function GetLength: Integer; stdcall;
     function GetHashCode: Integer; stdcall;
-    function SetChar(Index: Integer; Char: Char): HRESULT; stdcall;
-    function SetData(Chars: PChar; CharCount: Integer): HRESULT; stdcall;
+    function Set_(Index: Integer; Item: Char): HRESULT; stdcall;
+    function SetData(Items: PChar; ItemCount: Integer): HRESULT; stdcall;
 
     function Add(S: IAIMPString): HRESULT; stdcall;
-    function Add2(Chars: PChar; Count: Integer): HRESULT; stdcall;
+    function Add2(Items: PChar; ItemCount: Integer): HRESULT; stdcall;
 
     function ChangeCase(Mode: Integer): HRESULT; stdcall;
     function Clone(out S: IAIMPString): HRESULT; stdcall;
@@ -291,24 +335,34 @@ type
     // Ref.to apiWrappes.StrCompare
     function Compare(S: IAIMPString;
       out CompareResult: Integer; IgnoreCase: LongBool): HRESULT; stdcall;
-    function Compare2(Chars: PChar; CharCount: Integer;
+    function Compare2(Items: PChar; ItemCount: Integer;
       out CompareResult: Integer; IgnoreCase: LongBool): HRESULT; stdcall;
 
     function Delete(Index, Count: Integer): HRESULT; stdcall;
 
     function Find(S: IAIMPString; out Index: Integer;
       Flags: Integer; StartFromIndex: Integer = 0): HRESULT; stdcall;
-    function Find2(Chars: PChar; CharCount: Integer;
+    function Find2(Items: PChar; ItemCount: Integer;
       out Index: Integer; Flags: Integer; StartFromIndex: Integer = 0): HRESULT; stdcall;
 
     function Insert(Index: Integer; S: IAIMPString): HRESULT; stdcall;
-    function Insert2(Index: Integer; Chars: PChar; CharCount: Integer): HRESULT; stdcall;
+    function Insert2(Index: Integer; Items: PChar; ItemCount: Integer): HRESULT; stdcall;
 
     function Replace(OldPattern, NewPattern: IAIMPString; Flags: Integer): HRESULT; stdcall;
-    function Replace2(OldPatternChars: PChar; OldPatternCharCount: Integer;
-      NewPatternChars: PChar; NewPatternCharCount: Integer; Flags: Integer): HRESULT; stdcall;
+    function Replace2(OldPatternItems: PChar; OldPatternItemCount: Integer;
+      NewPatternItems: PChar; NewPatternItemCount: Integer; Flags: Integer): HRESULT; stdcall;
 
     function SubString(Index, Count: Integer; out S: IAIMPString): HRESULT; stdcall;
+  end;
+
+  { IAIMPNamedContainer }
+
+  IAIMPNamedContainer = interface(IAIMPString)
+  [SID_IAIMPNamedContainer]
+    function GetCustomData(out Data: Pointer): HRESULT; stdcall;
+    function SetCustomData(Data: Pointer): HRESULT; stdcall;
+    function GetCustomObject(out Obj: IUnknown): HRESULT; stdcall;
+    function SetCustomObject(Obj: IUnknown): HRESULT; stdcall;
   end;
 
 implementation

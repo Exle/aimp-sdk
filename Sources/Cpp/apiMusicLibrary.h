@@ -1,26 +1,25 @@
-////////////////////////////////////////////////////////////////////////////////
+﻿////////////////////////////////////////////////////////////////////////////////
 //
 //  Project:   AIMP
 //             Programming Interface
 //
-//  Target:    v5.40 build 2650
+//  Target:    v6.00 build 3000
 //
 //  Purpose:   MusicLibrary API
 //
 //  Author:    Artem Izmaylov
-//             � 2006-2025
+//             © 2006-2026
 //             www.aimp.ru
 //
 #ifndef apiMusicLibraryH
 #define apiMusicLibraryH
 
-#include <unknwn.h>
+#include "apiTypes.h"
 #include "apiActions.h"
 #include "apiAlbumArt.h"
 #include "apiObjects.h"
 #include "apiPlayer.h"
 #include "apiPlaylists.h"
-#include "apiTypes.h"
 
 static const GUID IID_IAIMPServiceMusicLibraryUI = {0x41494D50, 0x5372, 0x764D, 0x4C, 0x55, 0x49, 0x00, 0x00, 0x00, 0x00, 0x00};
 static const GUID IID_IAIMPMLAlbumArtProvider = {0x41494D50, 0x4D4C, 0x416C, 0x62, 0x41, 0x72, 0x74, 0x50, 0x72, 0x76, 0x00};
@@ -120,11 +119,11 @@ const int AIMPML_FIELDFLAG_INTERNAL    = 4;
 const int AIMPML_FIELDFLAG_REQUIRED    = 8;
 
 // Built-in Reserved Field Names
-static const TChar* AIMPML_RESERVED_FIELD_ID       = L"ID";       // !REQUIRED! unique record id (Int32, Int64 or String)
-static const TChar* AIMPML_RESERVED_FIELD_FILENAME = L"FileName"; // !REQUIRED! string
-static const TChar* AIMPML_RESERVED_FIELD_FILESIZE = L"FileSize"; // Int64, in bytes
-static const TChar* AIMPML_RESERVED_FIELD_DURATION = L"Duration"; // double, in seconds
-static const TChar* AIMPML_RESERVED_FIELD_USERMARK = L"UserMark"; // integer, 0.0 .. 5.0
+static const TChar AIMPML_RESERVED_FIELD_ID[]		= TEXT("ID");       // !REQUIRED! unique record id (Int32, Int64 or String)
+static const TChar AIMPML_RESERVED_FIELD_FILENAME[] = TEXT("FileName"); // !REQUIRED! string
+static const TChar AIMPML_RESERVED_FIELD_FILESIZE[] = TEXT("FileSize"); // Int64, in bytes
+static const TChar AIMPML_RESERVED_FIELD_DURATION[] = TEXT("Duration"); // double, in seconds
+static const TChar AIMPML_RESERVED_FIELD_USERMARK[] = TEXT("UserMark"); // integer, 0.0 .. 5.0
 
 // Property ID for IAIMPMLGroupingPreset
 const int AIMPML_GROUPINGPRESET_PROPID_CUSTOM   = 0;
@@ -152,6 +151,7 @@ const int AIMPML_FIELDFILTER_OPERATION_CONTAINS = 7;
 const int AIMPML_FIELDFILTER_OPERATION_BEGINSWITH = 8;
 const int AIMPML_FIELDFILTER_OPERATION_ENDSWITH = 9;
 const int AIMPML_FIELDFILTER_OPERATION_ISLASTXDAYS = 10;
+const int AIMPML_FIELDFILTER_OPERATION_DOESNOTCONTAIN = 11;
 
 // Property ID for IAIMPMLDataFilterGroup
 const int AIMPML_FILTERGROUP_OPERATION = 1; // Refer to the AIMPML_FILTERGROUP_OPERATION_XXX
@@ -191,41 +191,42 @@ const int AIMPML_GETFILES_FLAGS_SELECTED = 1;
 const int AIMPML_GETFILES_FLAGS_FOCUSED  = 2;
 
 // LocalDataStorage
-static const TChar* AIMPML_LOCALDATASTORAGE_ID = L"TAIMPMLLocalDataStorage";
+static const TChar AIMPML_LOCALDATASTORAGE_ID[]				= TEXT("TAIMPMLLocalDataStorage");
 
-static const TChar* AIMPML_LOCALDATASTORAGE_FIELD_ID = L"ID"; // Int32
-static const TChar* AIMPML_LOCALDATASTORAGE_FIELD_ADDDED = L"Added"; // DateTime (Float);
-static const TChar* AIMPML_LOCALDATASTORAGE_FIELD_ALBUM = L"Album"; // String, multiple values
-static const TChar* AIMPML_LOCALDATASTORAGE_FIELD_ALBUMARTIST = L"AlbumArtist"; // String, multiple values
-static const TChar* AIMPML_LOCALDATASTORAGE_FIELD_ARTIST = L"Artist"; // String, multiple values
-static const TChar* AIMPML_LOCALDATASTORAGE_FIELD_BITDEPTH = L"BitDepth"; // Int32;
-static const TChar* AIMPML_LOCALDATASTORAGE_FIELD_BITRATE = L"Bitrate"; // Int32
-static const TChar* AIMPML_LOCALDATASTORAGE_FIELD_BPM = L"BPM"; // Int32;
-static const TChar* AIMPML_LOCALDATASTORAGE_FIELD_CHANNELS = L"Channels"; // Int32;
-static const TChar* AIMPML_LOCALDATASTORAGE_FIELD_COMMENT = L"Comment"; // String (Memo)
-static const TChar* AIMPML_LOCALDATASTORAGE_FIELD_COMPOSER = L"Composer"; // String, multiple values
-static const TChar* AIMPML_LOCALDATASTORAGE_FIELD_CONDUCTOR = L"Conductor"; // String
-static const TChar* AIMPML_LOCALDATASTORAGE_FIELD_COPYRIGHTS = L"Copyrights"; // String
-static const TChar* AIMPML_LOCALDATASTORAGE_FIELD_DISKNUMBER = L"DiskNumber"; // String
-static const TChar* AIMPML_LOCALDATASTORAGE_FIELD_DURATION = L"Duration"; // = AIMPML_RESERVED_FIELD_DURATION; // Duration (Float)
-static const TChar* AIMPML_LOCALDATASTORAGE_FIELD_FILEFORMAT = L"FileFormat"; // String
-static const TChar* AIMPML_LOCALDATASTORAGE_FIELD_FILENAME = L"FileName"; // = AIMPML_RESERVED_FIELD_FILENAME; // FileName (String);
-static const TChar* AIMPML_LOCALDATASTORAGE_FIELD_FILESIZE =L"FileSize"; // = AIMPML_RESERVED_FIELD_FILESIZE; // FileSize (Int64);
-static const TChar* AIMPML_LOCALDATASTORAGE_FIELD_GENRE = L"Genre"; // String, multiple values
-static const TChar* AIMPML_LOCALDATASTORAGE_FIELD_LABELS = L"Labels"; // String, multiple values
-static const TChar* AIMPML_LOCALDATASTORAGE_FIELD_LASTMODIFICATION = L"LastModification"; // DateTime (Float)
-static const TChar* AIMPML_LOCALDATASTORAGE_FIELD_LASTPLAYBACK = L"LastPlayback"; // DateTime (Float);
-static const TChar* AIMPML_LOCALDATASTORAGE_FIELD_LYRICIST = L"Lyricist"; // String, multiple values
-static const TChar* AIMPML_LOCALDATASTORAGE_FIELD_MOOD = L"Mood"; // String, multiple values
-static const TChar* AIMPML_LOCALDATASTORAGE_FIELD_PLAYBACKCOUNT = L"PlaybackCount"; // Int32
-static const TChar* AIMPML_LOCALDATASTORAGE_FIELD_PUBLISHER = L"Publisher"; // String, multiple values
-static const TChar* AIMPML_LOCALDATASTORAGE_FIELD_RATING = L"Rating"; // Int32
-static const TChar* AIMPML_LOCALDATASTORAGE_FIELD_SAMPLERATE = L"SampleRate"; // Int32
-static const TChar* AIMPML_LOCALDATASTORAGE_FIELD_TITLE = L"Title"; // String
-static const TChar* AIMPML_LOCALDATASTORAGE_FIELD_TRACKNUMBER = L"TrackNumber"; // String
-static const TChar* AIMPML_LOCALDATASTORAGE_FIELD_URL = L"URL"; // String
-static const TChar* AIMPML_LOCALDATASTORAGE_FIELD_USERMARK = L"UserMark"; // = AIMPML_RESERVED_FIELD_USERMARK;
-static const TChar* AIMPML_LOCALDATASTORAGE_FIELD_YEAR = L"Year"; // String
+static const TChar AIMPML_LOCALDATASTORAGE_FIELD_ID[]			= TEXT("ID"); // Int32
+static const TChar AIMPML_LOCALDATASTORAGE_FIELD_ADDDED[]		= TEXT("Added"); // DateTime (Float);
+static const TChar AIMPML_LOCALDATASTORAGE_FIELD_ALBUM[]		= TEXT("Album"); // String, multiple values
+static const TChar AIMPML_LOCALDATASTORAGE_FIELD_ALBUMARTIST[]	= TEXT("AlbumArtist"); // String, multiple values
+static const TChar AIMPML_LOCALDATASTORAGE_FIELD_ARTIST[]		= TEXT("Artist"); // String, multiple values
+static const TChar AIMPML_LOCALDATASTORAGE_FIELD_BITDEPTH[]		= TEXT("BitDepth"); // Int32;
+static const TChar AIMPML_LOCALDATASTORAGE_FIELD_BITRATE[]		= TEXT("Bitrate"); // Int32
+static const TChar AIMPML_LOCALDATASTORAGE_FIELD_BPM[]			= TEXT("BPM"); // Int32;
+static const TChar AIMPML_LOCALDATASTORAGE_FIELD_CHANNELS[]		= TEXT("Channels"); // Int32;
+static const TChar AIMPML_LOCALDATASTORAGE_FIELD_COMMENT[]		= TEXT("Comment"); // String (Memo)
+static const TChar AIMPML_LOCALDATASTORAGE_FIELD_COMPOSER[]		= TEXT("Composer"); // String, multiple values
+static const TChar AIMPML_LOCALDATASTORAGE_FIELD_CONDUCTOR[]	= TEXT("Conductor"); // String
+static const TChar AIMPML_LOCALDATASTORAGE_FIELD_COPYRIGHTS[]	= TEXT("Copyrights"); // String
+static const TChar AIMPML_LOCALDATASTORAGE_FIELD_DISKNUMBER[]	= TEXT("DiskNumber"); // String
+static const TChar AIMPML_LOCALDATASTORAGE_FIELD_DURATION[]		= TEXT("Duration"); // = AIMPML_RESERVED_FIELD_DURATION; // Duration (Float)
+static const TChar AIMPML_LOCALDATASTORAGE_FIELD_FILEFORMAT[]	= TEXT("FileFormat"); // String
+static const TChar AIMPML_LOCALDATASTORAGE_FIELD_FILENAME[]		= TEXT("FileName"); // = AIMPML_RESERVED_FIELD_FILENAME; // FileName (String);
+static const TChar AIMPML_LOCALDATASTORAGE_FIELD_FILESIZE[]		= TEXT("FileSize"); // = AIMPML_RESERVED_FIELD_FILESIZE; // FileSize (Int64);
+static const TChar AIMPML_LOCALDATASTORAGE_FIELD_GENRE[]		= TEXT("Genre"); // String, multiple values
+static const TChar AIMPML_LOCALDATASTORAGE_FIELD_LABELS[]		= TEXT("Labels"); // String, multiple values
+static const TChar AIMPML_LOCALDATASTORAGE_FIELD_LASTMODIFICATION[] = TEXT("LastModification"); // DateTime (Float)
+static const TChar AIMPML_LOCALDATASTORAGE_FIELD_LASTPLAYBACK[]	= TEXT("LastPlayback"); // DateTime (Float);
+static const TChar AIMPML_LOCALDATASTORAGE_FIELD_LYRICIST[]		= TEXT("Lyricist"); // String, multiple values
+static const TChar AIMPML_LOCALDATASTORAGE_FIELD_MOOD[]			= TEXT("Mood"); // String, multiple values
+static const TChar AIMPML_LOCALDATASTORAGE_FIELD_PLAYBACKCOUNT[]= TEXT("PlaybackCount"); // Int32
+static const TChar AIMPML_LOCALDATASTORAGE_FIELD_PUBLISHER[]	= TEXT("Publisher"); // String, multiple values
+static const TChar AIMPML_LOCALDATASTORAGE_FIELD_RATING[]		= TEXT("Rating"); // Int32
+static const TChar AIMPML_LOCALDATASTORAGE_FIELD_SAMPLERATE[]	= TEXT("SampleRate"); // Int32
+static const TChar AIMPML_LOCALDATASTORAGE_FIELD_TKEY[]			= TEXT("TKey"); // String;
+static const TChar AIMPML_LOCALDATASTORAGE_FIELD_TITLE[]		= TEXT("Title"); // String
+static const TChar AIMPML_LOCALDATASTORAGE_FIELD_TRACKNUMBER[]  = TEXT("TrackNumber"); // String
+static const TChar AIMPML_LOCALDATASTORAGE_FIELD_URL[]			= TEXT("URL"); // String
+static const TChar AIMPML_LOCALDATASTORAGE_FIELD_USERMARK[]		= TEXT("UserMark"); // = AIMPML_RESERVED_FIELD_USERMARK;
+static const TChar AIMPML_LOCALDATASTORAGE_FIELD_YEAR[]			= TEXT("Year"); // String
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -243,7 +244,7 @@ class IAIMPMLDataField : public IAIMPPropertyList
 class IAIMPMLDataFieldDisplayValue : public IUnknown
 {
 	public:
-		virtual TChar* WINAPI GetDisplayValue(VARIANT* Value, int* Length) = 0;
+		virtual PChar WINAPI GetDisplayValue(REFVARVALUE Value, INT32* Length) = 0;
 };
 
 /* IAIMPMLDataFieldFilter */
@@ -257,8 +258,8 @@ class IAIMPMLDataFieldFilter : public IAIMPPropertyList2
 class IAIMPMLDataFieldFilterByArray : public IAIMPPropertyList2
 {
 	public:
-		virtual HRESULT WINAPI GetData(VARIANT* Values, int* Count) = 0;
-		virtual HRESULT WINAPI SetData(VARIANT* Values, int Count) = 0;
+		virtual HRESULT WINAPI GetData(VarValue* Values, INT32* Count) = 0;
+		virtual HRESULT WINAPI SetData(VarValue* Values, INT32 Count) = 0;
 };
 
 /* IAIMPMLDataFilterGroup */
@@ -266,13 +267,15 @@ class IAIMPMLDataFieldFilterByArray : public IAIMPPropertyList2
 class IAIMPMLDataFilterGroup : public IAIMPPropertyList2
 {
 	public:
-		virtual HRESULT WINAPI Add(IUnknown* Field, VARIANT* Value1, VARIANT* Value2, int Operation, IAIMPMLDataFieldFilter** Filter) = 0;
-		virtual HRESULT WINAPI Add2(IUnknown* Field, VARIANT* Values, int Count, IAIMPMLDataFieldFilterByArray** Filter) = 0;
+		virtual HRESULT WINAPI Add(IUnknown* Field, REFVARVALUE Value1, REFVARVALUE Value2,
+			INT32 Operation, IAIMPMLDataFieldFilter** Filter) = 0;
+		virtual HRESULT WINAPI Add2(IUnknown* Field, VarValue* Values,
+			INT32 Count, IAIMPMLDataFieldFilterByArray** Filter) = 0;
 		virtual HRESULT WINAPI AddGroup(IAIMPMLDataFilterGroup** Group) = 0;
 		virtual HRESULT WINAPI Clear() = 0;
-		virtual HRESULT WINAPI Delete(int Index) = 0;
-		virtual HRESULT WINAPI GetChild(int Index, REFIID IID, void **Obj) = 0;
-		virtual int WINAPI GetChildCount() = 0;
+		virtual HRESULT WINAPI Delete(INT32 Index) = 0;
+		virtual HRESULT WINAPI GetChild(INT32 Index, CONSTIID IID, void **Obj) = 0;
+		virtual INT32 WINAPI GetChildCount() = 0;
 };
 
 /* IAIMPMLDataFilter */
@@ -289,16 +292,16 @@ class IAIMPMLDataFilter : public IAIMPMLDataFilterGroup
 class IAIMPMLFileList : public IUnknown
 {
 	public:
-		virtual HRESULT WINAPI Add(VARIANT* ID, IAIMPString* FileName) = 0;
+		virtual HRESULT WINAPI Add(REFVARVALUE ID, IAIMPString* FileName) = 0;
 		virtual HRESULT WINAPI Clear() = 0;
-		virtual HRESULT WINAPI Delete(int Index) = 0;
-		virtual HRESULT WINAPI Insert(int Index, VARIANT* ID, IAIMPString* FileName) = 0;
+		virtual HRESULT WINAPI Delete(INT32 Index) = 0;
+		virtual HRESULT WINAPI Insert(INT32 Index, REFVARVALUE ID, IAIMPString* FileName) = 0;
 
-		virtual int WINAPI GetCount() = 0;
-		virtual HRESULT WINAPI GetFileName(int Index, IAIMPString** FileName) = 0;
-		virtual HRESULT WINAPI SetFileName(int Index, IAIMPString* FileName) = 0;
-		virtual HRESULT WINAPI GetID(int Index, VARIANT* ID) = 0;
-		virtual HRESULT WINAPI SetID(int Index, VARIANT* ID) = 0;
+		virtual INT32 WINAPI GetCount() = 0;
+		virtual HRESULT WINAPI GetFileName(INT32 Index, IAIMPString** FileName) = 0;
+		virtual HRESULT WINAPI SetFileName(INT32 Index, IAIMPString* FileName) = 0;
+		virtual HRESULT WINAPI GetID(INT32 Index, OUTVARVALUE ID) = 0;
+		virtual HRESULT WINAPI SetID(INT32 Index, REFVARVALUE ID) = 0;
 
 		virtual HRESULT WINAPI Clone(void** Obj) = 0;
 };
@@ -308,8 +311,8 @@ class IAIMPMLFileList : public IUnknown
 class IAIMPMLSortDirection: public IUnknown
 {
 	public:
-		virtual HRESULT WINAPI GetValue(int* Value) = 0;
-		virtual HRESULT WINAPI SetValue(int Value) = 0;
+		virtual HRESULT WINAPI GetValue(INT32* Value) = 0;
+		virtual HRESULT WINAPI SetValue(INT32 Value) = 0;
 };
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -334,7 +337,8 @@ class IAIMPMLPlaylistPreimage : public IAIMPPlaylistPreimage
 class IAIMPMLAlbumArtProvider : public IUnknown
 {
 	public:
-		virtual HRESULT WINAPI Get(IAIMPObjectList* Fields, VARIANT* Values, IAIMPPropertyList* Options, IAIMPImageContainer** Image) = 0;
+		virtual HRESULT WINAPI Get(IAIMPObjectList* Fields, VarValue* Values,
+			IAIMPPropertyList* Options, IAIMPImageContainer** Image) = 0;
 };
 
 /* IAIMPMLAlbumArtProvider2 */
@@ -342,7 +346,8 @@ class IAIMPMLAlbumArtProvider : public IUnknown
 class IAIMPMLAlbumArtProvider2 : public IUnknown
 {
 	public:
-		virtual HRESULT WINAPI Get(IAIMPObjectList* Fields, VARIANT* Values, IAIMPAlbumArtRequest* Request, IAIMPImageContainer** Image) = 0;
+		virtual HRESULT WINAPI Get(IAIMPObjectList* Fields, VarValue* Values,
+			IAIMPAlbumArtRequest* Request, IAIMPImageContainer** Image) = 0;
 };
 
 /* IAIMPMLDataProvider */
@@ -371,10 +376,10 @@ class IAIMPMLDataProvider2 : public IUnknown
 class IAIMPMLDataProviderSelection : public IUnknown
 {
 	public:
-		virtual DOUBLE WINAPI GetValueAsFloat(int FieldIndex) = 0;
-		virtual int WINAPI GetValueAsInt32(int FieldIndex) = 0;
-		virtual INT64 WINAPI GetValueAsInt64(int FieldIndex) = 0;
-		virtual TChar* WINAPI GetValueAsString(int FieldIndex, int* Length) = 0;
+		virtual DOUBLE WINAPI GetValueAsFloat(INT32 FieldIndex) = 0;
+		virtual INT32 WINAPI GetValueAsInt32(INT32 FieldIndex) = 0;
+		virtual INT64 WINAPI GetValueAsInt64(INT32 FieldIndex) = 0;
+		virtual PChar WINAPI GetValueAsString(INT32 FieldIndex, INT32* Length) = 0;
 		virtual BOOL WINAPI NextRow() = 0;
 		// Deprecated, use IAIMPMLDataProvider2 instead
 		// virtual BOOL WINAPI HasNextPage() = 0;
@@ -385,8 +390,8 @@ class IAIMPMLDataProviderSelection : public IUnknown
 class IAIMPMLGroupingTreeSelection : public IUnknown
 {
 	public:
-		virtual int WINAPI GetCount() = 0;
-		virtual HRESULT WINAPI GetValue(int Index, IAIMPString** FieldName, VARIANT* Value) = 0;
+		virtual INT32 WINAPI GetCount() = 0;
+		virtual HRESULT WINAPI GetValue(INT32 Index, IAIMPString** FieldName, OUTVARVALUE Value) = 0;
 };
 
 /* IAIMPMLGroupingTreeDataProviderSelection */
@@ -395,9 +400,9 @@ class IAIMPMLGroupingTreeDataProviderSelection : public IUnknown
 {
 	public:
 		virtual HRESULT WINAPI GetDisplayValue(IAIMPString** S) = 0;
-		virtual LongWord WINAPI GetFlags() = 0;
-		virtual HRESULT WINAPI GetImageIndex(int* Index) = 0;
-		virtual HRESULT WINAPI GetValue(IAIMPString** FieldName, VARIANT* Value) = 0;
+		virtual DWORD WINAPI GetFlags() = 0;
+		virtual HRESULT WINAPI GetImageIndex(INT32* Index) = 0;
+		virtual HRESULT WINAPI GetValue(IAIMPString** FieldName, OUTVARVALUE Value) = 0;
 		virtual BOOL WINAPI NextRow() = 0;
 };
 
@@ -407,7 +412,7 @@ class IAIMPMLGroupingTreeDataProvider : public IUnknown
 {
 	public:
 		virtual HRESULT WINAPI AppendFilter(IAIMPMLDataFilterGroup* Filter, IAIMPMLGroupingTreeSelection* Selection) = 0;
-		virtual LongWord WINAPI GetCapabilities() = 0;
+		virtual DWORD WINAPI GetCapabilities() = 0;
 		virtual HRESULT WINAPI GetData(IAIMPMLGroupingTreeSelection* Selection, IAIMPMLGroupingTreeDataProviderSelection** Data) = 0;
 		virtual HRESULT WINAPI GetFieldForAlphabeticIndex(IAIMPString** FieldName) = 0;
 };
@@ -446,16 +451,16 @@ class IAIMPMLGroupingPresets : public IUnknown
 		virtual HRESULT WINAPI BeginUpdate() = 0;
 		virtual HRESULT WINAPI EndUpdate() = 0;
 
-		virtual HRESULT WINAPI Add(IAIMPString* ID, IAIMPString* Name, LongWord Reserved,
+		virtual HRESULT WINAPI Add(IAIMPString* ID, IAIMPString* Name, DWORD Reserved,
 			IAIMPMLGroupingTreeDataProvider* Provider, IAIMPMLGroupingPreset** Preset) = 0;
-		virtual HRESULT WINAPI Add2(IAIMPString* ID, IAIMPString* Name, LongWord Reserved,
+		virtual HRESULT WINAPI Add2(IAIMPString* ID, IAIMPString* Name, DWORD Reserved,
 			IAIMPObjectList* FieldNames, IAIMPMLGroupingPresetStandard** Preset) = 0;
-		virtual HRESULT WINAPI Add3(IAIMPString* ID, IAIMPString* Name, LongWord Reserved,
+		virtual HRESULT WINAPI Add3(IAIMPString* ID, IAIMPString* Name, DWORD Reserved,
 			IAIMPString* FieldName, IAIMPMLGroupingPresetStandard** Preset) = 0;
-		virtual HRESULT WINAPI Delete(int Index) = 0;
-		virtual HRESULT WINAPI Get(int Index, REFIID IID, void **Obj) = 0;
-		virtual HRESULT WINAPI GetByID(IAIMPString* ID, REFIID IID, void **Obj) = 0;
-		virtual int WINAPI GetCount() = 0;
+		virtual HRESULT WINAPI Delete(INT32 Index) = 0;
+		virtual HRESULT WINAPI Get(INT32 Index, CONSTIID IID, void **Obj) = 0;
+		virtual HRESULT WINAPI GetByID(IAIMPString* ID, CONSTIID IID, void **Obj) = 0;
+		virtual INT32 WINAPI GetCount() = 0;
 };
 
 /* IAIMPMLDataStorageManager */
@@ -463,8 +468,8 @@ class IAIMPMLGroupingPresets : public IUnknown
 class IAIMPMLDataStorageManager : public IUnknown
 {
 	public:
-		virtual void WINAPI BackgroundTaskStarted(int ID, IAIMPString* Caption, IAIMPActionEvent* CancelEvent) = 0;
-		virtual void WINAPI BackgroundTaskFinished(int ID) = 0;
+		virtual void WINAPI BackgroundTaskStarted(INT32 ID, IAIMPString* Caption, IAIMPActionEvent* CancelEvent) = 0;
+		virtual void WINAPI BackgroundTaskFinished(INT32 ID) = 0;
 		virtual void WINAPI Changed() = 0;
 };
 
@@ -479,7 +484,7 @@ class IAIMPMLDataStorage : public IAIMPPropertyList // + IAIMPMLGroupingPresets
 class IAIMPMLDataStorage2 : public IAIMPMLDataStorage // + IAIMPMLDataProvider, IAIMPMLDataProvider2
 {
 	public:
-		virtual HRESULT WINAPI CreateObject(REFIID IID, void **Obj) = 0;
+		virtual HRESULT WINAPI CreateObject(CONSTIID IID, void **Obj) = 0;
 };
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -557,7 +562,7 @@ class IAIMPMLDataStorageCommandReportDialog : public IUnknown
 class IAIMPMLDataStorageCommandUserMark : public IUnknown
 {
 	public:
-		virtual HRESULT WINAPI SetMark(VARIANT* ID, const DOUBLE Value) = 0;
+		virtual HRESULT WINAPI SetMark(REFVARVALUE ID, const DOUBLE Value) = 0;
 };
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -575,10 +580,10 @@ class IAIMPMLExtensionDataStorage : public IAIMPPropertyList // + IAIMPMLDataPro
 		virtual HRESULT WINAPI ConfigLoad(IAIMPConfig *Config, IAIMPString* Section) = 0;
 		virtual HRESULT WINAPI ConfigSave(IAIMPConfig *Config, IAIMPString* Section) = 0;
 		// Schemas
-		virtual HRESULT WINAPI GetFields(int Schema, IAIMPObjectList** List) = 0;
-		virtual HRESULT WINAPI GetGroupingPresets(int Schema, IAIMPMLGroupingPresets* Presets) = 0;
+		virtual HRESULT WINAPI GetFields(INT32 Schema, IAIMPObjectList** List) = 0;
+		virtual HRESULT WINAPI GetGroupingPresets(INT32 Schema, IAIMPMLGroupingPresets* Presets) = 0;
 		// Build-in Commands
-		virtual void WINAPI FlushCache(int Reserved /*= 0*/) = 0;
+		virtual void WINAPI FlushCache(INT32 Reserved /*= 0*/) = 0;
 };
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -590,12 +595,12 @@ class IAIMPMLExtensionDataStorage : public IAIMPPropertyList // + IAIMPMLDataPro
 class IAIMPServiceMusicLibrary : public IUnknown
 {
 	public:
-		virtual HRESULT WINAPI GetActiveStorage(REFIID IID, void **Obj) = 0;
+		virtual HRESULT WINAPI GetActiveStorage(CONSTIID IID, void **Obj) = 0;
 		virtual HRESULT WINAPI SetActiveStorage(IUnknown* Storage) = 0;
 
-		virtual HRESULT WINAPI GetStorage(int Index, REFIID IID, void **Obj) = 0;
-		virtual HRESULT WINAPI GetStorageByID(IAIMPString* ID, REFIID IID, void **Obj) = 0;
-		virtual int WINAPI GetStorageCount() = 0;
+		virtual HRESULT WINAPI GetStorage(INT32 Index, CONSTIID IID, void **Obj) = 0;
+		virtual HRESULT WINAPI GetStorageByID(IAIMPString* ID, CONSTIID IID, void **Obj) = 0;
+		virtual INT32 WINAPI GetStorageCount() = 0;
 };
 
 /* IAIMPServiceMusicLibraryUI */
@@ -603,7 +608,7 @@ class IAIMPServiceMusicLibrary : public IUnknown
 class IAIMPServiceMusicLibraryUI : public IUnknown
 {
 	public:
-		virtual HRESULT WINAPI GetFiles(LongWord Flags, IAIMPMLFileList** List) = 0;
+		virtual HRESULT WINAPI GetFiles(DWORD Flags, IAIMPMLFileList** List) = 0;
 		virtual HRESULT WINAPI GetGroupingFilter(IAIMPMLDataFilter** Filter) = 0;
 		virtual HRESULT WINAPI GetGroupingFilterPath(IAIMPString** Path) = 0;
 		virtual HRESULT WINAPI SetGroupingFilterPath(IAIMPString* Path) = 0;

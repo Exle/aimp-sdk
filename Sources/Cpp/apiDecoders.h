@@ -3,22 +3,21 @@
 //  Project:   AIMP
 //             Programming Interface
 //
-//  Target:    v5.40 build 2650
+//  Target:    v6.00 build 3000
 //
 //  Purpose:   Audio Decoders API
 //
 //  Author:    Artem Izmaylov
-//             © 2006-2025
+//             Â© 2006-2026
 //             www.aimp.ru
 //
 #ifndef apiDecodersH
 #define apiDecodersH
 
-#include <unknwn.h>
+#include "apiTypes.h"
 #include "apiCore.h"
 #include "apiObjects.h"
 #include "apiFileManager.h"
-#include "apiTypes.h"
 
 static const GUID IID_IAIMPAudioDecoder = {0x41494D50, 0x4175, 0x6469, 0x6F, 0x44, 0x65, 0x63, 0x00, 0x00, 0x00, 0x00};
 static const GUID IID_IAIMPAudioDecoderBufferingProgress = {0x41494D50, 0x4175, 0x6469, 0x6F, 0x44, 0x65, 0x63, 0x42, 0x75, 0x66, 0x66};
@@ -48,7 +47,7 @@ class IAIMPAudioDecoder: public IUnknown
 {
 	public:
 		virtual BOOL WINAPI GetFileInfo(IAIMPFileInfo *FileInfo) = 0;
-		virtual BOOL WINAPI GetStreamInfo(int *SampleRate, int *Channels, int *SampleFormat) = 0;
+		virtual BOOL WINAPI GetStreamInfo(INT32 *SampleRate, INT32 *Channels, INT32 *SampleFormat) = 0;
 
 		virtual BOOL WINAPI IsSeekable() = 0;
 		virtual BOOL WINAPI IsRealTimeStream() = 0;
@@ -58,7 +57,7 @@ class IAIMPAudioDecoder: public IUnknown
 		virtual INT64 WINAPI GetPosition() = 0;
 		virtual BOOL WINAPI SetPosition(const INT64 Value) = 0;
 
-		virtual int WINAPI Read(void *Buffer, int Count) = 0;
+		virtual INT32 WINAPI Read(void *Buffer, INT32 Count) = 0;
 };
 
 /* IAIMPAudioDecoderBufferingProgress */
@@ -66,14 +65,14 @@ class IAIMPAudioDecoder: public IUnknown
 class IAIMPAudioDecoderBufferingProgress: public IUnknown
 {
 	public:
-		virtual BOOL WINAPI Get(double* Value) = 0;
+		virtual BOOL WINAPI Get(DOUBLE* Value) = 0;
 };
 
 /* IAIMPAudioDecoderListener */
 class IAIMPAudioDecoderListener: public IUnknown
 {
 	public:
-		virtual void WINAPI Changed(int Changes) = 0;
+		virtual void WINAPI Changed(DWORD Changes) = 0;
 };
 
 /* IAIMPAudioDecoderNotifications */
@@ -90,7 +89,7 @@ class IAIMPAudioDecoderNotifications: public IUnknown
 class IAIMPExtensionAudioDecoder: public IUnknown
 {
 	public:
-		virtual HRESULT WINAPI CreateDecoder(IAIMPStream *Stream, LongWord Flags,
+		virtual HRESULT WINAPI CreateDecoder(IAIMPStream *Stream, DWORD Flags,
 			IAIMPErrorInfo *ErrorInfo, IAIMPAudioDecoder **Decoder) = 0;
 };
 
@@ -99,7 +98,7 @@ class IAIMPExtensionAudioDecoder: public IUnknown
 class IAIMPExtensionAudioDecoderOld: public IUnknown
 {
 	public:
-		virtual HRESULT WINAPI CreateDecoder(IAIMPString *FileName, LongWord Flags,
+		virtual HRESULT WINAPI CreateDecoder(IAIMPString *FileName, DWORD Flags,
 			IAIMPErrorInfo *ErrorInfo, IAIMPAudioDecoder **Decoder) = 0;
 };
 
@@ -116,9 +115,9 @@ class IAIMPExtensionAudioDecoderPriority: public IUnknown
 class IAIMPServiceAudioDecoders: public IUnknown
 {
 	public:
-		virtual HRESULT WINAPI CreateDecoderForStream(IAIMPStream *Stream, LongWord Flags,
+		virtual HRESULT WINAPI CreateDecoderForStream(IAIMPStream *Stream, DWORD Flags,
 			IAIMPErrorInfo *ErrorInfo, IAIMPAudioDecoder **Decoder) = 0;
-		virtual HRESULT WINAPI CreateDecoderForFileURI(IAIMPString *FileURI, LongWord Flags,
+		virtual HRESULT WINAPI CreateDecoderForFileURI(IAIMPString *FileURI, DWORD Flags,
 			IAIMPErrorInfo *ErrorInfo, IAIMPAudioDecoder **Decoder) = 0;
 };
 #endif

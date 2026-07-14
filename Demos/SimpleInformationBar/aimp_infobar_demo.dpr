@@ -2,10 +2,7 @@
 
 uses
   apiPlugin,
-  uInfoBarDemo in 'uInfoBarDemo.pas',
-  uInfoBarDemoForm in 'uInfoBarDemoForm.pas' {frmCard};
-
-{$R *.res}
+  uInfoBarDemo in 'uInfoBarDemo.pas';
 
 function AIMPPluginGetHeader(out Header: IAIMPPlugin): HRESULT; stdcall;
 begin

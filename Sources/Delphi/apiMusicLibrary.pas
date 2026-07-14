@@ -3,12 +3,12 @@
 //  Project:   AIMP
 //             Programming Interface
 //
-//  Target:    v5.40 build 2650
+//  Target:    v6.00 build 3000
 //
 //  Purpose:   MusicLibrary API
 //
 //  Author:    Artem Izmaylov
-//             © 2006-2025
+//             © 2006-2026
 //             www.aimp.ru
 //
 //  FPC:       OK
@@ -229,6 +229,7 @@ const
   AIMPML_FIELDFILTER_OPERATION_BEGINSWITH = 8;
   AIMPML_FIELDFILTER_OPERATION_ENDSWITH = 9;
   AIMPML_FIELDFILTER_OPERATION_ISLASTXDAYS = 10;
+  AIMPML_FIELDFILTER_OPERATION_DOESNOTCONTAIN = 11; // v6.0
 
   // Property ID for IAIMPMLDataFilterGroup
   AIMPML_FILTERGROUP_OPERATION = 1; // Refer to the AIMPML_FILTERGROUP_OPERATION_XXX
@@ -300,6 +301,7 @@ const
   AIMPML_LOCALDATASTORAGE_FIELD_RATING = 'Rating'; // Int32
   AIMPML_LOCALDATASTORAGE_FIELD_SAMPLERATE = 'SampleRate'; // Int32
   AIMPML_LOCALDATASTORAGE_FIELD_TITLE = 'Title'; // String
+  AIMPML_LOCALDATASTORAGE_FIELD_TKEY = 'TKey'; // String;
   AIMPML_LOCALDATASTORAGE_FIELD_TRACKNUMBER = 'TrackNumber'; // String
   AIMPML_LOCALDATASTORAGE_FIELD_URL = 'URL'; // String
   AIMPML_LOCALDATASTORAGE_FIELD_USERMARK = AIMPML_RESERVED_FIELD_USERMARK;
@@ -321,7 +323,7 @@ type
 
   IAIMPMLDataFieldDisplayValue = interface
   [SID_IAIMPMLDataFieldDisplayValue]
-    function GetDisplayValue(const Value: OleVariant; out Length: Integer): PChar; stdcall;
+    function GetDisplayValue(const Value: VarValue; out Length: Integer): PChar; stdcall;
   end;
 
   { IAIMPMLDataFieldFilter }
@@ -334,17 +336,17 @@ type
 
   IAIMPMLDataFieldFilterByArray = interface(IAIMPPropertyList2)
   [SID_IAIMPMLDataFieldFilterByArray]
-    function GetData(Values: POleVariant; var Count: Integer): HRESULT; stdcall;
-    function SetData(Values: POleVariant; Count: Integer): HRESULT; stdcall;
+    function GetData(Values: PVarValue; var Count: Integer): HRESULT; stdcall;
+    function SetData(Values: PVarValue; Count: Integer): HRESULT; stdcall;
   end;
 
   { IAIMPMLDataFilterGroup }
 
   IAIMPMLDataFilterGroup = interface(IAIMPPropertyList2)
   [SID_IAIMPMLDataFilterGroup]
-    function Add(Field: IUnknown; const Value1, Value2: OleVariant;
+    function Add(Field: IUnknown; const Value1, Value2: VarValue;
       Operation: Integer; out Filter: IAIMPMLDataFieldFilter): HRESULT; stdcall;
-    function Add2(Field: IUnknown; Values: POleVariant;
+    function Add2(Field: IUnknown; Values: PVarValue;
       Count: Integer; out Filter: IAIMPMLDataFieldFilterByArray): HRESULT; stdcall;
     function AddGroup(out Group: IAIMPMLDataFilterGroup): HRESULT; stdcall;
     function Clear: HRESULT; stdcall;
@@ -365,16 +367,16 @@ type
 
   IAIMPMLFileList = interface
   [SID_IAIMPMLFileList]
-    function Add(const ID: OleVariant; FileName: IAIMPString): HRESULT; stdcall;
+    function Add(const ID: VarValue; FileName: IAIMPString): HRESULT; stdcall;
     function Clear: HRESULT; stdcall;
     function Delete(Index: Integer): HRESULT; stdcall;
-    function Insert(Index: Integer; const ID: OleVariant; FileName: IAIMPString): HRESULT; stdcall;
+    function Insert(Index: Integer; const ID: VarValue; FileName: IAIMPString): HRESULT; stdcall;
 
     function GetCount: Integer; stdcall;
     function GetFileName(Index: Integer; out FileName: IAIMPString): HRESULT; stdcall;
     function SetFileName(Index: Integer; FileName: IAIMPString): HRESULT; stdcall;
-    function GetID(Index: Integer; out ID: OleVariant): HRESULT; stdcall;
-    function SetID(Index: Integer; const ID: OleVariant): HRESULT; stdcall;
+    function GetID(Index: Integer; out ID: VarValue): HRESULT; stdcall;
+    function SetID(Index: Integer; const ID: VarValue): HRESULT; stdcall;
 
     function Clone(out Obj): HRESULT; stdcall;
   end;
@@ -407,7 +409,7 @@ type
 
   IAIMPMLAlbumArtProvider = interface
   [SID_IAIMPMLAlbumArtProvider]
-    function Get(Fields: IAIMPObjectList; Values: POleVariant;
+    function Get(Fields: IAIMPObjectList; Values: PVarValue;
       Options: IAIMPPropertyList; out Image: IAIMPImageContainer): HRESULT; stdcall;
   end;
 
@@ -415,7 +417,7 @@ type
 
   IAIMPMLAlbumArtProvider2 = interface
   [SID_IAIMPMLAlbumArtProvider2]
-    function Get(Fields: IAIMPObjectList; Values: POleVariant;
+    function Get(Fields: IAIMPObjectList; Values: PVarValue;
       Request: IAIMPAlbumArtRequest; out Image: IAIMPImageContainer): HRESULT; stdcall;
   end;
 
@@ -452,7 +454,9 @@ type
   IAIMPMLGroupingTreeSelection = interface
   [SID_IAIMPMLGroupingTreeSelection]
     function GetCount: Integer; stdcall;
-    function GetValue(Index: Integer; out FieldName: IAIMPString; out Value: OleVariant): HRESULT; stdcall;
+    function GetValue(Index: Integer;
+      out FieldName: IAIMPString;
+      out Value: VarValue): HRESULT; stdcall;
   end;
 
   { IAIMPMLGroupingTreeDataProviderSelection }
@@ -462,7 +466,7 @@ type
     function GetDisplayValue(out S: IAIMPString): HRESULT; stdcall;
     function GetFlags: LongWord; stdcall;
     function GetImageIndex(out Index: Integer): HRESULT; stdcall;
-    function GetValue(out FieldName: IAIMPString; out Value: OleVariant): HRESULT; stdcall;
+    function GetValue(out FieldName: IAIMPString; out Value: VarValue): HRESULT; stdcall;
     function NextRecord: LongBool; stdcall;
   end;
 
@@ -608,7 +612,7 @@ type
 
   IAIMPMLDataStorageCommandUserMark = interface
   [SID_IAIMPMLDataStorageCommandUserMark]
-    function SetMark(const ID: OleVariant; const Value: Double): HRESULT; stdcall;
+    function SetMark(const ID: VarValue; const Value: Double): HRESULT; stdcall;
   end;
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -657,6 +661,35 @@ type
     function SetGroupingFilterPath(Path: IAIMPString): HRESULT; stdcall;
   end;
 
+type
+  TEnumDataFieldFiltersProc = reference to
+    function (AFilter: IAIMPMLDataFieldFilter): Boolean;
+
+function EnumDataFieldFilters(
+  const AFilter: IAIMPMLDataFilterGroup;
+  const AProc: TEnumDataFieldFiltersProc): Boolean;
 implementation
+
+function EnumDataFieldFilters(
+  const AFilter: IAIMPMLDataFilterGroup;
+  const AProc: TEnumDataFieldFiltersProc): Boolean;
+var
+  I: Integer;
+  LFieldFilter: IAIMPMLDataFieldFilter;
+  LGroup: IAIMPMLDataFilterGroup;
+begin
+  Result := False;
+  for I := 0 to AFilter.GetChildCount - 1 do
+  begin
+    if Succeeded(AFilter.GetChild(I, IAIMPMLDataFilterGroup, LGroup)) then
+      Result := EnumDataFieldFilters(LGroup, AProc)
+    else
+      if Succeeded(AFilter.GetChild(I, IAIMPMLDataFieldFilter, LFieldFilter)) then
+        Result := AProc(LFieldFilter);
+
+    if Result then
+      Break;
+  end;
+end;
 
 end.

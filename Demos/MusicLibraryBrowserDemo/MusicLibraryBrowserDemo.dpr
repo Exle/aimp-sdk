@@ -6,8 +6,6 @@ uses
   uPlugin in 'uPlugin.pas',
   uDataProvider in 'uDataProvider.pas';
 
-{$R *.res}
-
 function AIMPPluginGetHeader(out Header: IAIMPPlugin): HRESULT; stdcall;
 begin
   try

@@ -1,13 +1,27 @@
 ﻿unit uDemoForm;
 
+{$I apiConfig.inc}
+
 interface
 
 {$R uDemoForm.res}
 
-{$MESSAGE 'TODO - Constraints'}
-
 uses
-  Windows, Types, apiGUI, apiObjects, apiWrappersGUI, apiMenu;
+{$IFDEF MSWINDOWS}
+  Windows,
+{$ELSE}
+  Cairo,
+  LCLType,
+{$ENDIF}
+  Types,
+  // API
+  apiGUI,
+  apiObjects,
+  apiMenu,
+  apiTypes,
+  apiWrappers,
+  apiWrappersGUI,
+  apiWrappers.Streams;
 
 const
   NullRect: TRect = (Left: 0; Top: 0; Right: 0; Bottom: 0);
@@ -31,7 +45,7 @@ type
     procedure HandlerAddFiles(const Sender: IUnknown);
     procedure HandlerAddFolders(const Sender: IUnknown);
     procedure HandlerCloseButton(const Sender: IUnknown);
-    procedure HandlerCustomDrawSlider(const Sender: IUnknown; DC: HDC; const R: TRect);
+    procedure HandlerCustomDrawSlider(const Sender: IUnknown; DC: HCANVAS; const R: TRect);
     procedure HandlerEditButton(const Sender: IUnknown);
     procedure HandlerSkipMouseEvents(const Sender: IUnknown);
 
@@ -42,7 +56,7 @@ type
     procedure OnEnter(Sender: IInterface); stdcall;
     procedure OnExit(Sender: IInterface); stdcall;
     procedure OnKeyDown(Sender: IInterface; var Key: Word; Modifiers: Word); stdcall;
-    procedure OnKeyPress(Sender: IInterface; var Key: Char); stdcall;
+    procedure OnKeyPress(Sender: IInterface; var Key: WideChar); stdcall;
     procedure OnKeyUp(Sender: IInterface; var Key: Word; Modifiers: Word); stdcall;
 
     // IAIMPUIMouseEvents
@@ -69,7 +83,7 @@ type
     procedure OnShortCut(Sender: IAIMPUIForm; Key: Word; Modifiers: Word; var Handled: LongBool); stdcall;
   protected
     FForm: IAIMPUIForm;
-    FImages: IAIMPUIImageList;
+    FImages: IAIMPUIImageList3;
     FLog: IAIMPUITreeList;
     FService: IAIMPServiceUI;
     FTreeList: IAIMPUITreeList;
@@ -96,38 +110,26 @@ type
 implementation
 
 uses
-  apiWrappers, SysUtils;
+  SysUtils;
 
 const
   ButtonNames: array[TAIMPUIMouseButton] of string = ('LMB', 'RMB', 'MMB');
 
-function CenterRect(const ABounds: TRect; AWidth, AHeight: Integer): TRect;
-begin
-  Result.Left := (ABounds.Left + ABounds.Right - AWidth) div 2;
-  Result.Top := (ABounds.Top + ABounds.Bottom - AHeight) div 2;
-  Result.Right := Result.Left + AWidth;
-  Result.Bottom := Result.Top + AHeight;
-end;
-
 { TDemoForm }
 
 constructor TDemoForm.Create(AService: IAIMPServiceUI);
-var
-  ABounds: TRect;
 begin
   FService := AService;
   FSkipMouseEvents := True;
 
   CheckResult(AService.CreateForm(0, 0, MakeString('DemoForm'), Self, FForm));
   CheckResult(FForm.SetValueAsInt32(AIMPUI_FORM_PROPID_CLOSEBYESCAPE, 1));
-
-  // Center the Form on screen
-  SystemParametersInfo(SPI_GETWORKAREA, 0, ABounds, 0);
-  CheckResult(FForm.SetPlacement(TAIMPUIControlPlacement.Create(CenterRect(ABounds, 1024, 600))));
+  CheckResult(FForm.SetValueAsInt32(AIMPUI_FORM_PROPID_CLIENTHEIGHT, 600));
+  CheckResult(FForm.SetValueAsInt32(AIMPUI_FORM_PROPID_CLIENTWIDTH, 1000));
 
   // Create ImageList for children controls
-  CheckResult(AService.CreateObject(FForm, nil, IAIMPUIImageList, FImages));
-  CheckResult(FImages.LoadFromResource(HInstance, 'IMAGES', 'PNG'));
+  CheckResult(AService.CreateObject(FForm, nil, IAIMPUIImageList3, FImages));
+  CheckResult(FImages.LoadFromStream(CreateResourceStream('IMAGES', 'PNG')));
 
   // Create children controls
   CreateControls(FForm);
@@ -305,21 +307,21 @@ end;
 
 procedure TDemoForm.CreateGraphics(AParent: IAIMPUIWinControl);
 
-  function CreateLabel(const AName: UnicodeString; AParent: IAIMPUIWinControl): IAIMPUIControl;
+  function CreateLabel(const AName: string; AParent: IAIMPUIWinControl): IAIMPUIControl;
   begin
     CheckResult(FService.CreateControl(FForm, AParent, MakeString(AName), Self, IAIMPUILabel, Result));
     CheckResult(Result.SetPlacement(TAIMPUIControlPlacement.Create(ualTop, 0)));
     CheckResult(Result.SetValueAsInt32(AIMPUI_LABEL_PROPID_AUTOSIZE, 1));
   end;
 
-  function CreateImage(const ResName: UnicodeString;
+  function CreateImage(const ResName: string;
     AParent: IAIMPUIWinControl; AAlignment: TAIMPUIControlAlignment): IAIMPUIControl;
   var
     AImage: IAIMPImage2;
     AImageSize: TSize;
   begin
     CoreCreateObject(IAIMPImage2, AImage);
-    CheckResult(AImage.LoadFromResource(HInstance, PWideChar(ResName), 'PNG'));
+    CheckResult(AImage.LoadFromStream(CreateResourceStream(PChar(ResName), 'PNG')));
     CheckResult(AImage.GetSize(AImageSize));
     CheckResult(FService.CreateControl(FForm, AParent, nil, Self, IAIMPUIImage, Result));
     CheckResult(Result.SetPlacement(TAIMPUIControlPlacement.Create(AAlignment, Bounds(0, 0, AImageSize.cx, AImageSize.cy))));
@@ -537,18 +539,29 @@ procedure TDemoForm.HandlerAddCustom(const Sender: IInterface);
 var
   ADialog: IAIMPUIInputDialog;
   ATextForValues: IAIMPObjectList;
-  AValues: array [0..2] of OleVariant;
+  AValues: array [0..2] of VarValue;
 begin
   CoreCreateObject(IAIMPObjectList, ATextForValues);
   CheckResult(ATextForValues.Add(LangLoadStringEx('InputBox\L1')));
   CheckResult(ATextForValues.Add(LangLoadStringEx('InputBox\L2')));
   CheckResult(ATextForValues.Add(LangLoadStringEx('InputBox\L3')));
 
+  AValues[0] := VarValueInit('');
+  AValues[1] := VarValueInit('');
+  AValues[2] := VarValueInit('');
+
   CheckResult(FService.QueryInterface(IAIMPUIInputDialog, ADialog));
   if Succeeded(ADialog.Execute2(FForm.GetHandle, LangLoadStringEx('InputBox\Caption'), nil,
     ATextForValues, @AValues[0], Length(AValues)))
   then
-    AddPathToTreeList(AValues[0], AValues[1], AValues[2], 9);
+    AddPathToTreeList(
+      VarValueToString(AValues[0]),
+      VarValueToString(AValues[1]),
+      VarValueToString(AValues[2]), 9);
+
+  VarValueFree(AValues[2]);
+  VarValueFree(AValues[1]);
+  VarValueFree(AValues[0]);
 end;
 
 procedure TDemoForm.HandlerAddFiles(const Sender: IInterface);
@@ -596,7 +609,7 @@ begin
   FForm.Close;
 end;
 
-procedure TDemoForm.HandlerCustomDrawSlider(const Sender: IInterface; DC: HDC; const R: TRect);
+procedure TDemoForm.HandlerCustomDrawSlider(const Sender: IInterface; DC: HCANVAS; const R: TRect);
 var
   ABrush: HBRUSH;
   AValue: Integer;
@@ -606,12 +619,24 @@ begin
   AValue := MulDiv(MaxByte, AValue, 100);
 
   // Fill the background
+{$IFDEF MSWINDOWS}
   ABrush := CreateSolidBrush(RGB(MaxByte - AValue, AValue, 0));
   FillRect(DC, R, ABrush);
   DeleteObject(ABrush);
+{$ELSE}
+  cairo_set_source_rgb(DC, (MaxByte - AValue) / 255, AValue / 255, 0);
+  cairo_rectangle(DC, R.Left, R.Top, R.Width, R.Height);
+  cairo_fill(DC);
+{$ENDIF}
 
-  // Draw the rectanble for track bar
+  // Draw the rectangle for track bar
+{$IFDEF MSWINDOWS}
   FrameRect(DC, R, GetStockObject(BLACK_BRUSH));
+{$ELSE}
+  cairo_set_source_rgb(DC, 0, 0, 0);
+  cairo_rectangle(DC, R.Left, R.Top, R.Width, R.Height);
+  cairo_stroke(DC);
+{$ENDIF}
 end;
 
 procedure TDemoForm.HandlerEditButton(const Sender: IInterface);
@@ -653,7 +678,7 @@ begin
   Log(Sender, Format('OnKeyDown(%d, %d)', [Key, Modifiers]));
 end;
 
-procedure TDemoForm.OnKeyPress(Sender: IInterface; var Key: Char);
+procedure TDemoForm.OnKeyPress(Sender: IInterface; var Key: WideChar);
 begin
   Log(Sender, Format('OnKeyPress(%s)', [Key]));
 end;

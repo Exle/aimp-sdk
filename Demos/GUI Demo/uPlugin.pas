@@ -1,9 +1,13 @@
 ﻿unit uPlugin;
 
+{$I apiConfig.inc}
+
 interface
 
 uses
-  Windows, AIMPCustomPlugin, apiPlugin;
+  AIMPCustomPlugin,
+  apiPlugin,
+  apiTypes;
 
 type
 
@@ -11,8 +15,9 @@ type
 
   TAIMPGuiDemoPlugin = class(TAIMPCustomPlugin, IAIMPExternalSettingsDialog)
   public
-    function InfoGet(Index: Integer): PWideChar; override;
-    function InfoGetCategories: DWORD; override;
+    function InfoGet(Index: Integer): PChar; override;
+    function InfoGetCategories: Cardinal; override;
+    function Initialize(Core: IAIMPCore): HRESULT; override; stdcall;
     // IAIMPExternalSettingsDialog
     procedure Show(ParentWindow: HWND); stdcall;
   end;
@@ -24,7 +29,7 @@ uses
 
 { TAIMPGuiDemoPlugin }
 
-function TAIMPGuiDemoPlugin.InfoGet(Index: Integer): PWideChar;
+function TAIMPGuiDemoPlugin.InfoGet(Index: Integer): PChar;
 begin
   case Index of
     AIMP_PLUGIN_INFO_NAME:
@@ -38,12 +43,20 @@ begin
   end;
 end;
 
-function TAIMPGuiDemoPlugin.InfoGetCategories: DWORD;
+function TAIMPGuiDemoPlugin.InfoGetCategories: Cardinal;
 begin
   Result := AIMP_PLUGIN_CATEGORY_ADDONS;
 end;
 
-procedure TAIMPGuiDemoPlugin.Show(ParentWindow: HWND);
+function TAIMPGuiDemoPlugin.Initialize(Core: IAIMPCore): HRESULT; stdcall;
+begin
+  if CoreCheckVersion(Core, 6000) then // We use the API that was introduced in v6.0
+    Result := inherited
+  else
+    Result := E_FAIL;
+end;
+
+procedure TAIMPGuiDemoPlugin.Show(ParentWindow: HWND); stdcall;
 var
   AService: IAIMPServiceUI;
 begin

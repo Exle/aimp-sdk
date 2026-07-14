@@ -3,22 +3,21 @@
 //  Project:   AIMP
 //             Programming Interface
 //
-//  Target:    v5.40 build 2650
+//  Target:    v6.00 build 3000
 //
 //  Purpose:   Lyrics API
 //
 //  Author:    Artem Izmaylov
-//             © 2006-2025
+//             Â© 2006-2026
 //             www.aimp.ru
 //
 #ifndef apiLyricsH
 #define apiLyricsH
 
-#include <unknwn.h>
+#include "apiTypes.h"
 #include "apiObjects.h"
 #include "apiFileManager.h"
 #include "apiThreading.h"
-#include "apiTypes.h"
 
 static const GUID IID_IAIMPLyrics = {0x41494D50, 0x4C79, 0x7269, 0x63, 0x73, 0x46, 0x69, 0x6C, 0x65, 0x00, 0x00};
 static const GUID IID_IAIMPExtensionLyricsProvider = {0x41494D50, 0x4578, 0x744C, 0x79, 0x72, 0x69, 0x78, 0x50, 0x72, 0x76, 0x00};
@@ -61,29 +60,29 @@ class IAIMPLyrics: public IAIMPPropertyList
 		virtual HRESULT WINAPI Assign(IAIMPLyrics* Source) = 0;
 		virtual HRESULT WINAPI Clone(IAIMPLyrics** Target) = 0;
 		//
-		virtual HRESULT WINAPI Add(int TimeStart, int TimeFinish, IAIMPString* Text) = 0;
-		virtual HRESULT WINAPI Delete(int Index) = 0;
-		virtual HRESULT WINAPI Find(int Time, int* Index, IAIMPString** Text) = 0;
-		virtual HRESULT WINAPI Get(int Index, int* TimeStart, int* TimeFinish, IAIMPString** Text) = 0;
-		virtual HRESULT WINAPI GetCount(int* Value) = 0;
+		virtual HRESULT WINAPI Add(INT32 TimeStart, INT32 TimeFinish, IAIMPString* Text) = 0;
+		virtual HRESULT WINAPI Delete(INT32 Index) = 0;
+		virtual HRESULT WINAPI Find(INT32 Time, INT32* Index, IAIMPString** Text) = 0;
+		virtual HRESULT WINAPI Get(INT32 Index, INT32* TimeStart, INT32* TimeFinish, IAIMPString** Text) = 0;
+		virtual HRESULT WINAPI GetCount(INT32* Value) = 0;
 		// I/O
 		virtual HRESULT WINAPI LoadFromFile(IAIMPString* FileURI) = 0;
-		virtual HRESULT WINAPI LoadFromStream(IAIMPStream* Stream, int Format) = 0;
-		virtual HRESULT WINAPI LoadFromString(IAIMPString* String, int Format) = 0;
+		virtual HRESULT WINAPI LoadFromStream(IAIMPStream* Stream, INT32 Format) = 0;
+		virtual HRESULT WINAPI LoadFromString(IAIMPString* String, INT32 Format) = 0;
 		virtual HRESULT WINAPI SaveToFile(IAIMPString* FileURI) = 0;
-		virtual HRESULT WINAPI SaveToStream(IAIMPStream* Stream, int Format) = 0;
-		virtual HRESULT WINAPI SaveToString(IAIMPString** String, int Format) = 0;
+		virtual HRESULT WINAPI SaveToStream(IAIMPStream* Stream, INT32 Format) = 0;
+		virtual HRESULT WINAPI SaveToString(IAIMPString** String, INT32 Format) = 0;
 };
 
-typedef void (CALLBACK TAIMPServiceLyricsReceiveProc)(IAIMPLyrics *Lyrics, void *UserData);
+typedef void (WINAPI TAIMPServiceLyricsReceiveProc)(IAIMPLyrics *Lyrics, void *UserData);
 
 /* IAIMPExtensionLyricsProvider */
 
 class IAIMPExtensionLyricsProvider: public IUnknown
 {
 	public:
-		virtual HRESULT WINAPI Get(IAIMPTaskOwner* Owner, IAIMPFileInfo* FileInfo, LongWord Flags, IAIMPLyrics* Lyrics) = 0;
-		virtual LongWord WINAPI GetCategory() = 0;
+		virtual HRESULT WINAPI Get(IAIMPTaskOwner* Owner, IAIMPFileInfo* FileInfo, DWORD Flags, IAIMPLyrics* Lyrics) = 0;
+		virtual DWORD WINAPI GetCategory() = 0;
 };
 
 
@@ -92,10 +91,10 @@ class IAIMPExtensionLyricsProvider: public IUnknown
 class IAIMPServiceLyrics: public IUnknown
 {
 	public:
-		virtual HRESULT WINAPI Get(IAIMPFileInfo* FileInfo, LongWord Flags, 
+		virtual HRESULT WINAPI Get(IAIMPFileInfo* FileInfo, DWORD Flags, 
 			TAIMPServiceLyricsReceiveProc *CallbackProc, void *UserData, 
 			TTaskHandle *TaskID) = 0;
-		virtual HRESULT WINAPI Cancel(TTaskHandle TaskID, LongWord Flags) = 0;
+		virtual HRESULT WINAPI Cancel(TTaskHandle TaskID, DWORD Flags) = 0;
 };
 
 #endif // !apiLyricsH

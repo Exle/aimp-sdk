@@ -3,20 +3,19 @@
 //  Project:   AIMP
 //             Programming Interface
 //
-//  Target:    v5.40 build 2650
+//  Target:    v6.00 build 3000
 //
 //  Purpose:   Plugin Header API
 //
 //  Author:    Artem Izmaylov
-//             © 2006-2025
+//             Â© 2006-2026
 //             www.aimp.ru
 //
 #ifndef apiPluginH
 #define apiPluginH
 
-#include <unknwn.h>
-#include "apiCore.h"
 #include "apiTypes.h"
+#include "apiCore.h"
  
 // IAIMPPlugin.InfoGetCategories
 const int  AIMP_PLUGIN_CATEGORY_ADDONS   = 1;
@@ -53,13 +52,13 @@ class IAIMPPlugin: public IUnknown
 {
 	public:
 		// Information about the plugin
-		virtual TChar* WINAPI InfoGet(int Index) = 0;
-		virtual LongWord WINAPI InfoGetCategories() = 0;
+		virtual PChar WINAPI InfoGet(INT32 Index) = 0;
+		virtual DWORD WINAPI InfoGetCategories() = 0;
 		// Initialization / Finalization
 		virtual HRESULT WINAPI Initialize(IAIMPCore* Core) = 0;
 		virtual HRESULT WINAPI Finalize() = 0;
 		// System Notifications
-		virtual void WINAPI SystemNotification(int NotifyID, IUnknown* Data) = 0;
+		virtual void WINAPI SystemNotification(INT32 NotifyID, IUnknown* Data) = 0;
 };
 
 // Export function name: AIMPPluginGetHeader

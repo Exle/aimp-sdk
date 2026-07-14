@@ -3,16 +3,18 @@
 //  Project:   AIMP
 //             Programming Interface
 //
-//  Target:    v5.40 build 2650
+//  Target:    v6.00 build 3000
 //
 //  Purpose:   Remote Control API
 //
 //  Author:    Artem Izmaylov
-//             © 2006-2025
+//             © 2006-2026
 //             www.aimp.ru
 //
 #ifndef apiRemoteH
 #define apiRemoteH
+
+#ifdef _WIN32 // Windows Only
 
 #include <windows.h>
 
@@ -212,4 +214,5 @@ const int AIMP_RA_NOTIFY_TRACK_START = AIMP_RA_NOTIFY_BASE + 2;
 // LParam: Property ID
 const int AIMP_RA_NOTIFY_PROPERTY = AIMP_RA_NOTIFY_BASE + 3; 
 
+#endif // !_WIN32
 #endif // !apiRemoteH

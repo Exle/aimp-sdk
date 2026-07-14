@@ -1,25 +1,25 @@
-////////////////////////////////////////////////////////////////////////////////
+﻿////////////////////////////////////////////////////////////////////////////////
 //
 //  Project:   AIMP
 //             Programming Interface
 //
-//  Target:    v5.40 build 2650
+//  Target:    v6.00 build 3000
 //
 //  Purpose:   Core API
 //
 //  Author:    Artem Izmaylov
-//             � 2006-2025
+//             © 2006-2026
 //             www.aimp.ru
 //
 #ifndef apiCoreH
 #define apiCoreH
 
-#include <unknwn.h>
-#include "apiObjects.h"
 #include "apiTypes.h"
+#include "apiObjects.h"
 
 static const GUID IID_IAIMPCore               = {0x41494D50, 0x436F, 0x7265, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
 static const GUID IID_IAIMPServiceConfig      = {0x41494D50, 0x5372, 0x7643, 0x66, 0x67, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
+static const GUID IID_IAIMPServiceLog 		  = {0x41494D50, 0x5372, 0x764C, 0x6F, 0x67, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
 static const GUID IID_IAIMPServiceShutdown    = {0x41494D50, 0x5372, 0x7653, 0x68, 0x75, 0x74, 0x64, 0x6F, 0x77, 0x6E, 0x00};
 static const GUID IID_IAIMPServiceVersionInfo = {0x41494D50, 0x5372, 0x7656, 0x65, 0x72, 0x49, 0x6E, 0x66, 0x6F, 0x00, 0x00};
 
@@ -58,11 +58,11 @@ class IAIMPCore: public IUnknown
 {
 	public:
 		// Creating Simple Objects
-		virtual HRESULT WINAPI CreateObject(REFIID IID, void **Obj) = 0;
+		virtual HRESULT WINAPI CreateObject(CONSTIID IID, void **Obj) = 0;
 		// System Paths
 		virtual HRESULT WINAPI GetPath(int PathID, IAIMPString **Value) = 0;
 		// Registration
-		virtual HRESULT WINAPI RegisterExtension(REFIID ServiceIID, IUnknown *Extension) = 0;
+		virtual HRESULT WINAPI RegisterExtension(CONSTIID ServiceIID, IUnknown *Extension) = 0;
 		virtual HRESULT WINAPI RegisterService(IUnknown *Service) = 0;	
 		virtual HRESULT WINAPI UnregisterExtension(IUnknown *Extension) = 0;	
 };
@@ -72,7 +72,7 @@ class IAIMPCore: public IUnknown
 class IAIMPServiceAttrObjects: public IUnknown
 {
 	public:
-		virtual HRESULT WINAPI CreateObject(REFIID IID, void **Obj) = 0;
+		virtual HRESULT WINAPI CreateObject(CONSTIID IID, void **Obj) = 0;
 };
 
 /* IAIMPServiceAttrExtendable */
@@ -92,13 +92,22 @@ class IAIMPServiceConfig: public IAIMPConfig
 		virtual HRESULT WINAPI FlushCache() = 0;
 };
 
+/* IAIMPServiceLog */
+
+class IAIMPServiceLog: public IUnknown
+{
+	public:
+		virtual void WINAPI Add1(   char* text, DWORD flags) = 0;
+		virtual void WINAPI Add2(wchar_t* text, DWORD flags) = 0;
+}; // v6.0
+
 /* IAIMPServiceShutdown */
 
 class IAIMPServiceShutdown: public IUnknown
 {
 	public:
 		virtual HRESULT WINAPI Restart(IAIMPString *Params) = 0;
-		virtual HRESULT WINAPI Shutdown(LongWord Flags) = 0;
+		virtual HRESULT WINAPI Shutdown(DWORD Flags) = 0;
 };
 
 /* IAIMPServiceVersionInfo */
@@ -107,10 +116,10 @@ class IAIMPServiceVersionInfo: public IUnknown
 {
 	public:
 		virtual HRESULT WINAPI FormatInfo(IAIMPString **S) = 0;
-		virtual int WINAPI GetBuildDate() = 0;
-		virtual int WINAPI GetBuildState() = 0;
-		virtual int WINAPI GetBuildNumber() = 0;
-		virtual int WINAPI GetVersionID() = 0;
+		virtual INT32 WINAPI GetBuildDate() = 0;
+		virtual INT32 WINAPI GetBuildState() = 0;
+		virtual INT32 WINAPI GetBuildNumber() = 0;
+		virtual INT32 WINAPI GetVersionID() = 0;
 };
 
 #endif // !apiCoreH

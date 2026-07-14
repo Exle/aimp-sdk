@@ -3,12 +3,12 @@
 //  Project:   AIMP
 //             Programming Interface
 //
-//  Target:    v5.40 build 2650
+//  Target:    v6.00 build 3000
 //
 //  Purpose:   Menu API Wrappers
 //
 //  Author:    Artem Izmaylov
-//             © 2006-2025
+//             © 2006-2026
 //             www.aimp.ru
 //
 //  FPC:       OK
@@ -21,7 +21,6 @@ interface
 
 uses
   Classes,
-  Generics.Collections,
   // API
   apiActions,
   apiMenu,
@@ -29,16 +28,14 @@ uses
   apiObjects,
   apiPlaylists,
   apiWrappers,
+  apiWrappers.Streams,
   apiTypes;
 
 const
   RT_PNG = 'PNG';
 
 type
-//------------------------------------------------------------------------------
-// Basic
-//------------------------------------------------------------------------------
-
+{$REGION ' Basic '}
   TAIMPUICustomMenuItem = class;
 
   TAIMPUIMenuItemStates = (isEnabled, isVisible);
@@ -63,11 +60,11 @@ type
     function GetState: TAIMPUIMenuItemState; virtual;
     // IAIMPActionEvent
     procedure OnExecute(Sender: IUnknown); virtual; stdcall; abstract;
-    //
+    // Events
     procedure UpdateGlyph(AMenuItem: IAIMPMenuItem);
     procedure UpdateState; overload;
     procedure UpdateState(AMenuItem: IAIMPMenuItem); overload; virtual;
-    //
+    // Properties
     property Controller: IAIMPUIMenuItemController read FController;
   public
     constructor Create(AController: IAIMPUIMenuItemController);
@@ -104,9 +101,9 @@ type
     procedure Refresh;
   end;
 
-//------------------------------------------------------------------------------
-// Files Providers
-//------------------------------------------------------------------------------
+{$ENDREGION}
+
+{$REGION ' File Providers '}
 
   TAIMPFileListClass = class of TAIMPFileList;
   TAIMPFileList = class(TStringList)
@@ -120,7 +117,7 @@ type
     procedure Clear; override;
     procedure MarkFocused(const FileURI: string); overload; virtual;
     procedure MarkFocused(const FileURI: IAIMPString); overload;
-    //
+    // Properties
     property Focused: string read GetFocused;
     property FocusIndex: Integer read FFocusIndex write FFocusIndex;
   end;
@@ -153,6 +150,9 @@ type
   TAIMPUIMusicLibraryBasedMenuItemController = class(TAIMPUICustomFileBasedMenuItemController)
   protected
     procedure QueryFiles(AFiles: TAIMPFileList); override;
+  public
+    class function GetGroupingTreeSelection(
+      const AFieldName: string; out AFieldValue: string): Boolean;
   end;
 
   { TAIMPUIPlaylistBasedMenuItemController }
@@ -163,6 +163,8 @@ type
   protected
     procedure QueryFiles(AFiles: TAIMPFileList); override;
   end;
+
+{$ENDREGION}
 
 procedure AddSimpleMenuItem(AParent: IAIMPMenuItem; const ATitle: string; AEvent: IUnknown); overload;
 procedure AddSimpleMenuItem(AParent: Integer; const ATitle: string; AEvent: IUnknown); overload;
@@ -202,9 +204,7 @@ begin
   end;
 end;
 
-//------------------------------------------------------------------------------
-// Basic
-//------------------------------------------------------------------------------
+{$REGION ' Basic '}
 
 { TAIMPUICustomMenuItem }
 
@@ -224,7 +224,7 @@ begin
     if FID <> '' then
       raise EInvalidInsert.CreateFmt(sErrorAlreadyRegistered, [FID]);
     if ID = '' then
-      raise EInvalidOp.Create(sErrorNoID);
+      raise EInvalidArgument.Create(sErrorNoID);
     if Succeeded(AService.GetByID(MakeString(ID), AHandle)) then
       raise EInvalidInsert.CreateFmt(sErrorDuplicateID, [ID]);
 
@@ -380,6 +380,10 @@ begin
     TAIMPUICustomMenuItem(FMenuItems.List[AIndex]).UpdateState;
 end;
 
+{$ENDREGION}
+
+{$REGION ' File Providers '}
+
 { TAIMPFileList }
 
 procedure TAIMPFileList.Add(const FileURI: IAIMPString);
@@ -454,6 +458,35 @@ end;
 
 { TAIMPUIMusicLibraryBasedMenuItemController }
 
+class function TAIMPUIMusicLibraryBasedMenuItemController.GetGroupingTreeSelection(
+  const AFieldName: string; out AFieldValue: string): Boolean;
+var
+  LFilter: IAIMPMLDataFilter;
+  LResult: IAIMPString;
+  LService: IAIMPServiceMusicLibraryUI;
+begin
+  Result := False;
+  if CoreGetService(IAIMPServiceMusicLibraryUI, LService) then
+  begin
+    if Succeeded(LService.GetGroupingFilter(LFilter)) then
+    begin
+      LResult := nil;
+      EnumDataFieldFilters(LFilter,
+        function (AFilter: IAIMPMLDataFieldFilter): Boolean
+        var
+          LField: IAIMPMLDataField;
+        begin
+          Result :=
+            (AFilter.GetValueAsObject(AIMPML_FIELDFILTER_FIELD, IAIMPMLDataField, LField) = S_OK) and
+            (PropListGetStr(LField, AIMPML_FIELD_PROPID_NAME) = AFieldName) and
+            (PropListGetStr(AFilter, AIMPML_FIELDFILTER_VALUE1, LResult));
+        end);
+      Result := LResult <> nil;
+      AFieldValue := IAIMPStringToString(LResult);
+    end;
+  end;
+end;
+
 procedure TAIMPUIMusicLibraryBasedMenuItemController.QueryFiles(AFiles: TAIMPFileList);
 var
   AFileURI: IAIMPString;
@@ -525,5 +558,7 @@ begin
         Result := Succeeded(AItem.GetValueAsObject(AIMP_PLAYLISTITEM_PROPID_FILENAME, IAIMPString, FileURI));
   end;
 end;
+
+{$ENDREGION}
 
 end.

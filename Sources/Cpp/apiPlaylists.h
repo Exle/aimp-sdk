@@ -3,21 +3,20 @@
 //  Project:   AIMP
 //             Programming Interface
 //
-//  Target:    v5.40 build 2650
+//  Target:    v6.00 build 3000
 //
 //  Purpose:   Playlists API
 //
 //  Author:    Artem Izmaylov
-//             © 2006-2025
+//             Â© 2006-2026
 //             www.aimp.ru
 //
 #ifndef apiPlaylistsH
 #define apiPlaylistsH
 
-#include <unknwn.h>
+#include "apiTypes.h"
 #include "apiObjects.h"
 #include "apiThreading.h"
-#include "apiTypes.h"
 
 static const GUID IID_IAIMPPlaylist = {0x41494D50, 0x506C, 0x7300, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
 static const GUID IID_IAIMPPlaylistGroup = {0x41494D50, 0x506C, 0x7347, 0x72, 0x6F, 0x75, 0x70, 0x00, 0x00, 0x00, 0x00};
@@ -36,6 +35,7 @@ static const GUID IID_IAIMPPlaylistPreimageDataProvider = {0x41494D50, 0x536D, 0
 static const GUID IID_IAIMPPlaylistPreimageListener = {0x41494D50, 0x536D, 0x504C, 0x4D, 0x6E, 0x67, 0x72, 0x00, 0x00, 0x00, 0x00};
 static const GUID IID_IAIMPPlaylistPreimage = {0x41494D50, 0x536D, 0x504C, 0x53, 0x72, 0x63, 0x00, 0x00, 0x00, 0x00, 0x00};
 static const GUID IID_IAIMPExtensionPlaylistPreimageFactory = {0x41494D50, 0x4578, 0x7453, 0x6D, 0x50, 0x6C, 0x73, 0x46, 0x63, 0x74, 0x00};
+static const GUID IID_IAIMPExtensionPlaylistShuffler = {0x41494D50, 0x4578, 0x7450, 0x6C, 0x73, 0x53, 0x68, 0x75, 0x66, 0x6C, 0x72};
 
 // Property IDs for IAIMPPlaylistItem
 const int AIMP_PLAYLISTITEM_PROPID_CUSTOM		  = 0;
@@ -156,9 +156,9 @@ const int AIMP_PLAYLISTPREIMAGE_PLAYLISTBASED_PROPID_URI = 100;
 const int AIMP_PREIMAGEFACTORY_FLAG_CONTEXTDEPENDENT = 1;
 
 // Built-in Preimage Factories
-static const WCHAR* AIMP_PREIMAGEFACTORY_FOLDERS_ID = L"TAIMPPlaylistFoldersPreimage";
-static const WCHAR* AIMP_PREIMAGEFACTORY_MUSICLIBRARY_ID = L"TAIMPMLPlaylistPreimage";
-static const WCHAR* AIMP_PREIMAGEFACTORY_PLAYLIST_ID = L"TAIMPPlaylistBasedPreimage";
+static const TChar AIMP_PREIMAGEFACTORY_FOLDERS_ID[] 		= TEXT("TAIMPPlaylistFoldersPreimage");
+static const TChar AIMP_PREIMAGEFACTORY_MUSICLIBRARY_ID[] 	= TEXT("TAIMPMLPlaylistPreimage");
+static const TChar AIMP_PREIMAGEFACTORY_PLAYLIST_ID[] 		= TEXT("TAIMPPlaylistBasedPreimage");
 
 /* IAIMPPlaylistItem */
 
@@ -173,8 +173,8 @@ class IAIMPPlaylistItem: public IAIMPPropertyList
 class IAIMPPlaylistGroup: public IAIMPPropertyList
 {
 	public:
-		virtual HRESULT WINAPI GetItem(int Index, REFIID IID, void **Obj) = 0;
-		virtual int WINAPI GetItemCount() = 0;
+		virtual HRESULT WINAPI GetItem(INT32 Index, CONSTIID IID, void **Obj) = 0;
+		virtual INT32 WINAPI GetItemCount() = 0;
 };
 
 /* IAIMPPlaylistListener */
@@ -183,7 +183,7 @@ class IAIMPPlaylistListener: public IUnknown
 {
 	public:
 		virtual void WINAPI Activated() = 0;
-		virtual void WINAPI Changed(LongWord Flags) = 0;
+		virtual void WINAPI Changed(DWORD Flags) = 0;
 		virtual void WINAPI Removed() = 0;
 };
 
@@ -193,12 +193,12 @@ class IAIMPPlaylistListener2: public IUnknown
 {
 	public:
 		virtual void WINAPI ScanningBegin() = 0;
-		virtual void WINAPI ScanningProgress(const double Progress) = 0;
+		virtual void WINAPI ScanningProgress(const DOUBLE Progress) = 0;
 		virtual void WINAPI ScanningEnd(BOOL HasChanges, BOOL Canceled) = 0;
 };
 
-typedef int  (CALLBACK TAIMPPlaylistCompareProc)(IAIMPPlaylistItem* Item1, IAIMPPlaylistItem* Item2, void* UserData);
-typedef BOOL (CALLBACK TAIMPPlaylistDeleteProc)(IAIMPPlaylistItem* Item, void* UserData);
+typedef INT32 (WINAPI TAIMPPlaylistCompareProc)(IAIMPPlaylistItem* Item1, IAIMPPlaylistItem* Item2, void* UserData);
+typedef BOOL  (WINAPI TAIMPPlaylistDeleteProc)(IAIMPPlaylistItem* Item, void* UserData);
 
 
 /* IAIMPPlaylist */
@@ -207,17 +207,17 @@ class IAIMPPlaylist: public IUnknown
 {
 	public:
 		// Adding
-		virtual HRESULT WINAPI Add(IUnknown* Obj, LongWord Flags, int InsertIn) = 0;
-		virtual HRESULT WINAPI AddList(IAIMPObjectList* ObjList, LongWord Flags, int InsertIn) = 0;
+		virtual HRESULT WINAPI Add(IUnknown* Obj, DWORD Flags, INT32 InsertIn) = 0;
+		virtual HRESULT WINAPI AddList(IAIMPObjectList* ObjList, DWORD Flags, INT32 InsertIn) = 0;
 
 		// Deleting
 		virtual HRESULT WINAPI Delete(IAIMPPlaylistItem* Item) = 0;
-		virtual HRESULT WINAPI Delete2(int ItemIndex) = 0;
-		virtual HRESULT WINAPI Delete3(LongWord Flags, TAIMPPlaylistDeleteProc Proc, void* UserData) = 0;
+		virtual HRESULT WINAPI Delete2(INT32 ItemIndex) = 0;
+		virtual HRESULT WINAPI Delete3(DWORD Flags, TAIMPPlaylistDeleteProc Proc, void* UserData) = 0;
 		virtual HRESULT WINAPI DeleteAll() = 0;
 
 		// Sorting
-		virtual HRESULT WINAPI Sort(int Mode) = 0;
+		virtual HRESULT WINAPI Sort(INT32 Mode) = 0;
 		virtual HRESULT WINAPI Sort2(IAIMPString* Template) = 0;
 		virtual HRESULT WINAPI Sort3(TAIMPPlaylistCompareProc* Proc, void* UserData) = 0;
 
@@ -226,19 +226,19 @@ class IAIMPPlaylist: public IUnknown
 		virtual HRESULT WINAPI EndUpdate() = 0;
 
 		// Other Commands
-		virtual HRESULT WINAPI Close(LongWord Flags) = 0;
-		virtual HRESULT WINAPI GetFiles(LongWord Flags, IAIMPObjectList **List) = 0;
+		virtual HRESULT WINAPI Close(DWORD Flags) = 0;
+		virtual HRESULT WINAPI GetFiles(DWORD Flags, IAIMPObjectList **List) = 0;
 		virtual HRESULT WINAPI MergeGroup(IAIMPPlaylistGroup* Group) = 0;
 		virtual HRESULT WINAPI ReloadFromPreimage() = 0;
-		virtual HRESULT WINAPI ReloadInfo(LongWord Flags) = 0;
+		virtual HRESULT WINAPI ReloadInfo(DWORD Flags) = 0;
 
 		// Items
-		virtual HRESULT WINAPI GetItem(int Index, REFIID IID, void **Obj) = 0;
-		virtual int WINAPI GetItemCount() = 0;
+		virtual HRESULT WINAPI GetItem(INT32 Index, CONSTIID IID, void **Obj) = 0;
+		virtual INT32 WINAPI GetItemCount() = 0;
 
 		// Groups
-		virtual HRESULT WINAPI GetGroup(int Index, REFIID IID, void **Obj) = 0;
-		virtual int WINAPI GetGroupCount() = 0;
+		virtual HRESULT WINAPI GetGroup(INT32 Index, CONSTIID IID, void **Obj) = 0;
+		virtual INT32 WINAPI GetGroupCount() = 0;
 
 		// Listener
 		virtual HRESULT WINAPI ListenerAdd(IAIMPPlaylistListener* AListener) = 0;
@@ -257,11 +257,11 @@ class IAIMPPlaylistQueue: public IUnknown
 		virtual HRESULT WINAPI Delete(IAIMPPlaylistItem* Item) = 0;
 		virtual HRESULT WINAPI Delete2(IAIMPPlaylist* Playlist) = 0;
 		// Reorder
-		virtual HRESULT WINAPI Move(IAIMPPlaylistItem* Item, int TargetIndex) = 0;
-		virtual HRESULT WINAPI Move2(int ItemIndex, int TargetIndex) = 0;
+		virtual HRESULT WINAPI Move(IAIMPPlaylistItem* Item, INT32 TargetIndex) = 0;
+		virtual HRESULT WINAPI Move2(INT32 ItemIndex, INT32 TargetIndex) = 0;
 		// Items
-		virtual HRESULT WINAPI GetItem(int Index, REFIID IID, void **Obj) = 0;
-		virtual int WINAPI GetItemCount() = 0;
+		virtual HRESULT WINAPI GetItem(INT32 Index, CONSTIID IID, void **Obj) = 0;
+		virtual INT32 WINAPI GetItemCount() = 0;
 };
 
 /* IAIMPPlaylistQueueListener */
@@ -320,7 +320,7 @@ class IAIMPPlaylistPreimage: public IAIMPPropertyList
 class IAIMPPlaylistPreimageDataProvider : public IUnknown 
 {
 	public:
-		virtual HRESULT WINAPI GetFiles(IAIMPTaskOwner* Owner, LongWord** Flags, IAIMPObjectList** List) = 0;
+		virtual HRESULT WINAPI GetFiles(IAIMPTaskOwner* Owner, DWORD** Flags, IAIMPObjectList** List) = 0;
 };
 
 /* IAIMPPlaylistPreimageFolders */
@@ -329,11 +329,15 @@ class IAIMPPlaylistPreimageFolders : public IAIMPPlaylistPreimage
 {
 	public:
 		virtual HRESULT WINAPI ItemsAdd(IAIMPString* Path, BOOL Recursive) = 0;
-		virtual HRESULT WINAPI ItemsDelete(int Index) = 0;
+		virtual HRESULT WINAPI ItemsDelete(INT32 Index) = 0;
 		virtual HRESULT WINAPI ItemsDeleteAll() = 0;
-		virtual HRESULT WINAPI ItemsGet(int Index, IAIMPString* Path, BOOL* Recursive) = 0;
-		virtual int WINAPI ItemsGetCount() = 0;
+		virtual HRESULT WINAPI ItemsGet(INT32 Index, IAIMPString* Path, BOOL* Recursive) = 0;
+		virtual INT32 WINAPI ItemsGetCount() = 0;
 };
+
+//----------------------------------------------------------------------------------------------------------------------
+// Extensions
+//----------------------------------------------------------------------------------------------------------------------
 
 /* IAIMPExtensionPlaylistManagerListener */
 
@@ -353,9 +357,21 @@ class IAIMPExtensionPlaylistPreimageFactory : public IUnknown
 		virtual HRESULT WINAPI CreatePreimage(IAIMPPlaylistPreimage** preimage) = 0;
 		virtual HRESULT WINAPI GetID(IAIMPString** ID) = 0;
 		virtual HRESULT WINAPI GetName(IAIMPString** Name) = 0;
-		virtual LongWord WINAPI GetFlags() = 0;
+		virtual DWORD WINAPI GetFlags() = 0;
 };
 
+/* IAIMPExtensionPlaylistShuffler */
+
+class IAIMPExtensionPlaylistShuffler : public IUnknown // v6.00
+{
+	public:
+		virtual HRESULT WINAPI Shuffle(IAIMPPlaylist* Playlist,
+			IAIMPObjectList2* List, INT32 InitialPlaybackQueueIndex) = 0;
+};
+
+//----------------------------------------------------------------------------------------------------------------------
+// Services
+//----------------------------------------------------------------------------------------------------------------------
 
 /* IAIMPServicePlaylistManager */
 
@@ -374,9 +390,9 @@ class IAIMPServicePlaylistManager: public IUnknown
     	virtual HRESULT WINAPI GetPlayingPlaylist(IAIMPPlaylist **Playlist) = 0;
 
 		// Loaded Playlists
-		virtual HRESULT WINAPI GetLoadedPlaylist(int Index, IAIMPPlaylist** Playlist) = 0;
+		virtual HRESULT WINAPI GetLoadedPlaylist(INT32 Index, IAIMPPlaylist** Playlist) = 0;
 		virtual HRESULT WINAPI GetLoadedPlaylistByName(IAIMPString* Name, IAIMPPlaylist** Playlist) = 0;
-		virtual int WINAPI GetLoadedPlaylistCount() = 0;
+		virtual INT32 WINAPI GetLoadedPlaylistCount() = 0;
 		virtual HRESULT WINAPI GetLoadedPlaylistByID(IAIMPString* ID, IAIMPPlaylist** Playlist) = 0;
 };
 
@@ -385,9 +401,9 @@ class IAIMPServicePlaylistManager: public IUnknown
 class IAIMPServicePlaylistManager2 : public IAIMPServicePlaylistManager 
 {
 	public:
-		virtual HRESULT WINAPI GetPreimageFactory(int Index, IAIMPExtensionPlaylistPreimageFactory** Factory) = 0;
+		virtual HRESULT WINAPI GetPreimageFactory(INT32 Index, IAIMPExtensionPlaylistPreimageFactory** Factory) = 0;
 		virtual HRESULT WINAPI GetPreimageFactoryByID(IAIMPString* ID, IAIMPExtensionPlaylistPreimageFactory** Factory) = 0;
-		virtual int WINAPI GetPreimageFactoryCount() = 0;
+		virtual INT32 WINAPI GetPreimageFactoryCount() = 0;
 };
 
 #endif // !apiPlaylistsH

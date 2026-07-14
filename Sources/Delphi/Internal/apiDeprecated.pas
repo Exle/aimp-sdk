@@ -8,7 +8,7 @@
 //  Purpose:   For compatibility reasons only
 //
 //  Author:    Artem Izmaylov
-//             © 2006-2025
+//             © 2006-2026
 //             www.aimp.ru
 //
 //  FPC:       OK
@@ -20,7 +20,9 @@ unit apiDeprecated;
 interface
 
 uses
-  apiObjects, apiTypes;
+  Types,
+  apiObjects,
+  apiTypes;
 
 const
   AIMP_SCHEDULER_MSG_EVENT_NEARESTTASK = 'AIMP.Scheduler.MSG.NearestTask';
@@ -94,6 +96,13 @@ type
 
     function GetPreset(Index: Integer; out Preset: IAIMPDeprecatedEqualizerPreset): HRESULT; stdcall;
     function GetPresetCount: Integer; stdcall;
+  end;
+
+  { IAIMPUIDeprecatedImageList2 }
+
+  IAIMPUIDeprecatedImageList2 = interface
+  ['{61756949-6D67-4C69-7374-320000000000}']
+    function DrawEx(Canvas: HCANVAS; Index: Integer; const R: TRect; Enabled: LongBool): HRESULT; stdcall;
   end;
 
 implementation

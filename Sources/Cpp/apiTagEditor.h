@@ -3,22 +3,21 @@
 //  Project:   AIMP
 //             Programming Interface
 //
-//  Target:    v5.40 build 2650
+//  Target:    v6.00 build 3000
 //
 //  Purpose:   Tags Library API
 //
 //  Author:    Artem Izmaylov
-//             © 2006-2025
+//             © 2006-2026
 //             www.aimp.ru
 //
 #ifndef apiTagEditorH
 #define apiTagEditorH
 
-#include <unknwn.h>
+#include "apiTypes.h"
 #include "apiObjects.h"
 #include "apiFileManager.h"
 #include "apiThreading.h"
-#include "apiTypes.h"
 
 static const GUID IID_IAIMPFileTag 		        = {0x41494D50, 0x4669, 0x6C65, 0x54, 0x61, 0x67, 0x00, 0x00, 0x00, 0x00, 0x00};
 static const GUID IID_IAIMPFileTagEditor        = {0x41494D50, 0x4669, 0x6C65, 0x54, 0x61, 0x67, 0x45, 0x64, 0x69, 0x74, 0x00};
@@ -40,7 +39,7 @@ const int AIMP_FILETAG_ID_MP4    = 4;
 const int AIMP_FILETAG_ID_VORBIS = 5;
 const int AIMP_FILETAG_ID_WMA    = 6;
 
-typedef void (CALLBACK TAIMPServiceFindTagsOnlineAlbumInfoReceiveProc)(IAIMPFileInfo *image, void *data);
+typedef void (WINAPI TAIMPServiceFindTagsOnlineAlbumInfoReceiveProc)(IAIMPFileInfo *image, void *data);
 
 /* IAIMPFileTag */
 
@@ -56,8 +55,8 @@ class IAIMPFileTagEditor: public IUnknown
 	public:
 		// Info
 		virtual HRESULT WINAPI GetMixedInfo(IAIMPFileInfo **Info) = 0;
-		virtual HRESULT WINAPI GetTag(int Index, REFIID IID, void **Obj) = 0;
-		virtual int WINAPI GetTagCount() = 0;
+		virtual HRESULT WINAPI GetTag(INT32 Index, CONSTIID IID, void **Obj) = 0;
+		virtual INT32 WINAPI GetTagCount() = 0;
 		virtual HRESULT WINAPI SetToAll(IAIMPFileInfo *Info) = 0;
 		// Save
 		virtual HRESULT WINAPI Save() = 0;
@@ -69,7 +68,7 @@ class IAIMPExtensionTagsProvider: public IUnknown
 {
 	public:
 		virtual HRESULT WINAPI GetName(IAIMPString **Source) = 0;
-		virtual HRESULT WINAPI GetSupportedFields(int* *Fields, int* Count) = 0;
+		virtual HRESULT WINAPI GetSupportedFields(INT32* *Fields, INT32* Count) = 0;
 		// Commands
 		virtual HRESULT WINAPI FindAlbums(IAIMPString *Query, IAIMPTaskOwner* Owner, IAIMPErrorInfo* ErrorInfo,
 			TAIMPServiceFindTagsOnlineAlbumInfoReceiveProc* ReceiveProc, void *ReceiveProcData) = 0;
@@ -89,8 +88,8 @@ class IAIMPServiceFindTagsOnline: public IUnknown
 class IAIMPServiceFileTagEditor: public IUnknown
 {
 	public:
-		virtual HRESULT WINAPI EditFile(IUnknown *Source, REFIID IID, void **Obj) = 0;
-		virtual HRESULT WINAPI EditTag(IUnknown *Source, int TagID, REFIID IID, void **Obj) = 0;
+		virtual HRESULT WINAPI EditFile(IUnknown *Source, CONSTIID IID, void **Obj) = 0;
+		virtual HRESULT WINAPI EditTag(IUnknown *Source, INT32 TagID, CONSTIID IID, void **Obj) = 0;
 };
 
 #endif // !apiTagEditorH

@@ -3,12 +3,12 @@
 //  Project:   AIMP
 //             Programming Interface
 //
-//  Target:    v5.40 build 2650
+//  Target:    v6.00 build 3000
 //
 //  Purpose:   File Manager API
 //
 //  Author:    Artem Izmaylov
-//             © 2006-2025
+//             Â© 2006-2026
 //             www.aimp.ru
 //
 //  FPC:       OK
@@ -16,24 +16,15 @@
 #ifndef apiFileManagerH
 #define apiFileManagerH
 
-#include <unknwn.h>
-#include "apiObjects.h"
 #include "apiTypes.h"
+#include "apiObjects.h"
 
-static const GUID IID_IAIMPFileInfo = {0x41494D50, 0x4669, 0x6C65, 0x49, 0x6E, 0x66, 0x6F, 0x00, 0x00, 0x00, 0x00};
 static const GUID IID_IAIMPExtensionFileExpander = {0x41494D50, 0x4578, 0x7446, 0x69, 0x6C, 0x65, 0x45, 0x78, 0x70, 0x64, 0x72};
 static const GUID IID_IAIMPExtensionFileFormat = {0x41494D50, 0x4578, 0x7446, 0x69, 0x6C, 0x65, 0x46, 0x6D, 0x74, 0x00, 0x00};
 static const GUID IID_IAIMPExtensionFileInfoProvider = {0x41494D50, 0x4578, 0x7446, 0x69, 0x6C, 0x65, 0x49, 0x6E, 0x66, 0x6F, 0x00};
 static const GUID IID_IAIMPExtensionFileInfoProviderEx = {0x41494D50, 0x4578, 0x7446, 0x69, 0x6C, 0x65, 0x49, 0x6E, 0x66, 0x6F, 0x45};
-static const GUID IID_IAIMPVirtualFile = {0x41494D50, 0x5669, 0x7274, 0x75, 0x61, 0x6C, 0x46, 0x69, 0x6C, 0x65, 0x00};
-static const GUID IID_IAIMPServiceFileManager = {0x41494D50, 0x5372, 0x7646, 0x69, 0x6C, 0x65, 0x4D, 0x61, 0x6E, 0x00, 0x00};
-static const GUID IID_IAIMPServiceFileFormats = {0x41494D50, 0x5372, 0x7646, 0x69, 0x6C, 0x65, 0x46, 0x6D, 0x74, 0x73, 0x00};
-static const GUID IID_IAIMPServiceFileInfo = {0x41494D50, 0x5372, 0x7646, 0x69, 0x6C, 0x65, 0x49, 0x6E, 0x66, 0x6F, 0x00};
-static const GUID IID_IAIMPServiceFileInfoFormatter = {0x41494D50, 0x5372, 0x7646, 0x6C, 0x49, 0x6E, 0x66, 0x46, 0x6D, 0x74, 0x00};
-static const GUID IID_IAIMPServiceFileInfoFormatterUtils = {0x41494D50, 0x5372, 0x7646, 0x6C, 0x49, 0x6E, 0x66, 0x46, 0x6D, 0x74, 0x55};
-static const GUID IID_IAIMPServiceFileStreaming = {0x41494D50, 0x5372, 0x7646, 0x69, 0x6C, 0x65, 0x53, 0x74, 0x72, 0x6D, 0x00};
-static const GUID IID_IAIMPServiceFileURI = {0x41494D50, 0x5372, 0x7646, 0x69, 0x6C, 0x65, 0x55, 0x52, 0x49, 0x00, 0x00};
 static const GUID IID_IAIMPExtensionFileSystem = {0x41494D50, 0x4578, 0x7446, 0x53, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
+static const GUID IID_IAIMPFileInfo = {0x41494D50, 0x4669, 0x6C65, 0x49, 0x6E, 0x66, 0x6F, 0x00, 0x00, 0x00, 0x00};
 static const GUID IID_IAIMPFileSystem = {0x41494D50, 0x4653, 0x0000, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
 static const GUID IID_IAIMPFileSystemCommandCopyToClipboard = {0x41465343, 0x6D64, 0x436F, 0x70, 0x79, 0x32, 0x43, 0x6C, 0x70, 0x62, 0x64};
 static const GUID IID_IAIMPFileSystemCommandDelete = {0x41465343, 0x6D64, 0x4465, 0x6C, 0x65, 0x74, 0x65, 0x00, 0x00, 0x00, 0x00};
@@ -42,8 +33,17 @@ static const GUID IID_IAIMPFileSystemCommandFileExists = {0x41465343, 0x6D64, 0x
 static const GUID IID_IAIMPFileSystemCommandFileInfo = { 0x41494D50, 0x4578, 0x7446, 0x69, 0x6C, 0x65, 0x49, 0x6E, 0x66, 0x6F, 0x00};
 static const GUID IID_IAIMPFileSystemCommandOpenFileFolder = {0x41465343, 0x6D64, 0x4669, 0x6C, 0x65, 0x46, 0x6C, 0x64, 0x72, 0x00, 0x00};
 static const GUID IID_IAIMPFileSystemCommandStreaming = {0x41465343, 0x6D64, 0x5374, 0x72, 0x65, 0x61, 0x6D, 0x69, 0x6E, 0x67, 0x00};
+static const GUID IID_IAIMPServiceFileFormats = {0x41494D50, 0x5372, 0x7646, 0x69, 0x6C, 0x65, 0x46, 0x6D, 0x74, 0x73, 0x00};
+static const GUID IID_IAIMPServiceFileInfo = {0x41494D50, 0x5372, 0x7646, 0x69, 0x6C, 0x65, 0x49, 0x6E, 0x66, 0x6F, 0x00};
+static const GUID IID_IAIMPServiceFileInfoFormatter = {0x41494D50, 0x5372, 0x7646, 0x6C, 0x49, 0x6E, 0x66, 0x46, 0x6D, 0x74, 0x00};
+static const GUID IID_IAIMPServiceFileInfoFormatterUtils = {0x41494D50, 0x5372, 0x7646, 0x6C, 0x49, 0x6E, 0x66, 0x46, 0x6D, 0x74, 0x55};
+static const GUID IID_IAIMPServiceFileManager = {0x41494D50, 0x5372, 0x7646, 0x69, 0x6C, 0x65, 0x4D, 0x61, 0x6E, 0x00, 0x00};
+static const GUID IID_IAIMPServiceFileStreaming = {0x41494D50, 0x5372, 0x7646, 0x69, 0x6C, 0x65, 0x53, 0x74, 0x72, 0x6D, 0x00};
 static const GUID IID_IAIMPServiceFileSystems = {0x41494D50, 0x5372, 0x7646, 0x53, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
+static const GUID IID_IAIMPServiceFileURI = {0x41494D50, 0x5372, 0x7646, 0x69, 0x6C, 0x65, 0x55, 0x52, 0x49, 0x00, 0x00};
 static const GUID IID_IAIMPServiceFileURI2 = {0x41494D50, 0x5372, 0x7646, 0x69, 0x6C, 0x65, 0x55, 0x52, 0x49, 0x32, 0x00};
+static const GUID IID_IAIMPServiceFileURI3 = {0x41494D50, 0x5372, 0x7646, 0x69, 0x6C, 0x65, 0x55, 0x52, 0x49, 0x33, 0x00};
+static const GUID IID_IAIMPVirtualFile = {0x41494D50, 0x5669, 0x7274, 0x75, 0x61, 0x6C, 0x46, 0x69, 0x6C, 0x65, 0x00};
 
 // PropertyID for the IAIMPFileInfo
 const int AIMP_FILEINFO_PROPID_CUSTOM            = 0; // IUnknown
@@ -127,6 +127,18 @@ const int AIMP_FILESYSTEM_PROPID_READONLY = 2;
 const int AIMP_FILEINFO_FORMATTER_ID_BASIC   = 0;
 const int AIMP_FILEINFO_FORMATTER_ID_PLAYING = 1;
 
+// Flags for IAIMPServiceFileURI3.ProcessEnvironmentVariables
+const int AIMP_SERVICE_FILEURI_ENVAR_FLAG_EXPAND   = 0;
+const int AIMP_SERVICE_FILEURI_ENVAR_FLAG_COLLAPSE = 1;
+
+static const TChar AIMP_SERVICE_FILEURI_ENVAR_APPDATA[]		= TEXT("%AppData%");
+static const TChar AIMP_SERVICE_FILEURI_ENVAR_DESKTOP[]		= TEXT("%Desktop%");
+static const TChar AIMP_SERVICE_FILEURI_ENVAR_HOME[]		= TEXT("%Home%");
+static const TChar AIMP_SERVICE_FILEURI_ENVAR_MYDOCUMENTS[] = TEXT("%MyDocuments%");
+static const TChar AIMP_SERVICE_FILEURI_ENVAR_MYMUSIC[]		= TEXT("%MyMusic%");
+static const TChar AIMP_SERVICE_FILEURI_ENVAR_PROFILE[]		= TEXT("%Profile%");
+static const TChar AIMP_SERVICE_FILEURI_ENVAR_TEMP[]		= TEXT("%Temp%");
+
 //----------------------------------------------------------------------------------------------------------------------
 // Common
 //----------------------------------------------------------------------------------------------------------------------
@@ -155,7 +167,7 @@ class IAIMPVirtualFile: public IAIMPPropertyList
 #pragma pack(push, 1)
 struct TAIMPFileAttributes 
 {
-	LongWord Attributes;
+	DWORD Attributes;
 	DOUBLE TimeCreation;
 	DOUBLE TimeLastAccess;
 	DOUBLE TimeLastWrite;
@@ -222,7 +234,7 @@ class IAIMPFileSystemCommandOpenFileFolder : public IAIMPFileSystemCustomFileCom
 class IAIMPFileSystemCommandStreaming : public IUnknown
 {
 	public:
-		virtual HRESULT WINAPI CreateStream(IAIMPString* FileName, const INT64 Offset, const INT64 Size, LongWord Flags, IAIMPStream** Stream) = 0;
+		virtual HRESULT WINAPI CreateStream(IAIMPString* FileName, const INT64 Offset, const INT64 Size, DWORD Flags, IAIMPStream** Stream) = 0;
 };
 //----------------------------------------------------------------------------------------------------------------------
 // Extensions
@@ -243,7 +255,7 @@ class IAIMPExtensionFileFormat: public IUnknown
 	public:
 		virtual HRESULT WINAPI GetDescription(IAIMPString **S) = 0;
 		virtual HRESULT WINAPI GetExtList(IAIMPString **S) = 0;
-		virtual HRESULT WINAPI GetFlags(LongWord *S) = 0;
+		virtual HRESULT WINAPI GetFlags(DWORD *S) = 0;
 };
 
 /* IAIMPExtensionFileInfoProvider */
@@ -285,8 +297,8 @@ class IAIMPServiceFileManager: public IUnknown
 class IAIMPServiceFileFormats: public IUnknown
 {
 	public:
-		virtual HRESULT WINAPI GetFormats(LongWord Flags, IAIMPString **S) = 0;
-		virtual HRESULT WINAPI IsSupported(IAIMPString *FileName, LongWord Flags) = 0;
+		virtual HRESULT WINAPI GetFormats(DWORD Flags, IAIMPString **S) = 0;
+		virtual HRESULT WINAPI IsSupported(IAIMPString *FileName, DWORD Flags) = 0;
 };
 
 /* IAIMPServiceFileInfo */
@@ -295,10 +307,10 @@ class IAIMPServiceFileInfo: public IUnknown
 {
 	public:
 		// File Info
-		virtual HRESULT WINAPI GetFileInfoFromFileURI(IAIMPString *FileURI, LongWord Flags, IAIMPFileInfo *Info) = 0;
-		virtual HRESULT WINAPI GetFileInfoFromStream(IAIMPStream *Stream, LongWord Flags, IAIMPFileInfo *Info) = 0;
+		virtual HRESULT WINAPI GetFileInfoFromFileURI(IAIMPString *FileURI, DWORD Flags, IAIMPFileInfo *Info) = 0;
+		virtual HRESULT WINAPI GetFileInfoFromStream(IAIMPStream *Stream, DWORD Flags, IAIMPFileInfo *Info) = 0;
 		// Virtual Files
-		virtual HRESULT WINAPI GetVirtualFile(IAIMPString *FileURI, LongWord Flags, IAIMPVirtualFile **Info) = 0;
+		virtual HRESULT WINAPI GetVirtualFile(IAIMPString *FileURI, DWORD Flags, IAIMPVirtualFile **Info) = 0;
 };
 
 /* IAIMPServiceFileInfoFormatter */
@@ -306,7 +318,7 @@ class IAIMPServiceFileInfo: public IUnknown
 class IAIMPServiceFileInfoFormatter: public IUnknown
 {
 	public:
-		virtual HRESULT WINAPI Format(IAIMPString *Template, IAIMPFileInfo *FileInfo, int ID, IUnknown *AdditionalInfo, IAIMPString **FormattedResult) = 0;
+		virtual HRESULT WINAPI Format(IAIMPString *Template, IAIMPFileInfo *FileInfo, INT32 ID, IUnknown *AdditionalInfo, IAIMPString **FormattedResult) = 0;
 };
 
 /* IAIMPServiceFileInfoFormatterUtils */
@@ -314,7 +326,7 @@ class IAIMPServiceFileInfoFormatter: public IUnknown
 class IAIMPServiceFileInfoFormatterUtils: public IUnknown
 {
 	public:
-		virtual HRESULT WINAPI ShowMacrosLegend(RECT ScreenTarget, int ID, IUnknown *EventsHandler) = 0;
+		virtual HRESULT WINAPI ShowMacrosLegend(RECT ScreenTarget, INT32 ID, IUnknown *EventsHandler) = 0;
 };
 
 /* IAIMPServiceFileStreaming */
@@ -322,7 +334,7 @@ class IAIMPServiceFileInfoFormatterUtils: public IUnknown
 class IAIMPServiceFileStreaming: public IUnknown
 {
 	public:
-		virtual HRESULT WINAPI CreateStreamForFile(IAIMPString *FileName, LongWord Flags, const INT64 Offset, const INT64 Size, IAIMPStream **Stream) = 0;
+		virtual HRESULT WINAPI CreateStreamForFile(IAIMPString *FileName, DWORD Flags, const INT64 Offset, const INT64 Size, IAIMPStream **Stream) = 0;
 		virtual HRESULT WINAPI CreateStreamForFileURI(IAIMPString *FileURI, IAIMPVirtualFile **VirtualFile, IAIMPStream **Stream) = 0;
 };
 
@@ -331,8 +343,8 @@ class IAIMPServiceFileStreaming: public IUnknown
 class IAIMPServiceFileSystems : public IUnknown
 {
 	public:
-		virtual HRESULT WINAPI Get(IAIMPString* FileURI, REFIID IID, void **Obj) = 0;
-		virtual HRESULT WINAPI GetDefault(REFIID IID, void **Obj) = 0;
+		virtual HRESULT WINAPI Get(IAIMPString* FileURI, CONSTIID IID, void **Obj) = 0;
+		virtual HRESULT WINAPI GetDefault(CONSTIID IID, void **Obj) = 0;
 };
 
 /* IAIMPServiceFileURI */
@@ -343,8 +355,8 @@ class IAIMPServiceFileURI: public IUnknown
 		virtual HRESULT WINAPI Build(IAIMPString* ContainerFileName, IAIMPString* PartName, IAIMPString** FileURI) = 0;
 		virtual HRESULT WINAPI Parse(IAIMPString* FileURI, IAIMPString** ContainerFileName, IAIMPString** PartName) = 0;
 
-		virtual HRESULT WINAPI ChangeFileExt(IAIMPString** FileURI, IAIMPString* NewExt, LongWord Flags) = 0;
-		virtual HRESULT WINAPI ExtractFileExt(IAIMPString* FileURI, IAIMPString** S, LongWord Flags) = 0;
+		virtual HRESULT WINAPI ChangeFileExt(IAIMPString** FileURI, IAIMPString* NewExt, DWORD Flags) = 0;
+		virtual HRESULT WINAPI ExtractFileExt(IAIMPString* FileURI, IAIMPString** S, DWORD Flags) = 0;
 		virtual HRESULT WINAPI ExtractFileName(IAIMPString* FileURI, IAIMPString* S) = 0;
 		virtual HRESULT WINAPI ExtractFileParentDirName(IAIMPString* FileURI, IAIMPString** S) = 0;
 		virtual HRESULT WINAPI ExtractFileParentName(IAIMPString* FileURI, IAIMPString** S) = 0;
@@ -358,6 +370,14 @@ class IAIMPServiceFileURI2 : public IAIMPServiceFileURI
 {
 	public:
 		virtual HRESULT WINAPI GetScheme(IAIMPString* FileURI, IAIMPString** Scheme) = 0;
+};
+
+/* IAIMPServiceFileURI3 */
+
+class IAIMPServiceFileURI3 : public IAIMPServiceFileURI2 // v6.0
+{
+	public:
+		virtual HRESULT WINAPI ProcessEnvironmentVariables(IAIMPString** FileURI, DWORD Flags) = 0;
 };
 
 #endif // !apiFileManagerH

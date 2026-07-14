@@ -3,12 +3,12 @@
 //  Project:   AIMP
 //             Programming Interface
 //
-//  Target:    v5.40 build 2650
+//  Target:    v6.00 build 3000
 //
 //  Purpose:   Menus API
 //
 //  Author:    Artem Izmaylov
-//             © 2006-2025
+//             © 2006-2026
 //             www.aimp.ru
 //
 //  FPC:       OK
@@ -38,6 +38,8 @@ const
   AIMP_MENUITEM_PROPID_STYLE        = 5; // Refer to the AIMP_MENUITEM_STYLE_XXX
   AIMP_MENUITEM_PROPID_EVENT        = 6;
   AIMP_MENUITEM_PROPID_EVENT_ONSHOW = 7;
+  AIMP_MENUITEM_PROPID_HINT         = 8; // v6.0
+  AIMP_MENUITEM_PROPID_TAG          = 9;
   AIMP_MENUITEM_PROPID_GLYPH        = 10;
   AIMP_MENUITEM_PROPID_PARENT       = 11;
   AIMP_MENUITEM_PROPID_VISIBLE      = 12;

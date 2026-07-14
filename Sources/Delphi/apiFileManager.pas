@@ -3,12 +3,12 @@
 //  Project:   AIMP
 //             Programming Interface
 //
-//  Target:    v5.40 build 2650
+//  Target:    v6.00 build 3000
 //
 //  Purpose:   File Manager API
 //
 //  Author:    Artem Izmaylov
-//             © 2006-2025
+//             © 2006-2026
 //             www.aimp.ru
 //
 //  FPC:       OK
@@ -64,6 +64,9 @@ const
 
   SID_IAIMPServiceFileURI2 = '{41494D50-5372-7646-696C-655552493200}';
   IID_IAIMPServiceFileURI2: TGUID = SID_IAIMPServiceFileURI2;
+
+  SID_IAIMPServiceFileURI3 = '{41494D50-5372-7646-696C-655552493300}';
+  IID_IAIMPServiceFileURI3: TGUID = SID_IAIMPServiceFileURI3;
 
   SID_IAIMPExtensionFileSystem = '{41494D50-4578-7446-5300-000000000000}';
   IID_IAIMPExtensionFileSystem: TGUID = SID_IAIMPExtensionFileSystem;
@@ -170,6 +173,18 @@ const
   // Factory IDs for IAIMPServiceFileInfoFormatter and IAIMPServiceFileInfoFormatterUtils
   AIMP_FILEINFO_FORMATTER_ID_BASIC   = 0;
   AIMP_FILEINFO_FORMATTER_ID_PLAYING = 1;
+
+  // Flags for IAIMPServiceFileURI3.ProcessEnvironmentVariables
+  AIMP_SERVICE_FILEURI_ENVAR_FLAG_EXPAND   = 0;
+  AIMP_SERVICE_FILEURI_ENVAR_FLAG_COLLAPSE = 1;
+
+  AIMP_SERVICE_FILEURI_ENVAR_APPDATA     = '%AppData%';
+  AIMP_SERVICE_FILEURI_ENVAR_DESKTOP     = '%Desktop%';
+  AIMP_SERVICE_FILEURI_ENVAR_HOME        = '%Home%';
+  AIMP_SERVICE_FILEURI_ENVAR_MYDOCUMENTS = '%MyDocuments%';
+  AIMP_SERVICE_FILEURI_ENVAR_MYMUSIC     = '%MyMusic%';
+  AIMP_SERVICE_FILEURI_ENVAR_PROFILE     = '%Profile%';
+  AIMP_SERVICE_FILEURI_ENVAR_TEMP        = '%Temp%';
 
 type
 
@@ -389,6 +404,13 @@ type
   IAIMPServiceFileURI2 = interface(IAIMPServiceFileURI)
   [SID_IAIMPServiceFileURI2]
     function GetScheme(FileURI: IAIMPString; out Scheme: IAIMPString): HRESULT; stdcall;
+  end;
+
+  { IAIMPServiceFileURI3 }
+
+  IAIMPServiceFileURI3 = interface(IAIMPServiceFileURI2) // v6.0
+  [SID_IAIMPServiceFileURI3]
+    function ProcessEnvironmentVariables(var FileURI: IAIMPString; Flags: LongWord): HRESULT; stdcall;
   end;
 
 implementation

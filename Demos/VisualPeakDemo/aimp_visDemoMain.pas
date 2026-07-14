@@ -1,20 +1,25 @@
 ﻿unit aimp_visDemoMain;
 
+{$I apiConfig.inc}
+
 interface
 
 uses
+{$IFDEF MSWINDOWS}
   Windows,
+{$ELSE}
+  Cairo,
+{$ENDIF}
   // System
-  System.Classes,
-  System.SysUtils,
-  // VCL
-  Vcl.Graphics,
+  Classes,
+  SysUtils,
   // SDK
   apiCore,
   apiObjects,
   apiPlugin,
-  apiWrappers,
   apiVisuals,
+  apiTypes,
+  apiWrappers,
   AIMPCustomPlugin;
 
 type
@@ -23,7 +28,7 @@ type
 
   TVisualPlugin = class(TAIMPCustomPlugin)
   protected
-    function InfoGet(Index: Integer): PWideChar; override;
+    function InfoGet(Index: Integer): PChar; override;
     function InfoGetCategories: Cardinal; override;
     function Initialize(Core: IAIMPCore): HRESULT; override;
   end;
@@ -33,8 +38,12 @@ type
   TVisualization = class(TInterfacedObject,
     IAIMPExtensionEmbeddedVisualization)
   strict private
-    FCanvas: TCanvas;
+    FBarIndent: Integer;
+    FBarHeight: Integer;
     FWidth, FHeight: Integer;
+  {$IFDEF MSWINDOWS}
+    FBrush: HBRUSH;
+  {$ENDIF}
   public
     // IAIMPExtensionEmbeddedVisualization
     function GetFlags: Integer; stdcall;
@@ -45,7 +54,7 @@ type
     procedure Finalize; stdcall;
     // Basic functionality
     procedure Click(X, Y: Integer; Button: Integer); stdcall;
-    procedure Draw(DC: HDC; Data: PAIMPVisualData); stdcall;
+    procedure Draw(DC: HCANVAS; Data: PAIMPVisualData); stdcall;
     procedure Resize(NewWidth, NewHeight: Integer); stdcall;
   end;
 
@@ -53,7 +62,7 @@ implementation
 
 { TVisualPlugin }
 
-function TVisualPlugin.InfoGet(Index: Integer): PWideChar;
+function TVisualPlugin.InfoGet(Index: Integer): PChar;
 begin
   case Index of
     AIMP_PLUGIN_INFO_NAME:
@@ -83,27 +92,51 @@ begin
   // do nothing
 end;
 
-procedure TVisualization.Draw(DC: HDC; Data: PAIMPVisualData);
+procedure TVisualization.Draw(DC: HCANVAS; Data: PAIMPVisualData);
 begin
-  FCanvas.Handle := DC;
-  try
-    // fill the background
-    FCanvas.Brush.Color := clBlack;
-    FCanvas.FillRect(Rect(0, 0, FWidth, FHeight));
-    // draw left peak
-    FCanvas.Brush.Color := clLime;
-    FCanvas.FillRect(Rect(0, 10, Round(FWidth * Data^.Peaks[0]), FHeight div 2 - 5));
-    // draw right peak
-    FCanvas.Brush.Color := clLime;
-    FCanvas.FillRect(Rect(0, FHeight div 2 + 5, Round(FWidth * Data^.Peaks[0]), FHeight - 10));
-  finally
-    FCanvas.Handle := 0;
-  end;
+  // --------------------------------------------
+  // INDENT
+  // [======= BAR =========]
+  // INDENT
+  // [======= BAR =========]
+  // INDENT
+  // --------------------------------------------
+{$IFDEF MSWINDOWS}
+
+  // fill the background
+  FillRect(DC, Rect(0, 0, FWidth, FHeight), GetStockObject(BLACK_BRUSH));
+
+  // draw left peak
+  FillRect(DC, Bounds(0, FBarIndent, Round(FWidth * Data^.Peaks[0]), FBarHeight), FBrush);
+
+  // draw right peak
+  FillRect(DC, Bounds(0, FBarIndent + FBarHeight + FBarIndent, Round(FWidth * Data^.Peaks[1]), FBarHeight), FBrush);
+
+{$ELSE}
+
+  // fill the background
+  cairo_set_source_rgb(DC, 0, 0, 0); // Black
+  cairo_rectangle(DC, 0, 0, FWidth, FHeight);
+  cairo_fill(DC);
+
+  // draw left peak
+  cairo_set_source_rgb(DC, 0, 1.0, 0); // Green
+  cairo_rectangle(DC, 0, FBarIndent, FWidth * Data^.Peaks[0], FBarHeight);
+  cairo_fill(DC);
+
+  // draw right peak
+  cairo_set_source_rgb(DC, 0, 1.0, 0); // Green
+  cairo_rectangle(DC, 0, FBarIndent + FBarHeight + FBarIndent, FWidth * Data^.Peaks[1], FBarHeight);
+  cairo_fill(DC);
+
+{$ENDIF}
 end;
 
 procedure TVisualization.Finalize;
 begin
-  FreeAndNil(FCanvas);
+{$IFDEF MSWINDOWS}
+  DeleteObject(FBrush);
+{$ENDIF}
 end;
 
 function TVisualization.GetFlags: Integer;
@@ -124,15 +157,26 @@ end;
 
 function TVisualization.Initialize(Width, Height: Integer): HRESULT;
 begin
-  FCanvas := TCanvas.Create;
+{$IFDEF MSWINDOWS}
+  FBrush := CreateSolidBrush(RGB(0, 255, 0)); // Green
+{$ENDIF}
   Resize(Width, Height);
   Result := S_OK;
 end;
 
 procedure TVisualization.Resize(NewWidth, NewHeight: Integer);
 begin
+  // --------------------------------------------
+  // INDENT
+  // [======= BAR =========]
+  // INDENT
+  // [======= BAR =========]
+  // INDENT
+  // --------------------------------------------
   FHeight := NewHeight;
   FWidth := NewWidth;
+  FBarIndent := (NewHeight div 8);
+  FBarHeight := (FHeight - 3 * FBarIndent) div 2;
 end;
 
 end.

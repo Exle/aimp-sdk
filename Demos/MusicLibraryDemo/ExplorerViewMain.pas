@@ -1,11 +1,21 @@
 ﻿unit ExplorerViewMain;
 
+{$I apiConfig.inc}
+
 interface
 
 uses
-  Windows, ActiveX, SysUtils,
+  Classes,
+  System.IOUtils,
+  SysUtils,
   // API
-  apiCore, apiMusicLibrary, apiWrappers, apiPlugin, apiObjects, apiFileManager,
+  apiCore,
+  apiFileManager,
+  apiMusicLibrary,
+  apiObjects,
+  apiPlugin,
+  apiTypes,
+  apiWrappers,
   // Wrappers
   AIMPCustomPlugin;
 
@@ -15,8 +25,8 @@ type
 
   TDemoExplorerViewPlugin = class(TAIMPCustomPlugin)
   protected
-    function InfoGet(Index: Integer): PWideChar; override; stdcall;
-    function InfoGetCategories: Cardinal; override; stdcall;
+    function InfoGet(Index: Integer): PChar; override; stdcall;
+    function InfoGetCategories: LongWord; override; stdcall;
     function Initialize(Core: IAIMPCore): HRESULT; override; stdcall;
   end;
 
@@ -29,9 +39,9 @@ type
     FManager: IAIMPMLDataStorageManager;
 
     function CreateField(const AName: string; AType: Integer; AFlags: Integer = 0): IAIMPMLDataField;
-    function GetRootPath(const AFilter: IAIMPMLDataFilter; out APath: UnicodeString): Boolean;
+    function GetRootPath(const AFilter: IAIMPMLDataFilter; out APath: string): Boolean;
   protected
-    procedure DoGetValueAsInt32(PropertyID: Integer; out Value: Integer; var Result: HRESULT); override;
+    procedure DoGetValue(PropID: Integer; out Value: Variant; var Result: HRESULT); override;
     function DoGetValueAsObject(PropertyID: Integer): IInterface; override;
   public
     // IAIMPMLDataProvider
@@ -52,14 +62,14 @@ type
   TDemoExplorerViewAbstractDataProviderSelection = class abstract(TInterfacedObject,
     IAIMPMLDataProviderSelection)
   strict private
-    FTempBuffer: UnicodeString;
+    FTempBuffer: string;
   public
     // IAIMPMLDataProviderSelection
     function GetValueAsFloat(AFieldIndex: Integer): Double; virtual; stdcall;
     function GetValueAsInt32(AFieldIndex: Integer): Integer; virtual; stdcall;
     function GetValueAsInt64(AFieldIndex: Integer): Int64; virtual; stdcall;
-    function GetValueAsString(AFieldIndex: Integer; out ALength: Integer): PWideChar; overload; stdcall;
-    function GetValueAsString(AFieldIndex: Integer): UnicodeString; overload; virtual; abstract;
+    function GetValueAsString(AFieldIndex: Integer; out ALength: Integer): PChar; overload; stdcall;
+    function GetValueAsString(AFieldIndex: Integer): string; overload; virtual; abstract;
     function NextRow: LongBool; virtual; stdcall; abstract;
   end;
 
@@ -67,25 +77,13 @@ type
 
   TDemoExplorerViewCustomDataProviderSelection = class abstract(TDemoExplorerViewAbstractDataProviderSelection)
   protected
-    FRootPath: UnicodeString;
+    FRootPath: string;
     FSearchRec: TSearchRec;
-
     function CheckRecordAttr: Boolean; virtual; abstract;
   public
-    constructor Create(const APath: UnicodeString);
+    constructor Create(const APath: string);
     destructor Destroy; override;
     function NextRow: LongBool; override;
-  end;
-
-  { TDemoExplorerViewGroupingTreeDrivesProvider }
-
-  TDemoExplorerViewGroupingTreeDrivesProvider = class(TDemoExplorerViewAbstractDataProviderSelection)
-  strict private
-    FDrive: WideChar;
-  public
-    constructor Create;
-    function GetValueAsString(AFieldIndex: Integer): string; override;
-    function NextRow: LongBool; override; stdcall;
   end;
 
   { TDemoExplorerViewGroupingTreeFoldersProvider }
@@ -97,11 +95,24 @@ type
     function GetValueAsString(AFieldIndex: Integer): string; override;
   end;
 
+  { TDemoExplorerViewGroupingTreeRootProvider }
+
+  TDemoExplorerViewGroupingTreeRootProvider = class(TDemoExplorerViewAbstractDataProviderSelection)
+  strict private
+    FList: TStrings;
+    FListIndex: Integer;
+  public
+    constructor Create;
+    destructor Destroy; override;
+    function GetValueAsString(AFieldIndex: Integer): string; override;
+    function NextRow: LongBool; override; stdcall;
+  end;
+
   { TDemoExplorerViewDataProviderSelection }
 
   TDemoExplorerViewDataProviderSelection = class(TDemoExplorerViewCustomDataProviderSelection)
   strict private
-    FAudioExts: UnicodeString;
+    FAudioExts: string;
     FFieldFileAccessTime: Integer;
     FFieldFileCreationTime: Integer;
     FFieldFileFormat: Integer;
@@ -110,7 +121,7 @@ type
   protected
     function CheckRecordAttr: Boolean; override;
   public
-    constructor Create(const APath: UnicodeString; AFields: IAIMPObjectList);
+    constructor Create(const APath: string; AFields: IAIMPObjectList);
     function GetValueAsFloat(FieldIndex: Integer): Double; override;
     function GetValueAsInt64(FieldIndex: Integer): Int64; override;
     function GetValueAsString(AFieldIndex: Integer): string; override;
@@ -118,8 +129,10 @@ type
 
 implementation
 
+{$IF DEFINED(HAS_ACL)}
 uses
-  DateUtils;
+  ACL.Utils.FileSystem.Watcher;
+{$ENDIF}
 
 const
   // DataStorage Fields
@@ -134,23 +147,9 @@ const
 type
   TEnumDataFieldFiltersProc = reference to function (AFilter: IAIMPMLDataFieldFilter): Boolean;
 
-function FileTimeToDateTime(const FileTime: TFileTime): TDateTime;
-var
-  ModifiedTime: TFileTime;
-  SystemTime: TSystemTime;
-begin
-  Result := 0;
-  if (FileTime.dwLowDateTime > 0) and (FileTime.dwHighDateTime > 0) then
-  try
-    FileTimeToLocalFileTime(FileTime, ModifiedTime);
-    FileTimeToSystemTime(ModifiedTime, SystemTime);
-    Result := SystemTimeToDateTime(SystemTime);
-  except
-    Result := 0;
-  end;
-end;
-
-function EnumDataFieldFilters(const AFilter: IAIMPMLDataFilterGroup; const AProc: TEnumDataFieldFiltersProc): Boolean;
+function EnumDataFieldFilters(
+  const AFilter: IAIMPMLDataFilterGroup;
+  const AProc: TEnumDataFieldFiltersProc): Boolean;
 var
   AFieldFilter: IAIMPMLDataFieldFilter;
   AGroup: IAIMPMLDataFilterGroup;
@@ -185,7 +184,7 @@ begin
     end;
 end;
 
-function acExtractFileFormat(const FileName: UnicodeString): UnicodeString;
+function acExtractFileFormat(const FileName: string): string;
 var
   I: Integer;
 begin
@@ -198,13 +197,13 @@ end;
 
 { TDemoExplorerViewPlugin }
 
-function TDemoExplorerViewPlugin.InfoGet(Index: Integer): PWideChar;
+function TDemoExplorerViewPlugin.InfoGet(Index: Integer): PChar;
 begin
   case Index of
     AIMP_PLUGIN_INFO_NAME:
       Result := 'Explorer View Demo';
     AIMP_PLUGIN_INFO_SHORT_DESCRIPTION:
-      Result := 'Demo plugin based on AIMP API v4.10';
+      Result := 'Shows how to integrate a custom data source into the Music Library';
     AIMP_PLUGIN_INFO_AUTHOR:
       Result := 'Artem Izmaylov';
   else
@@ -220,26 +219,30 @@ end;
 function TDemoExplorerViewPlugin.Initialize(Core: IAIMPCore): HRESULT;
 begin
   Result := inherited Initialize(Core);
+{$IF DEFINED(HAS_ACL)}
+  TACLDriveManager.EnsureInit;
+{$ENDIF}
   Core.RegisterExtension(IAIMPServiceMusicLibrary, TDemoExplorerViewDataStorage.Create);
 end;
 
 { TDemoExplorerViewDataStorage }
 
-function TDemoExplorerViewDataStorage.GetData(Fields: IAIMPObjectList; Filter: IAIMPMLDataFilter; out Data: IInterface): HRESULT;
+function TDemoExplorerViewDataStorage.GetData(
+  Fields: IAIMPObjectList; Filter: IAIMPMLDataFilter; out Data: IInterface): HRESULT;
 var
-  APath: UnicodeString;
+  LPath: string;
 begin
   try
     if (Fields.GetCount = 1) and (GetFieldIndex(Fields, EVDS_Fake) = 0) then // Is it request from grouping tree?
     begin
-      if GetRootPath(Filter, APath) then
-        Data := TDemoExplorerViewGroupingTreeFoldersProvider.Create(APath)
+      if GetRootPath(Filter, LPath) then
+        Data := TDemoExplorerViewGroupingTreeFoldersProvider.Create(LPath)
       else
-        Data := TDemoExplorerViewGroupingTreeDrivesProvider.Create;
+        Data := TDemoExplorerViewGroupingTreeRootProvider.Create;
     end
     else
-      if GetRootPath(Filter, APath) then
-        Data := TDemoExplorerViewDataProviderSelection.Create(APath, Fields)
+      if GetRootPath(Filter, LPath) then
+        Data := TDemoExplorerViewDataProviderSelection.Create(LPath, Fields)
       else
         Data := LangLoadStringEx('ExplorerView\NoData');
 
@@ -293,7 +296,8 @@ begin
   Result := S_OK;
 end;
 
-function TDemoExplorerViewDataStorage.GetGroupingPresets(Schema: Integer; Presets: IAIMPMLGroupingPresets): HRESULT;
+function TDemoExplorerViewDataStorage.GetGroupingPresets(
+  Schema: Integer; Presets: IAIMPMLGroupingPresets): HRESULT;
 var
   APreset: IAIMPMLGroupingPresetStandard;
 begin
@@ -318,9 +322,10 @@ begin
   FManager := AManager;
 end;
 
-procedure TDemoExplorerViewDataStorage.DoGetValueAsInt32(PropertyID: Integer; out Value: Integer; var Result: HRESULT);
+procedure TDemoExplorerViewDataStorage.DoGetValue(
+  PropID: Integer; out Value: Variant; var Result: HRESULT);
 begin
-  case PropertyID of
+  case PropID of
     AIMPML_DATASTORAGE_PROPID_CAPABILITIES:
       Value := 0; // Supress all features
   else
@@ -340,7 +345,8 @@ begin
   end
 end;
 
-function TDemoExplorerViewDataStorage.CreateField(const AName: string; AType: Integer; AFlags: Integer = 0): IAIMPMLDataField;
+function TDemoExplorerViewDataStorage.CreateField(
+  const AName: string; AType: Integer; AFlags: Integer = 0): IAIMPMLDataField;
 begin
   CoreCreateObject(IAIMPMLDataField, Result);
   CheckResult(Result.SetValueAsInt32(AIMPML_FIELD_PROPID_TYPE, AType));
@@ -348,7 +354,8 @@ begin
   CheckResult(Result.SetValueAsInt32(AIMPML_FIELD_PROPID_FLAGS, AIMPML_FIELDFLAG_FILTERING or AFlags));
 end;
 
-function TDemoExplorerViewDataStorage.GetRootPath(const AFilter: IAIMPMLDataFilter; out APath: UnicodeString): Boolean;
+function TDemoExplorerViewDataStorage.GetRootPath(
+  const AFilter: IAIMPMLDataFilter; out APath: string): Boolean;
 var
   AString: IAIMPString;
 begin
@@ -366,7 +373,8 @@ begin
 
       // Check Field Operation
       Result := Result and Succeeded(AFilter.GetValueAsInt32(AIMPML_FIELDFILTER_OPERATION, AValue)) and
-        ((AValue = AIMPML_FIELDFILTER_OPERATION_BEGINSWITH) or (AValue = AIMPML_FIELDFILTER_OPERATION_EQUALS));
+        ((AValue = AIMPML_FIELDFILTER_OPERATION_BEGINSWITH) or
+         (AValue = AIMPML_FIELDFILTER_OPERATION_EQUALS));
 
       // Extract the value
       Result := Result and Succeeded(AFilter.GetValueAsObject(AIMPML_FIELDFILTER_VALUE1, IAIMPString, AString));
@@ -393,25 +401,21 @@ begin
   Result := 0;
 end;
 
-function TDemoExplorerViewAbstractDataProviderSelection.GetValueAsString(AFieldIndex: Integer; out ALength: Integer): PWideChar;
+function TDemoExplorerViewAbstractDataProviderSelection.GetValueAsString(
+  AFieldIndex: Integer; out ALength: Integer): PChar;
 begin
   FTempBuffer := GetValueAsString(AFieldIndex);
   ALength := Length(FTempBuffer);
-  Result := PWideChar(FTempBuffer);
+  Result := PChar(FTempBuffer);
 end;
 
 { TDemoExplorerViewCustomDataProviderSelection }
 
-constructor TDemoExplorerViewCustomDataProviderSelection.Create(const APath: UnicodeString);
+constructor TDemoExplorerViewCustomDataProviderSelection.Create(const APath: string);
 begin
   FRootPath := IncludeTrailingPathDelimiter(APath);
   if FindFirst(FRootPath + '*', faAnyFile, FSearchRec) <> 0 then
     Abort;
-  while (FSearchRec.Name = '.') or (FSearchRec.Name = '..') do
-  begin
-    if not NextRow then
-      Abort;
-  end;
   while not CheckRecordAttr do
   begin
     if not NextRow then
@@ -429,57 +433,64 @@ function TDemoExplorerViewCustomDataProviderSelection.NextRow: LongBool;
 begin
   repeat
     Result := FindNext(FSearchRec) = 0;
-  until not Result or CheckRecordAttr ;
+  until not Result or CheckRecordAttr;
 end;
 
-{ TDemoExplorerViewGroupingTreeDrivesProvider }
+{ TDemoExplorerViewGroupingTreeRootProvider }
 
-constructor TDemoExplorerViewGroupingTreeDrivesProvider.Create;
+constructor TDemoExplorerViewGroupingTreeRootProvider.Create;
 begin
-  FDrive := 'C';
+  FList := TStringList.Create;
+{$IFDEF MSWINDOWS}
+  FList.AddStrings(TDirectory.GetLogicalDrives);
+{$ELSE}
+  FList.Add(TPath.GetHomePath);
+{$ENDIF}
+  // Linux: if we have the ACL library, use it to get a list of mounted flash drives.
+{$IF DEFINED(HAS_ACL)}
+  TACLDriveManager.Enum(
+    procedure (const Drive: TACLDriveInfo)
+    begin
+      if not FList.Contains(Drive.Path) then
+        FList.Add(Drive.Path);
+    end);
+{$ENDIF}
 end;
 
-function TDemoExplorerViewGroupingTreeDrivesProvider.GetValueAsString(AFieldIndex: Integer): string;
+destructor TDemoExplorerViewGroupingTreeRootProvider.Destroy;
 begin
-  Result := FDrive + ':\';
+  FreeAndNil(FList);
+  inherited;
 end;
 
-function TDemoExplorerViewGroupingTreeDrivesProvider.NextRow: LongBool;
-var
-  AAttr: Cardinal;
-  AErrorMode: Integer;
+function TDemoExplorerViewGroupingTreeRootProvider.GetValueAsString(AFieldIndex: Integer): string;
 begin
-  Result := False;
-  while FDrive < 'Z' do
-  begin
-    FDrive := Char(Ord(FDrive) + 1);
+  Result := FList[FListIndex];
+end;
 
-    AErrorMode := SetErrorMode(SEM_FailCriticalErrors);
-    try
-      AAttr := GetFileAttributesW(PWideChar(FDrive + ':'));
-      if (AAttr <> INVALID_FILE_ATTRIBUTES) and (AAttr and FILE_ATTRIBUTE_DIRECTORY <> 0) then
-        Exit(True);
-    finally
-      SetErrorMode(AErrorMode);
-    end;
-  end;
+function TDemoExplorerViewGroupingTreeRootProvider.NextRow: LongBool;
+begin
+  Inc(FListIndex);
+  Result := FListIndex < FList.Count;
 end;
 
 { TDemoExplorerViewGroupingTreeFoldersProvider }
+
+function TDemoExplorerViewGroupingTreeFoldersProvider.CheckRecordAttr: Boolean;
+begin
+  Result :=
+    (FSearchRec.Attr and faDirectory = faDirectory) and
+    (FSearchRec.Attr and faSysFile = 0) and (FSearchRec.Name[1] <> '.');
+end;
 
 function TDemoExplorerViewGroupingTreeFoldersProvider.GetValueAsString(AFieldIndex: Integer): string;
 begin
   Result := FRootPath + IncludeTrailingPathDelimiter(FSearchRec.Name);
 end;
 
-function TDemoExplorerViewGroupingTreeFoldersProvider.CheckRecordAttr: Boolean;
-begin
-  Result := (FSearchRec.Attr and faDirectory = faDirectory) and (FSearchRec.Attr and faSysFile = 0);
-end;
-
 { TDemoExplorerViewDataProviderSelection }
 
-constructor TDemoExplorerViewDataProviderSelection.Create(const APath: UnicodeString; AFields: IAIMPObjectList);
+constructor TDemoExplorerViewDataProviderSelection.Create(const APath: string; AFields: IAIMPObjectList);
 var
   AService: IAIMPServiceFileFormats;
   AString: IAIMPString;
@@ -499,15 +510,20 @@ begin
   FFieldID := GetFieldIndex(AFields, EVDS_ID);
 end;
 
+function TDemoExplorerViewDataProviderSelection.CheckRecordAttr: Boolean;
+begin
+  Result := (FSearchRec.Attr and faDirectory = 0) and
+    (Pos(LowerCase('*' + ExtractFileExt(FSearchRec.Name) + ';'), FAudioExts) > 0);
+end;
+
 function TDemoExplorerViewDataProviderSelection.GetValueAsFloat(FieldIndex: Integer): Double;
 begin
   if FieldIndex = FFieldFileAccessTime then
-    Result := FileTimeToDateTime(FSearchRec.FindData.ftLastAccessTime)
+    Result := TFile.GetLastAccessTime(GetValueAsString(FFieldFileName))
+  else if FieldIndex = FFieldFileCreationTime then
+    Result := TFile.GetCreationTime(GetValueAsString(FFieldFileName))
   else
-    if FieldIndex = FFieldFileCreationTime then
-      Result := FileTimeToDateTime(FSearchRec.FindData.ftCreationTime)
-    else
-      Result := 0;
+    Result := 0;
 end;
 
 function TDemoExplorerViewDataProviderSelection.GetValueAsInt64(FieldIndex: Integer): Int64;
@@ -519,17 +535,10 @@ function TDemoExplorerViewDataProviderSelection.GetValueAsString(AFieldIndex: In
 begin
   if AFieldIndex = FFieldFileFormat then
     Result := acExtractFileFormat(FSearchRec.Name)
+  else if AFieldIndex = FFieldID then
+    Result := LowerCase(FSearchRec.Name)
   else
-    if AFieldIndex = FFieldID then
-      Result := LowerCase(FSearchRec.Name)
-    else
-      Result := FRootPath + FSearchRec.Name;
-end;
-
-function TDemoExplorerViewDataProviderSelection.CheckRecordAttr: Boolean;
-begin
-  Result := (FSearchRec.Attr and faDirectory = 0) and
-    (Pos(LowerCase('*' + ExtractFileExt(FSearchRec.Name) + ';'), FAudioExts) > 0);
+    Result := FRootPath + FSearchRec.Name;
 end;
 
 end.

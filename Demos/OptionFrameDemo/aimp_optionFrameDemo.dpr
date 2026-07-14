@@ -1,12 +1,9 @@
 ﻿library aimp_optionFrameDemo;
 
 uses
-  Windows,
   apiPlugin,
-  uOptionFrameDemoForm in 'uOptionFrameDemoForm.pas' {frmOptionFrameDemo},
+  apiTypes,
   uOptionFrameDemo in 'uOptionFrameDemo.pas';
-
-{$R *.res}
 
 function AIMPPluginGetHeader(out Header: IAIMPPlugin): HRESULT; stdcall;
 begin

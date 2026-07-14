@@ -1,13 +1,30 @@
 ﻿unit DemoCustomFileSystemMain;
 
+{$I apiConfig.inc}
+
 interface
 
 uses
-  Windows, Classes, ShlObj, Types,
+{$IFDEF MSWINDOWS}
+  ShlObj,
+  Windows,
+{$ENDIF}
+  // RTL
+  Classes,
+  SysUtils,
+  System.IOUtils,
+  Types,
   // API
-  apiPlugin, apiFileManager, apiMenu, apiCore, apiActions, apiPlaylists, apiObjects,
-  // Wrappers
-  AIMPCustomPlugin, apiWrappers;
+  apiActions,
+  apiCore,
+  apiFileManager,
+  apiMenu,
+  apiObjects,
+  apiPlaylists,
+  apiPlugin,
+  apiTypes,
+  apiWrappers,
+  AIMPCustomPlugin;
 
 type
 
@@ -39,14 +56,13 @@ type
     IAIMPFileSystemCommandStreaming,
     IAIMPExtensionFileSystem)
   strict private
-    FRootPath: UnicodeString;
+    FRootPath: string;
 
     function GetCommandForDefaultFileSystem(const IID: TGUID; out Obj): Boolean;
     function TranslateFileName(const AFileName: IAIMPString): IAIMPString;
   protected
     // IAIMPExtensionFileSystem
-    procedure DoGetValueAsInt32(PropertyID: Integer; out Value: Integer; var Result: HRESULT); override;
-    function DoGetValueAsObject(PropertyID: Integer): IInterface; override;
+    procedure DoGetValue(PropertyID: Integer; out Value: Variant; var Result: HRESULT); override;
     // IAIMPFileSystemCommandCopyToClipboard
     function CopyToClipboard(Files: IAIMPObjectList): HRESULT; stdcall;
     // IAIMPFileSystemCommandDropSource
@@ -66,7 +82,8 @@ type
     function CanOpenFileFolder(FileName: IAIMPString): HRESULT; stdcall;
     function OpenFileFolder(FileName: IAIMPString): HRESULT; stdcall;
     // IAIMPFileSystemCommandStreaming
-    function CreateStream(FileName: IAIMPString; const Offset, Size: Int64; Flags: Cardinal; out Stream: IAIMPStream): HRESULT; overload; stdcall;
+    function CreateStream(FileName: IAIMPString; const Offset, Size: Int64;
+      Flags: Cardinal; out Stream: IAIMPStream): HRESULT; overload; stdcall;
   public
     constructor Create; virtual;
   end;
@@ -77,33 +94,34 @@ type
   strict private
     procedure HandlerMenuItemClick(Sender: TObject);
   protected
-    function InfoGet(Index: Integer): PWideChar; override; stdcall;
+    function InfoGet(Index: Integer): PChar; override; stdcall;
     function InfoGetCategories: Cardinal; override; stdcall;
     function Initialize(Core: IAIMPCore): HRESULT; override; stdcall;
   end;
 
 implementation
 
-uses
-  ActiveX, SysUtils, IOUtils;
-
 const
   sMyScheme = 'mymusic';
-  sMySchemePrefix = sMyScheme + ':\\';
+  sMySchemePrefix = sMyScheme + '://';
 
-function ShellGetSystemFolder(AFolder: Integer): UnicodeString;
+{$IFDEF LINUX}
+function g_get_user_special_dir(directory: DWORD): PChar; cdecl; external 'libgobject-2.0.so.0';
+{$ENDIF}
+
+function ShellGetMyMusic: string;
+{$IFDEF MSWINDOWS}
 var
-  ABuf: array[0..MAX_PATH] of WideChar;
+  LBuffer: array[0..MAX_PATH] of WideChar;
 begin
-  if SHGetSpecialFolderPathW(0, @ABuf[0], AFolder, False) then
-    Result := IncludeTrailingPathDelimiter(ABuf)
+  if SHGetSpecialFolderPathW(0, @LBuffer[0], CSIDL_MYMUSIC, False) then
+    Result := IncludeTrailingPathDelimiter(LBuffer)
   else
     Result := '';
-end;
-
-function ShellGetMyMusic: UnicodeString;
+{$ELSE}
 begin
-  Result := ShellGetSystemFolder(CSIDL_MYMUSIC);
+  Result := IncludeTrailingPathDelimiter(g_get_user_special_dir({G_USER_DIRECTORY_MUSIC}3));
+{$ENDIF}
 end;
 
 { TMenuItemHandler }
@@ -113,7 +131,7 @@ begin
   FEvent := AEvent;
 end;
 
-procedure TMenuItemHandler.OnExecute(Data: IInterface);
+procedure TMenuItemHandler.OnExecute(Data: IInterface); stdcall;
 begin
   FEvent(nil);
 end;
@@ -125,33 +143,27 @@ begin
   FRootPath := ShellGetMyMusic;
 end;
 
-procedure TMyMusicFileSystem.DoGetValueAsInt32(PropertyID: Integer; out Value: Integer; var Result: HRESULT);
+procedure TMyMusicFileSystem.DoGetValue(
+  PropertyID: Integer; out Value: Variant; var Result: HRESULT);
 begin
-  if PropertyID = AIMP_FILESYSTEM_PROPID_READONLY then
-  begin
-    Result := S_OK;
-    Value := 0;
+  case PropertyID of
+    AIMP_FILESYSTEM_PROPID_READONLY:
+      Value := 0;
+    AIMP_FILESYSTEM_PROPID_SCHEME:
+      Value := sMyScheme;
+  else
+    inherited;
   end
-  else
-    inherited DoGetValueAsInt32(PropertyID, Value, Result);
 end;
 
-function TMyMusicFileSystem.DoGetValueAsObject(PropertyID: Integer): IInterface;
-begin
-  if PropertyID = AIMP_FILESYSTEM_PROPID_SCHEME then
-    Result := MakeString(sMyScheme)
-  else
-    Result := inherited DoGetValueAsObject(PropertyID);
-end;
-
-function TMyMusicFileSystem.CopyToClipboard(Files: IAIMPObjectList): HRESULT;
+function TMyMusicFileSystem.CopyToClipboard(Files: IAIMPObjectList): HRESULT; stdcall;
 var
   AFileName: IAIMPString;
-  AIntf: IAIMPFileSystemCommandCopyToClipboard;
+  LIntf: IAIMPFileSystemCommandCopyToClipboard;
   AList: IAIMPObjectList;
   I: Integer;
 begin
-  if GetCommandForDefaultFileSystem(IAIMPFileSystemCommandCopyToClipboard, AIntf) then
+  if GetCommandForDefaultFileSystem(IAIMPFileSystemCommandCopyToClipboard, LIntf) then
   begin
     CoreCreateObject(IAIMPObjectList, AList);
     for I := 0 to Files.GetCount - 1 do
@@ -159,94 +171,94 @@ begin
       if Succeeded(Files.GetObject(I, IAIMPString, AFileName)) then
         AList.Add(TranslateFileName(AFileName));
     end;
-    Result := AIntf.CopyToClipboard(AList);
+    Result := LIntf.CopyToClipboard(AList);
   end
   else
     Result := E_NOTIMPL;
 end;
 
-function TMyMusicFileSystem.CreateStream(FileName: IAIMPString; out Stream: IAIMPStream): HRESULT;
+function TMyMusicFileSystem.CreateStream(FileName: IAIMPString; out Stream: IAIMPStream): HRESULT; stdcall;
 begin
   Result := CreateStream(FileName, -1, -1, 0, Stream);
 end;
 
-function TMyMusicFileSystem.GetFileAttrs(FileName: IAIMPString; out Attrs: TAIMPFileAttributes): HRESULT;
+function TMyMusicFileSystem.GetFileAttrs(FileName: IAIMPString; out Attrs: TAIMPFileAttributes): HRESULT; stdcall;
 var
-  AIntf: IAIMPFileSystemCommandFileInfo;
+  LIntf: IAIMPFileSystemCommandFileInfo;
 begin
-  if GetCommandForDefaultFileSystem(IAIMPFileSystemCommandFileInfo, AIntf) then
-    Result := AIntf.GetFileAttrs(TranslateFileName(FileName), Attrs)
+  if GetCommandForDefaultFileSystem(IAIMPFileSystemCommandFileInfo, LIntf) then
+    Result := LIntf.GetFileAttrs(TranslateFileName(FileName), Attrs)
   else
     Result := E_NOTIMPL;
 end;
 
-function TMyMusicFileSystem.GetFileSize(FileName: IAIMPString; out Size: Int64): HRESULT;
+function TMyMusicFileSystem.GetFileSize(FileName: IAIMPString; out Size: Int64): HRESULT; stdcall;
 var
-  AIntf: IAIMPFileSystemCommandFileInfo;
+  LIntf: IAIMPFileSystemCommandFileInfo;
 begin
-  if GetCommandForDefaultFileSystem(IAIMPFileSystemCommandFileInfo, AIntf) then
-    Result := AIntf.GetFileSize(TranslateFileName(FileName), Size)
+  if GetCommandForDefaultFileSystem(IAIMPFileSystemCommandFileInfo, LIntf) then
+    Result := LIntf.GetFileSize(TranslateFileName(FileName), Size)
   else
     Result := E_NOTIMPL;
 end;
 
-function TMyMusicFileSystem.IsFileExists(FileName: IAIMPString): HRESULT;
+function TMyMusicFileSystem.IsFileExists(FileName: IAIMPString): HRESULT; stdcall;
 var
-  AIntf: IAIMPFileSystemCommandFileInfo;
+  LIntf: IAIMPFileSystemCommandFileInfo;
 begin
-  if GetCommandForDefaultFileSystem(IAIMPFileSystemCommandFileInfo, AIntf) then
-    Result := AIntf.IsFileExists(TranslateFileName(FileName))
+  if GetCommandForDefaultFileSystem(IAIMPFileSystemCommandFileInfo, LIntf) then
+    Result := LIntf.IsFileExists(TranslateFileName(FileName))
   else
     Result := E_NOTIMPL;
 end;
 
-function TMyMusicFileSystem.CanDelete(FileName: IAIMPString): HRESULT;
+function TMyMusicFileSystem.CanDelete(FileName: IAIMPString): HRESULT; stdcall;
 var
-  AIntf: IAIMPFileSystemCommandDelete;
+  LIntf: IAIMPFileSystemCommandDelete;
 begin
-  if GetCommandForDefaultFileSystem(IAIMPFileSystemCommandDelete, AIntf) then
-    Result := AIntf.CanProcess(TranslateFileName(FileName))
+  if GetCommandForDefaultFileSystem(IAIMPFileSystemCommandDelete, LIntf) then
+    Result := LIntf.CanProcess(TranslateFileName(FileName))
   else
     Result := E_NOTIMPL;
 end;
 
-function TMyMusicFileSystem.Delete(FileName: IAIMPString): HRESULT;
+function TMyMusicFileSystem.Delete(FileName: IAIMPString): HRESULT; stdcall;
 var
-  AIntf: IAIMPFileSystemCommandDelete;
+  LIntf: IAIMPFileSystemCommandDelete;
 begin
-  if GetCommandForDefaultFileSystem(IAIMPFileSystemCommandDelete, AIntf) then
-    Result := AIntf.Process(TranslateFileName(FileName))
+  if GetCommandForDefaultFileSystem(IAIMPFileSystemCommandDelete, LIntf) then
+    Result := LIntf.Process(TranslateFileName(FileName))
   else
     Result := E_NOTIMPL;
 end;
 
-function TMyMusicFileSystem.CanOpenFileFolder(FileName: IAIMPString): HRESULT;
+function TMyMusicFileSystem.CanOpenFileFolder(FileName: IAIMPString): HRESULT; stdcall;
 var
-  AIntf: IAIMPFileSystemCommandOpenFileFolder;
+  LIntf: IAIMPFileSystemCommandOpenFileFolder;
 begin
-  if GetCommandForDefaultFileSystem(IAIMPFileSystemCommandOpenFileFolder, AIntf) then
-    Result := AIntf.CanProcess(TranslateFileName(FileName))
+  if GetCommandForDefaultFileSystem(IAIMPFileSystemCommandOpenFileFolder, LIntf) then
+    Result := LIntf.CanProcess(TranslateFileName(FileName))
   else
     Result := E_NOTIMPL;
 end;
 
-function TMyMusicFileSystem.OpenFileFolder(FileName: IAIMPString): HRESULT;
+function TMyMusicFileSystem.OpenFileFolder(FileName: IAIMPString): HRESULT; stdcall;
 var
-  AIntf: IAIMPFileSystemCommandOpenFileFolder;
+  LIntf: IAIMPFileSystemCommandOpenFileFolder;
 begin
-  if GetCommandForDefaultFileSystem(IAIMPFileSystemCommandOpenFileFolder, AIntf) then
-    Result := AIntf.Process(TranslateFileName(FileName))
+  if GetCommandForDefaultFileSystem(IAIMPFileSystemCommandOpenFileFolder, LIntf) then
+    Result := LIntf.Process(TranslateFileName(FileName))
   else
     Result := E_NOTIMPL;
 end;
 
 function TMyMusicFileSystem.CreateStream(FileName: IAIMPString;
-  const Offset, Size: Int64; Flags: Cardinal; out Stream: IAIMPStream): HRESULT;
+  const Offset, Size: Int64; Flags: Cardinal; out Stream: IAIMPStream): HRESULT; stdcall;
 var
-  AIntf: IAIMPFileSystemCommandStreaming;
+  LIntf: IAIMPFileSystemCommandStreaming;
 begin
-  if GetCommandForDefaultFileSystem(IAIMPFileSystemCommandStreaming, AIntf) then
-    Result := AIntf.CreateStream(TranslateFileName(FileName), Offset, Size, Flags, Stream)
+  if GetCommandForDefaultFileSystem(IAIMPFileSystemCommandStreaming, LIntf) then
+    Result := LIntf.CreateStream(TranslateFileName(FileName), Offset, Size, Flags, Stream)
   else
     Result := E_NOTIMPL;
 end;
@@ -266,7 +278,7 @@ end;
 
 { TDemoCustomFileSystemPlugin }
 
-function TDemoCustomFileSystemPlugin.InfoGet(Index: Integer): PWideChar;
+function TDemoCustomFileSystemPlugin.InfoGet(Index: Integer): PChar; stdcall;
 begin
   case Index of
     AIMP_PLUGIN_INFO_NAME:
@@ -278,12 +290,12 @@ begin
   end;
 end;
 
-function TDemoCustomFileSystemPlugin.InfoGetCategories: Cardinal;
+function TDemoCustomFileSystemPlugin.InfoGetCategories: Cardinal; stdcall;
 begin
   Result := AIMP_PLUGIN_CATEGORY_ADDONS;
 end;
 
-function TDemoCustomFileSystemPlugin.Initialize(Core: IAIMPCore): HRESULT;
+function TDemoCustomFileSystemPlugin.Initialize(Core: IAIMPCore): HRESULT; stdcall;
 var
   AMenuItem: IAIMPMenuItem;
   AMenuServiceIntf: IAIMPServiceMenuManager;
@@ -317,14 +329,15 @@ var
   AFiles: TStringDynArray;
   APlaylist: IAIMPPlaylist;
   APlaylistService: IAIMPServicePlaylistManager;
-  ARootPath: UnicodeString;
+  ARootPath: string;
   I: Integer;
 begin
   if CoreGetService(IAIMPServiceFileFormats, AFileFormatService) then
   begin
     // Get all files from MyMusic folder and sub-folders
     ARootPath := ShellGetMyMusic;
-    AFiles := TDirectory.GetFiles(ARootPath, '*', TSearchOption.soAllDirectories, nil);
+    AFiles := TDirectory.GetFiles(ARootPath, '*', TSearchOption.soAllDirectories,
+      {$IFDEF FPC}TFilterPredicate(nil){$ELSE}nil{$ENDIF});
     if Length(AFiles) = 0 then
       Exit;
 

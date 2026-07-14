@@ -3,12 +3,12 @@
 //  Project:   AIMP
 //             Programming Interface
 //
-//  Target:    v5.40 build 2650
+//  Target:    v6.00 build 3000
 //
 //  Purpose:   Playlists API
 //
 //  Author:    Artem Izmaylov
-//             © 2006-2025
+//             © 2006-2026
 //             www.aimp.ru
 //
 //  FPC:       OK
@@ -75,6 +75,9 @@ const
 
   SID_IAIMPServicePlaylistManager2 = '{41494D50-536D-504C-4D6E-677232000000}';
   IID_IAIMPServicePlaylistManager2: TGUID = SID_IAIMPServicePlaylistManager;
+
+  SID_IAIMPExtensionPlaylistShuffler = '{41494D50-4578-7450-6C73-536875666C72}';
+  IID_IAIMPExtensionPlaylistShuffler: TGUID = SID_IAIMPExtensionPlaylistShuffler;
 
   // Property IDs for IAIMPPlaylistItem
   AIMP_PLAYLISTITEM_PROPID_CUSTOM             = 0;
@@ -364,6 +367,14 @@ type
 // Extensions
 //----------------------------------------------------------------------------------------------------------------------
 
+  { IAIMPExtensionPlaylistShuffler }
+
+  IAIMPExtensionPlaylistShuffler = interface // v6.00
+  [SID_IAIMPExtensionPlaylistShuffler]
+    function Shuffle(Playlist: IAIMPPlaylist;
+      List: IAIMPObjectList2; InitialPlaybackQueueIndex: Integer): HRESULT; stdcall;
+  end;
+
   { IAIMPExtensionPlaylistPreimageFactory }
 
   IAIMPExtensionPlaylistPreimageFactory = interface
@@ -376,7 +387,7 @@ type
 
   { IAIMPExtensionPlaylistManagerListener }
 
-  IAIMPExtensionPlaylistManagerListener = interface(IUnknown)
+  IAIMPExtensionPlaylistManagerListener = interface
   [SID_IAIMPExtensionPlaylistManagerListener]
     procedure PlaylistActivated(Playlist: IAIMPPlaylist); stdcall;
     procedure PlaylistAdded(Playlist: IAIMPPlaylist); stdcall;
@@ -392,8 +403,10 @@ type
   IAIMPServicePlaylistManager = interface(IUnknown)
   [SID_IAIMPServicePlaylistManager]
     // Creating Playlist
-    function CreatePlaylist(Name: IAIMPString; Activate: LongBool; out Playlist: IAIMPPlaylist): HRESULT; stdcall;
-    function CreatePlaylistFromFile(FileName: IAIMPString; Activate: LongBool; out Playlist: IAIMPPlaylist): HRESULT; stdcall;
+    function CreatePlaylist(Name: IAIMPString;
+      Activate: LongBool; out Playlist: IAIMPPlaylist): HRESULT; stdcall;
+    function CreatePlaylistFromFile(FileName: IAIMPString;
+      Activate: LongBool; out Playlist: IAIMPPlaylist): HRESULT; stdcall;
     // Active Playlist
     function GetActivePlaylist(out Playlist: IAIMPPlaylist): HRESULT; stdcall;
     function SetActivePlaylist(Playlist: IAIMPPlaylist): HRESULT; stdcall;
@@ -410,8 +423,10 @@ type
 
   IAIMPServicePlaylistManager2 = interface(IAIMPServicePlaylistManager)
   [SID_IAIMPServicePlaylistManager2]
-    function GetPreimageFactory(Index: Integer; out Factory: IAIMPExtensionPlaylistPreimageFactory): HRESULT; stdcall;
-    function GetPreimageFactoryByID(ID: IAIMPString; out Factory: IAIMPExtensionPlaylistPreimageFactory): HRESULT; stdcall;
+    function GetPreimageFactory(Index: Integer;
+      out Factory: IAIMPExtensionPlaylistPreimageFactory): HRESULT; stdcall;
+    function GetPreimageFactoryByID(ID: IAIMPString;
+      out Factory: IAIMPExtensionPlaylistPreimageFactory): HRESULT; stdcall;
     function GetPreimageFactoryCount: Integer; stdcall;
   end;
 

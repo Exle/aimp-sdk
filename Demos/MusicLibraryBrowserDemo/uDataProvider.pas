@@ -1,9 +1,10 @@
 ﻿unit uDataProvider;
 
+{$I apiConfig.inc}
+
 interface
 
 uses
-  Windows,
   Variants,
   // Generics
   Generics.Collections,
@@ -12,6 +13,7 @@ uses
   apiObjects,
   apiMusicLibrary,
   apiThreading,
+  apiTypes,
   apiWrappers;
 
 type
@@ -37,11 +39,11 @@ type
 
   TMLDataProvider = class
   public
-    procedure CancelRequest(AHandle: THandle);
-    function FetchAlbums(AArtist: IAIMPString; ACallback: TStringSetCallback): THandle;
-    function FetchArtists(ACallback: TStringSetCallback): THandle;
-    function FetchTracks(AArtist, AAlbum: IAIMPString; ACallback: TStringSetCallback): THandle;
-    function Run(ATask: IAIMPTask): THandle;
+    procedure CancelRequest(AHandle: TTaskHandle);
+    function FetchAlbums(AArtist: IAIMPString; ACallback: TStringSetCallback): TTaskHandle;
+    function FetchArtists(ACallback: TStringSetCallback): TTaskHandle;
+    function FetchTracks(AArtist, AAlbum: IAIMPString; ACallback: TStringSetCallback): TTaskHandle;
+    function Run(ATask: IAIMPTask): TTaskHandle;
   end;
 
   { TMLFetchFieldDataTask }
@@ -152,7 +154,7 @@ end;
 
 { TMLDataProvider }
 
-procedure TMLDataProvider.CancelRequest(AHandle: THandle);
+procedure TMLDataProvider.CancelRequest(AHandle: TTaskHandle);
 var
   AService: IAIMPServiceThreads;
 begin
@@ -160,7 +162,7 @@ begin
     AService.Cancel(AHandle, AIMP_SERVICE_THREADS_FLAGS_WAITFOR);
 end;
 
-function TMLDataProvider.Run(ATask: IAIMPTask): THandle;
+function TMLDataProvider.Run(ATask: IAIMPTask): TTaskHandle;
 var
   AService: IAIMPServiceThreads;
 begin
@@ -172,17 +174,17 @@ begin
   end;
 end;
 
-function TMLDataProvider.FetchAlbums(AArtist: IAIMPString; ACallback: TStringSetCallback): THandle;
+function TMLDataProvider.FetchAlbums(AArtist: IAIMPString; ACallback: TStringSetCallback): TTaskHandle;
 begin
   Result := Run(TMLFetchAlbumsTask.Create(AArtist, ACallback));
 end;
 
-function TMLDataProvider.FetchArtists(ACallback: TStringSetCallback): THandle;
+function TMLDataProvider.FetchArtists(ACallback: TStringSetCallback): TTaskHandle;
 begin
   Result := Run(TMLFetchArtistsTask.Create(ACallback));
 end;
 
-function TMLDataProvider.FetchTracks(AArtist, AAlbum: IAIMPString; ACallback: TStringSetCallback): THandle;
+function TMLDataProvider.FetchTracks(AArtist, AAlbum: IAIMPString; ACallback: TStringSetCallback): TTaskHandle;
 begin
   Result := Run(TMLFetchTracksTask.Create(AArtist, AAlbum, ACallback));
 end;
@@ -291,11 +293,17 @@ end;
 
 function TMLFetchAlbumsTask.BuildFilter: IAIMPMLDataFilter;
 var
-  AFieldFilter: IAIMPMLDataFieldFilter;
+  LFilter: IAIMPMLDataFieldFilter;
+  LValue: VarValue;
 begin
-  CheckResult(FDataStorage.CreateObject(IAIMPMLDataFilter, Result));
-  CheckResult(Result.Add(MakeString('Artist'), IAIMPStringToString(FArtist),
-    Null, AIMPML_FIELDFILTER_OPERATION_EQUALS, AFieldFilter));
+  LValue := VarValueInit(IAIMPStringToString(FArtist));
+  try
+    CheckResult(FDataStorage.CreateObject(IAIMPMLDataFilter, Result));
+    CheckResult(Result.Add(MakeString('Artist'),
+      LValue, VarValueNull, AIMPML_FIELDFILTER_OPERATION_EQUALS, LFilter));
+  finally
+    VarValueFree(LValue);
+  end;
 end;
 
 { TMLFetchTracksTask }
@@ -316,12 +324,21 @@ end;
 
 function TMLFetchTracksTask.BuildFilter: IAIMPMLDataFilter;
 var
-  AFieldFilter: IAIMPMLDataFieldFilter;
+  LFilter: IAIMPMLDataFieldFilter;
+  LValue1: VarValue;
+  LValue2: VarValue;
 begin
-  CheckResult(FDataStorage.CreateObject(IAIMPMLDataFilter, Result));
-  CheckResult(Result.SetValueAsInt32(AIMPML_FILTERGROUP_OPERATION, AIMPML_FILTERGROUP_OPERATION_AND));
-  CheckResult(Result.Add(MakeString('Artist'), IAIMPStringToString(FArtist), Null, AIMPML_FIELDFILTER_OPERATION_EQUALS, AFieldFilter));
-  CheckResult(Result.Add(MakeString('Album'), IAIMPStringToString(FAlbum), Null, AIMPML_FIELDFILTER_OPERATION_EQUALS, AFieldFilter));
+  LValue1 := VarValueInit(IAIMPStringToString(FArtist));
+  LValue2 := VarValueInit(IAIMPStringToString(FAlbum));
+  try
+    CheckResult(FDataStorage.CreateObject(IAIMPMLDataFilter, Result));
+    CheckResult(Result.SetValueAsInt32(AIMPML_FILTERGROUP_OPERATION, AIMPML_FILTERGROUP_OPERATION_AND));
+    CheckResult(Result.Add(MakeString('Artist'), LValue1, VarValueNull, AIMPML_FIELDFILTER_OPERATION_EQUALS, LFilter));
+    CheckResult(Result.Add(MakeString('Album'), LValue2, VarValueNull, AIMPML_FIELDFILTER_OPERATION_EQUALS, LFilter));
+  finally
+    VarValueFree(LValue2);
+    VarValueFree(LValue1);
+  end;
 end;
 
 end.

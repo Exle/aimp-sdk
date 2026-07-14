@@ -3,21 +3,20 @@
 //  Project:   AIMP
 //             Programming Interface
 //
-//  Target:    v5.40 build 2650
+//  Target:    v6.00 build 3000
 //
 //  Purpose:   Internet API
 //
 //  Author:    Artem Izmaylov
-//             © 2006-2025
+//             Â© 2006-2026
 //             www.aimp.ru
 //
 #ifndef apiInternetH
 #define apiInternetH
 
-#include <unknwn.h>
+#include "apiTypes.h"
 #include "apiObjects.h"
 #include "apiCore.h"
-#include "apiTypes.h"
 
 static const GUID IID_IAIMPServiceConnectionSettings = {0x4941494D, 0x5053, 0x7276, 0x43, 0x6F, 0x6E, 0x6E, 0x43, 0x66, 0x67, 0x00};
 static const GUID IID_IAIMPServiceHTTPClient = {0x41494D50, 0x5372, 0x7648, 0x74, 0x74, 0x70, 0x43, 0x6C, 0x74, 0x00, 0x00};
@@ -46,6 +45,9 @@ const int AIMP_SERVICE_HTTPCLIENT_FLAGS_UTF8            = 2;
 const int AIMP_SERVICE_HTTPCLIENT_FLAGS_PRIORITY_NORMAL = 0;
 const int AIMP_SERVICE_HTTPCLIENT_FLAGS_PRIORITY_LOW    = 4;
 const int AIMP_SERVICE_HTTPCLIENT_FLAGS_PRIORITY_HIGH   = 8;
+const int AIMP_SERVICE_HTTPCLIENT_FLAGS_ASYNC_ACCEPT    = 16; // v6.0
+const int AIMP_SERVICE_HTTPCLIENT_FLAGS_ASYNC_PROGRESS  = 32; // v6.0
+const int AIMP_SERVICE_HTTPCLIENT_FLAGS_ASYNC_COMPLETE  = 64; // v6.0
 
 // Methods for IAIMPServiceHTTPClient2.Request
 const int AIMP_SERVICE_HTTPCLIENT_METHOD_GET    = 0;
@@ -83,11 +85,11 @@ class IAIMPServiceConnectionSettings: public IAIMPPropertyList
 class IAIMPServiceHTTPClient: public IUnknown
 {
 	public:
-		virtual HRESULT WINAPI Get(IAIMPString *URL, LongWord Flags, IAIMPStream *AnswerData,
+		virtual HRESULT WINAPI Get(IAIMPString *URL, DWORD Flags, IAIMPStream *AnswerData,
 			IAIMPHTTPClientEvents *EventHandler, IAIMPConfig *Params, TTaskHandle *Task) = 0;
-		virtual HRESULT WINAPI Post(IAIMPString *URL, LongWord Flags, IAIMPStream *AnswerData, IAIMPStream *PostData,
+		virtual HRESULT WINAPI Post(IAIMPString *URL, DWORD Flags, IAIMPStream *AnswerData, IAIMPStream *PostData,
 			IAIMPHTTPClientEvents *EventHandler, IAIMPConfig *Params, TTaskHandle *Task) = 0;
-		virtual HRESULT WINAPI Cancel(TTaskHandle Task, LongWord Flags) = 0;
+		virtual HRESULT WINAPI Cancel(TTaskHandle Task, DWORD Flags) = 0;
 };
 
 /* IAIMPServiceHTTPClient2 */
@@ -95,10 +97,10 @@ class IAIMPServiceHTTPClient: public IUnknown
 class IAIMPServiceHTTPClient2: public IUnknown
 {
 	public:
-		virtual HRESULT WINAPI Request(IAIMPString *URL, LongWord Method, LongWord Flags,
+		virtual HRESULT WINAPI Request(IAIMPString *URL, DWORD Method, DWORD Flags,
 			IAIMPStream *AnswerData, IAIMPStream *PostData,
 			IAIMPHTTPClientEvents *EventHandler, IAIMPConfig *Params, TTaskHandle *Task) = 0;
-		virtual HRESULT WINAPI Cancel(TTaskHandle Task, LongWord Flags) = 0;
+		virtual HRESULT WINAPI Cancel(TTaskHandle Task, DWORD Flags) = 0;
 };
 
 /* IAIMPServiceHTTPClient3 */
@@ -106,10 +108,10 @@ class IAIMPServiceHTTPClient2: public IUnknown
 class IAIMPServiceHTTPClient3: public IUnknown
 {
 	public:
-		virtual HRESULT WINAPI Request(IAIMPString *URL, IAIMPString *Method, LongWord Flags,
+		virtual HRESULT WINAPI Request(IAIMPString *URL, IAIMPString *Method, DWORD Flags,
 			IAIMPStream *AnswerData, IAIMPStream *PostData,
 			IAIMPHTTPClientEvents *EventHandler, IAIMPConfig *Params, TTaskHandle *Task) = 0;
-		virtual HRESULT WINAPI Cancel(TTaskHandle Task, LongWord Flags) = 0;
+		virtual HRESULT WINAPI Cancel(TTaskHandle Task, DWORD Flags) = 0;
 };
 
 #endif // !apiInternetH

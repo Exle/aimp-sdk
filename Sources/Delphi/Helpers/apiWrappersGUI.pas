@@ -3,12 +3,12 @@
 //  Project:   AIMP
 //             Programming Interface
 //
-//  Target:    v5.40 build 2650
+//  Target:    v6.00 build 3000
 //
 //  Purpose:   GUI Api Wrappers
 //
 //  Author:    Artem Izmaylov
-//             © 2006-2025
+//             © 2006-2026
 //             www.aimp.ru
 //
 //  FPC:       OK
@@ -123,6 +123,32 @@ type
     function OnMouseWheel(Sender: IInterface; WheelDelta: Integer; X, Y: Integer; Modifiers: Word): LongBool; stdcall;
   public
     constructor Create(AMouseWheelEvent: TAIMPUIMouseWheelEvent; AMasterAdapter: IUnknown = nil);
+  end;
+
+  { TAIMPUITreeListEventAdapter }
+
+  TAIMPUITreeListEventAdapter = class(TInterfacedObject, IAIMPUITreeListEvents)
+  protected
+    // IAIMPUITreeListEvents
+    procedure OnColumnClick(Sender: IAIMPUITreeList; ColumnIndex: Integer); virtual; stdcall;
+    procedure OnFocusedColumnChanged(Sender: IAIMPUITreeList); virtual; stdcall;
+    procedure OnFocusedNodeChanged(Sender: IAIMPUITreeList); virtual; stdcall;
+    procedure OnNodeChecked(Sender: IAIMPUITreeList; Node: IAIMPUITreeListNode); virtual; stdcall;
+    procedure OnNodeDblClicked(Sender: IAIMPUITreeList; Node: IAIMPUITreeListNode); virtual; stdcall;
+    procedure OnSelectionChanged(Sender: IAIMPUITreeList); virtual; stdcall;
+    procedure OnSorted(Sender: IAIMPUITreeList); virtual; stdcall;
+    procedure OnStructChanged(Sender: IAIMPUITreeList); virtual; stdcall;
+  end;
+
+  { TAIMPUITreeListNodeSelectEventAdapter }
+
+  TAIMPUITreeListNodeEvent = procedure (Sender: IAIMPUITreeList; Node: IAIMPUITreeListNode) of object;
+  TAIMPUITreeListNodeSelectEventAdapter = class(TAIMPUITreeListEventAdapter)
+  strict private
+    FEvent: TAIMPUITreeListNodeEvent;
+  public
+    constructor Create(AEvent: TAIMPUITreeListNodeEvent);
+    procedure OnFocusedNodeChanged(Sender: IAIMPUITreeList); override;
   end;
 
   { TAIMPUINotifyEventAdapter }
@@ -356,11 +382,72 @@ begin
   FOnMouseWheel := AMouseWheelEvent;
 end;
 
-function TAIMPUIMouseWheelEventAdapter.OnMouseWheel(Sender: IInterface; WheelDelta, X, Y: Integer; Modifiers: Word): LongBool;
+function TAIMPUIMouseWheelEventAdapter.OnMouseWheel(
+  Sender: IInterface; WheelDelta, X, Y: Integer; Modifiers: Word): LongBool;
 begin
   Result := False;
   if Assigned(FOnMouseWheel) then
     FOnMouseWheel(Sender, ModifiersToShiftState(Modifiers), WheelDelta, X, Y, Result);
+end;
+
+{ TAIMPUITreeListEventAdapter }
+
+procedure TAIMPUITreeListEventAdapter.OnFocusedColumnChanged(Sender: IAIMPUITreeList);
+begin
+  // do nothing
+end;
+
+procedure TAIMPUITreeListEventAdapter.OnFocusedNodeChanged(Sender: IAIMPUITreeList);
+begin
+  // do nothing
+end;
+
+procedure TAIMPUITreeListEventAdapter.OnColumnClick(Sender: IAIMPUITreeList; ColumnIndex: Integer);
+begin
+  // do nothing
+end;
+
+procedure TAIMPUITreeListEventAdapter.OnNodeChecked(Sender: IAIMPUITreeList; Node: IAIMPUITreeListNode);
+begin
+  // do nothing
+end;
+
+procedure TAIMPUITreeListEventAdapter.OnNodeDblClicked(Sender: IAIMPUITreeList; Node: IAIMPUITreeListNode);
+begin
+  // do nothing
+end;
+
+procedure TAIMPUITreeListEventAdapter.OnSelectionChanged(Sender: IAIMPUITreeList);
+begin
+  // do nothing
+end;
+
+procedure TAIMPUITreeListEventAdapter.OnSorted(Sender: IAIMPUITreeList);
+begin
+  // do nothing
+end;
+
+procedure TAIMPUITreeListEventAdapter.OnStructChanged(Sender: IAIMPUITreeList);
+begin
+  // do nothing
+end;
+
+{ TAIMPUITreeListNodeSelectEventAdapter }
+
+constructor TAIMPUITreeListNodeSelectEventAdapter.Create(AEvent: TAIMPUITreeListNodeEvent);
+begin
+  inherited Create;
+  FEvent := AEvent;
+end;
+
+procedure TAIMPUITreeListNodeSelectEventAdapter.OnFocusedNodeChanged(Sender: IAIMPUITreeList);
+var
+  LNode: IAIMPUITreeListNode;
+begin
+  if Succeeded(Sender.GetFocused(IAIMPUITreeListNode, LNode)) then
+    FEvent(Sender, LNode)
+  else
+    FEvent(Sender, nil);
 end;
 
 { TAIMPUINotifyEventAdapter }

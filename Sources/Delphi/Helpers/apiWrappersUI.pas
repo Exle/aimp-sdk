@@ -3,14 +3,14 @@
 //  Project:   AIMP
 //             Programming Interface
 //
-//  Target:    v5.40 build 2650
+//  Target:    v6.00 build 3000
 //
 //  Author:    Artem Izmaylov
-//             © 2006-2025
+//             © 2006-2026
 //             www.aimp.ru
 //
 
-unit apiWrappersUI;
+unit apiWrappersUI deprecated 'Use apiGUI';
 
 {$I apiConfig.inc}
 
@@ -204,12 +204,12 @@ end;
 
 function TAIMPCustomOptionsFrame.DialogChar(CharCode: WideChar; Unused: Integer): LongBool;
 begin
-  Result := Form.Perform(CM_DIALOGCHAR, WPARAM(CharCode), 0) <> 0;
+  Result := Form.Perform({%H-}CM_DIALOGCHAR, WPARAM(CharCode), 0) <> 0;
 end;
 
 function TAIMPCustomOptionsFrame.DialogKey(CharCode: Word; Unused: Integer): LongBool; stdcall;
 begin
-  Result := Form.Perform(CM_DIALOGKEY, CharCode, 0) <> 0;
+  Result := Form.Perform({%H-}CM_DIALOGKEY, CharCode, 0) <> 0;
 end;
 
 function TAIMPCustomOptionsFrame.SelectFirstControl: LongBool; stdcall;

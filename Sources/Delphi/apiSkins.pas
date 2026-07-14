@@ -3,12 +3,12 @@
 //  Project:   AIMP
 //             Programming Interface
 //
-//  Target:    v5.40 build 2650
+//  Target:    v6.00 build 3000
 //
 //  Purpose:   Skin Manager API
 //
 //  Author:    Artem Izmaylov
-//             © 2006-2025
+//             © 2006-2026
 //             www.aimp.ru
 //
 //  FPC:       OK
@@ -36,9 +36,10 @@ const
   AIMP_SKININFO_PROPID_PREVIEW       = 4;
 
   // SkinsManager Properties
-  AIMP_SERVICE_SKINSMAN_PROPID_SKIN          = 1;
-  AIMP_SERVICE_SKINSMAN_PROPID_HUE           = 2;
-  AIMP_SERVICE_SKINSMAN_PROPID_HUE_INTENSITY = 3;
+  AIMP_SERVICE_SKINSMAN_PROPID_SKIN           = 1;
+  AIMP_SERVICE_SKINSMAN_PROPID_HUE            = 2;
+  AIMP_SERVICE_SKINSMAN_PROPID_HUE_INTENSITY  = 3;
+  AIMP_SERVICE_SKINSMAN_PROPID_HUE_BRIGHTNESS = 4; // v6.0
 
   // Flags for IAIMPServiceSkinsManager.Install
   AIMP_SERVICE_SKINSMAN_FLAGS_INSTALL_FOR_ALL_USERS = 1;

@@ -3,7 +3,12 @@
 interface
 
 uses
-  Classes, apiPlugin, AIMPCustomPlugin, apiCore, CustomServiceDemoPublicIntf;
+  Classes,
+  apiPlugin,
+  apiCore,
+  apiTypes,
+  AIMPCustomPlugin,
+  CustomServiceDemoPublicIntf;
 
 type
 
@@ -46,7 +51,7 @@ type
 
   TAIMPCustomServicePlugin = class(TAIMPCustomPlugin)
   protected
-    function InfoGet(Index: Integer): PWideChar; override; stdcall;
+    function InfoGet(Index: Integer): PChar; override; stdcall;
     function InfoGetCategories: Cardinal; override; stdcall;
     function Initialize(Core: IAIMPCore): HRESULT; override; stdcall;
   end;
@@ -54,16 +59,16 @@ type
 implementation
 
 uses
-  ActiveX, SysUtils;
+  SysUtils;
 
 { TMyCustomObject }
 
-function TMyCustomObject.SomeMethod: HRESULT;
+function TMyCustomObject.SomeMethod: HRESULT; stdcall;
 begin
   Result := S_OK;
 end;
 
-function TMyCustomObject.SomeNewMethod: HRESULT;
+function TMyCustomObject.SomeNewMethod: HRESULT; stdcall;
 begin
   Result := S_OK;
 end;
@@ -96,7 +101,7 @@ begin
   end;
 end;
 
-function TMyCustomService.CreateObject(const IID: TGUID; out Obj): HRESULT;
+function TMyCustomService.CreateObject(const IID: TGUID; out Obj): HRESULT; stdcall;
 begin
   Result := S_OK;
   if IsEqualGUID(IID, IID_IMyCustomObject) then
@@ -108,7 +113,7 @@ begin
       Result := E_NOINTERFACE;
 end;
 
-procedure TMyCustomService.RegisterExtension(Extension: IInterface);
+procedure TMyCustomService.RegisterExtension(Extension: IInterface); stdcall;
 var
   AIntf: IMyCustomExtension;
 begin
@@ -117,7 +122,7 @@ begin
     FExtensions.Add(AIntf);
 end;
 
-procedure TMyCustomService.UnregisterExtension(Extension: IInterface);
+procedure TMyCustomService.UnregisterExtension(Extension: IInterface); stdcall;
 var
   AIntf: IMyCustomExtension;
 begin
@@ -126,14 +131,14 @@ begin
     FExtensions.Remove(AIntf);
 end;
 
-function TMyCustomService.SomeMethod: HRESULT;
+function TMyCustomService.SomeMethod: HRESULT; stdcall;
 begin
   Result := S_OK;
 end;
 
 { TAIMPCustomServicePlugin }
 
-function TAIMPCustomServicePlugin.InfoGet(Index: Integer): PWideChar;
+function TAIMPCustomServicePlugin.InfoGet(Index: Integer): PChar; stdcall;
 begin
   case Index of
     AIMP_PLUGIN_INFO_NAME:
@@ -147,14 +152,14 @@ begin
   end;
 end;
 
-function TAIMPCustomServicePlugin.InfoGetCategories: Cardinal;
+function TAIMPCustomServicePlugin.InfoGetCategories: Cardinal; stdcall;
 begin
   Result := AIMP_PLUGIN_CATEGORY_ADDONS;
 end;
 
-function TAIMPCustomServicePlugin.Initialize(Core: IAIMPCore): HRESULT;
+function TAIMPCustomServicePlugin.Initialize(Core: IAIMPCore): HRESULT; stdcall;
 begin
-  Result := inherited Initialize(Core);
+  Result := inherited;
   if Succeeded(Result) then
     // Register the custom service
     Core.RegisterService(TMyCustomService.Create);

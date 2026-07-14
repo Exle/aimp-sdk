@@ -1,36 +1,33 @@
 ﻿unit uDemoForm;
 
+{$I apiConfig.inc}
+
 interface
 
 {$R uDemoForm.res}
 
 uses
-  Windows, apiGUI, apiObjects, apiWrappersGUI, uDataProvider;
-
-const
-  NullRect: TRect = (Left: 0; Top: 0; Right: 0; Bottom: 0);
+  Types,
+  // API
+  apiGUI,
+  apiObjects,
+  apiTypes,
+  apiWrappers,
+  apiWrappersGUI,
+  // Plugin
+  uDataProvider;
 
 type
-
   TAIMPUITreeListNodeValueEvent = procedure (Sender: IAIMPUITreeList; NodeValue: IAIMPString) of object;
 
   { TAIMPUITreeListNodeSelectedEventAdapter }
 
-  TAIMPUITreeListNodeSelectedEventAdapter = class(TInterfacedObject,
-    IAIMPUITreeListEvents)
+  TAIMPUITreeListNodeSelectedEventAdapter = class(TAIMPUITreeListEventAdapter)
   strict private
     FEvent: TAIMPUITreeListNodeValueEvent;
   public
     constructor Create(AEvent: TAIMPUITreeListNodeValueEvent);
-    // IAIMPUITreeListEvents
-    procedure OnColumnClick(Sender: IAIMPUITreeList; ColumnIndex: Integer); stdcall;
-    procedure OnFocusedColumnChanged(Sender: IAIMPUITreeList); stdcall;
-    procedure OnFocusedNodeChanged(Sender: IAIMPUITreeList); stdcall;
-    procedure OnNodeChecked(Sender: IAIMPUITreeList; Node: IAIMPUITreeListNode); stdcall;
-    procedure OnNodeDblClicked(Sender: IAIMPUITreeList; Node: IAIMPUITreeListNode); stdcall;
-    procedure OnSelectionChanged(Sender: IAIMPUITreeList); stdcall;
-    procedure OnSorted(Sender: IAIMPUITreeList); stdcall;
-    procedure OnStructChanged(Sender: IAIMPUITreeList); stdcall;
+    procedure OnFocusedNodeChanged(Sender: IAIMPUITreeList); override;
   end;
 
   { TDemoForm }
@@ -76,27 +73,11 @@ type
 
 implementation
 
-uses
-  apiWrappers;
-
-function CenterRect(const ABounds: TRect; AWidth, AHeight: Integer): TRect;
-begin
-  Result.Left := (ABounds.Left + ABounds.Right - AWidth) div 2;
-  Result.Top := (ABounds.Top + ABounds.Bottom - AHeight) div 2;
-  Result.Right := Result.Left + AWidth;
-  Result.Bottom := Result.Top + AHeight;
-end;
-
 { TAIMPUITreeListNodeSelectedEventAdapter }
 
 constructor TAIMPUITreeListNodeSelectedEventAdapter.Create(AEvent: TAIMPUITreeListNodeValueEvent);
 begin
   FEvent := AEvent;
-end;
-
-procedure TAIMPUITreeListNodeSelectedEventAdapter.OnFocusedColumnChanged(Sender: IAIMPUITreeList);
-begin
-  // do nothing
 end;
 
 procedure TAIMPUITreeListNodeSelectedEventAdapter.OnFocusedNodeChanged(Sender: IAIMPUITreeList);
@@ -111,41 +92,9 @@ begin
   end;
 end;
 
-procedure TAIMPUITreeListNodeSelectedEventAdapter.OnColumnClick(Sender: IAIMPUITreeList; ColumnIndex: Integer);
-begin
-  // do nothing
-end;
-
-procedure TAIMPUITreeListNodeSelectedEventAdapter.OnNodeChecked(Sender: IAIMPUITreeList; Node: IAIMPUITreeListNode);
-begin
-  // do nothing
-end;
-
-procedure TAIMPUITreeListNodeSelectedEventAdapter.OnNodeDblClicked(Sender: IAIMPUITreeList; Node: IAIMPUITreeListNode);
-begin
-  // do nothing
-end;
-
-procedure TAIMPUITreeListNodeSelectedEventAdapter.OnSelectionChanged(Sender: IAIMPUITreeList);
-begin
-  // do nothing
-end;
-
-procedure TAIMPUITreeListNodeSelectedEventAdapter.OnSorted(Sender: IAIMPUITreeList);
-begin
-  // do nothing
-end;
-
-procedure TAIMPUITreeListNodeSelectedEventAdapter.OnStructChanged(Sender: IAIMPUITreeList);
-begin
-  // do nothing
-end;
-
 { TDemoForm }
 
 constructor TDemoForm.Create(AService: IAIMPServiceUI; ADataProvider: TMLDataProvider);
-var
-  ABounds: TRect;
 begin
   FService := AService;
   FDataProvider := ADataProvider;
@@ -153,8 +102,8 @@ begin
   CheckResult(AService.CreateForm(0, 0, MakeString('DemoForm'), Self, FForm));
 
   // Center the Form on screen
-  SystemParametersInfo(SPI_GETWORKAREA, 0, ABounds, 0);
-  CheckResult(FForm.SetPlacement(TAIMPUIControlPlacement.Create(CenterRect(ABounds, 1024, 600))));
+  FForm.SetValueAsInt32(AIMPUI_FORM_PROPID_CLIENTWIDTH, 1024);
+  FForm.SetValueAsInt32(AIMPUI_FORM_PROPID_CLIENTHEIGHT, 600);
 
   // Create children controls
   CreateControls;
@@ -175,20 +124,20 @@ begin
   // Create an artist view
   CheckResult(FService.CreateControl(FForm, FControlTopPanel, nil,
     TAIMPUITreeListNodeSelectedEventAdapter.Create(OnSelectArtist), IID_IAIMPUITreeList, FControlArtistList));
-  CheckResult(FControlArtistList.SetPlacement(TAIMPUIControlPlacement.Create(ualNone, NullRect)));
+  CheckResult(FControlArtistList.SetPlacement(TAIMPUIControlPlacement.Create(ualNone, TRect.Empty)));
   CheckResult(FControlArtistList.AddColumn(IID_IAIMPUITreeListColumn, AColumn));
   PropListSetStr(AColumn, AIMPUI_TL_COLUMN_PROPID_CAPTION, 'Artists');
 
   // Create an album view
   CheckResult(FService.CreateControl(FForm, FControlTopPanel, nil,
     TAIMPUITreeListNodeSelectedEventAdapter.Create(OnSelectAlbum), IID_IAIMPUITreeList, FControlAlbumList));
-  CheckResult(FControlAlbumList.SetPlacement(TAIMPUIControlPlacement.Create(ualClient, NullRect)));
+  CheckResult(FControlAlbumList.SetPlacement(TAIMPUIControlPlacement.Create(ualClient, TRect.Empty)));
   CheckResult(FControlAlbumList.AddColumn(IID_IAIMPUITreeListColumn, AColumn));
   PropListSetStr(AColumn, AIMPUI_TL_COLUMN_PROPID_CAPTION, 'Albums');
 
   // Create a tracks view
   CheckResult(FService.CreateControl(FForm, FForm, nil, nil, IID_IAIMPUITreeList, FControlTrackList));
-  CheckResult(FControlTrackList.SetPlacement(TAIMPUIControlPlacement.Create(ualClient, NullRect)));
+  CheckResult(FControlTrackList.SetPlacement(TAIMPUIControlPlacement.Create(ualClient, TRect.Empty)));
 end;
 
 procedure TDemoForm.FetchAlbums;

@@ -3,19 +3,18 @@
 //  Project:   AIMP
 //             Programming Interface
 //
-//  Target:    v5.40 build 2650
+//  Target:    v6.00 build 3000
 //
 //  Purpose:   GUI API
 //
 //  Author:    Artem Izmaylov
-//             © 2006-2025
+//             © 2006-2026
 //             www.aimp.ru
 //
 //  FPC:       OK
 //
 unit apiGUI;
 
-{$MINENUMSIZE 4}
 {$I apiConfig.inc}
 
 interface
@@ -72,8 +71,8 @@ const
   SID_IAIMPUIImageList = '{61756949-6D67-4C69-7374-000000000000}';
   IID_IAIMPUIImageList: TGUID = SID_IAIMPUIImageList;
 
-  SID_IAIMPUIImageList2 = '{61756949-6D67-4C69-7374-320000000000}';
-  IID_IAIMPUIImageList2: TGUID = SID_IAIMPUIImageList2;
+  SID_IAIMPUIImageList3 = '{61756949-6D67-4C69-7374-330000000000}';
+  IID_IAIMPUIImageList3: TGUID = SID_IAIMPUIImageList3;
 
   SID_IAIMPUIBaseEdit = '{61756942-6173-6545-6469-740000000000}';
   IID_IAIMPUIBaseEdit: TGUID = SID_IAIMPUIBaseEdit;
@@ -86,6 +85,9 @@ const
 
   SID_IAIMPUIButton = '{61756942-7574-746F-6E00-000000000000}';
   IID_IAIMPUIButton: TGUID = SID_IAIMPUIButton;
+
+  SID_IAIMPUIToolButton = '{61756954-6F6F-6C42-7574-746F6E000000}';
+  IID_IAIMPUIToolButton: TGUID = SID_IAIMPUIToolButton;
 
   SID_IAIMPUICategory = '{61756943-6174-6567-6F72-790000000000}';
   IID_IAIMPUICategory: TGUID = SID_IAIMPUICategory;
@@ -143,6 +145,9 @@ const
 
   SID_IAIMPUIForm = '{61756946-6F72-6D00-0000-000000000000}';
   IID_IAIMPUIForm: TGUID = SID_IAIMPUIForm;
+
+  SID_IAIMPUIForm2 = '{61756946-6F72-6D32-0000-000000000000}';
+  IID_IAIMPUIForm2: TGUID = SID_IAIMPUIForm2;
 
   SID_IAIMPUIFormEvents = '{61756946-6F72-6D45-7665-6E7473000000}';
   IID_IAIMPUIFormEvents: TGUID = SID_IAIMPUIFormEvents;
@@ -207,11 +212,23 @@ const
   SID_IAIMPUICheckComboBox = '{61756943-6865-636B-6564-436F6D626F00}';
   IID_IAIMPUICheckComboBox: TGUID = SID_IAIMPUICheckComboBox;
 
+  SID_IAIMPUIDateEdit = '{61756944-6174-6545-6469-740000000000}';
+  IID_IAIMPUIDateEdit: TGUID = SID_IAIMPUIDateEdit;
+
+  SID_IAIMPUIDateTimeEdit = '{61756944-6174-6554-696D-654564697400}';
+  IID_IAIMPUIDateTimeEdit: TGUID = SID_IAIMPUIDateTimeEdit;
+
+  SID_IAIMPUINumericEdit = '{6175694E-756D-6572-6963-456469740000}';
+  IID_IAIMPUINumericEdit: TGUID = SID_IAIMPUINumericEdit;
+
   SID_IAIMPUIImageComboBox = '{61756949-6D61-6765-436F-6D626F000000}';
   IID_IAIMPUIImageComboBox: TGUID = SID_IAIMPUIImageComboBox;
 
   SID_IAIMPUIPopupMenu = '{61756950-6F70-7570-4D65-6E7500000000}';
   IID_IAIMPUIPopupMenu: TGUID = SID_IAIMPUIPopupMenu;
+
+  SID_IAIMPUIPopupMenu2 = '{61756950-6F70-7570-4D65-6E7532000000}';
+  IID_IAIMPUIPopupMenu2: TGUID = SID_IAIMPUIPopupMenu2;
 
   SID_IAIMPUIMenuItem = '{6175694D-656E-7549-7465-6D0000000000}';
   IID_IAIMPUIMenuItem: TGUID = SID_IAIMPUIMenuItem;
@@ -227,6 +244,9 @@ const
 
   SID_IAIMPUITreeListEvents = '{61756954-4C45-7665-6E74-730000000000}';
   IID_IAIMPUITreeListEvents: TGUID = SID_IAIMPUITreeListEvents;
+
+  SID_IAIMPUITreeListDeleteEvents = '{61756954-4C44-656C-4576-656E74730000}';
+  IID_IAIMPUITreeListDeleteEvents: TGUID = SID_IAIMPUITreeListDeleteEvents;
 
   SID_IAIMPUITreeListColumn = '{61756954-4C43-6F6C-756D-6E0000000000}';
   IID_IAIMPUITreeListColumn: TGUID = SID_IAIMPUITreeListColumn;
@@ -264,14 +284,35 @@ const
   SID_IAIMPUIProgressDialogEvents = '{61756950-7267-7273-446C-6745766E7400}';
   IID_IAIMPUIProgressDialogEvents: TGUID = SID_IAIMPUIProgressDialogEvents;
 
-  SID_IAIMPUIWndProcEvents = '{61756957-6E64-5072-6F63-45766E747300}';
-  IID_IAIMPUIWndProcEvents: TGUID = SID_IAIMPUIWndProcEvents;
-
   SID_IAIMPUIAuthDialog = '{61756941-7574-6844-6C67-000000000000}';
   IID_IAIMPUIAuthDialog: TGUID = SID_IAIMPUIAuthDialog;
 
   SID_IAIMPUIAuthDialogEvents = '{61756941-7574-6844-6C67-45766E740000}';
   IID_IAIMPUIAuthDialogEvents: TGUID = SID_IAIMPUIAuthDialogEvents;
+
+  SID_IAIMPUIFontPickerDialog = '{61756946-6F6E-7450-6963-6B6572000000}';
+  IID_IAIMPUIFontPickerDialog: TGUID = SID_IAIMPUIFontPickerDialog;
+
+  SID_IAIMPUIColorPickerDialog = '{61756943-6F6C-6F72-5069-636B65720000}';
+  IID_IAIMPUIColorPickerDialog: TGUID = SID_IAIMPUIColorPickerDialog;
+
+  SID_IAIMPUIFont = '{61756946-6F6E-7400-0000-000000000000}';
+  IID_IAIMPUIFont: TGUID = SID_IAIMPUIFont;
+
+  SID_IAIMPUIColorButton = '{61756943-6F6C-6F72-4275-74746F6E0000}';
+  IID_IAIMPUIColorButton: TGUID = SID_IAIMPUIColorButton;
+
+  SID_IAIMPUICardView = '{61756943-6172-6456-6965-770000000000}';
+  IID_IAIMPUICardView: TGUID = SID_IAIMPUICardView;
+
+  SID_IAIMPUICardViewEvents = '{61756943-6172-6456-6965-7745766E7473}';
+  IID_IAIMPUICardViewEvents: TGUID = SID_IAIMPUICardViewEvents;
+
+  SID_IAIMPUICardViewItem = '{61756943-6172-6456-6965-7749746D0000}';
+  IID_IAIMPUICardViewItem: TGUID = SID_IAIMPUICardViewItem;
+
+  SID_IAIMPUIPathChooser = '{61756950-6174-6843-6873-720000000000}';
+  IID_IAIMPUIPathChooser: TGUID = SID_IAIMPUIPathChooser;
 
 const
 //----------------------------------------------------------------------------------------------------------------------
@@ -364,6 +405,9 @@ const
   AIMPUI_FLAGS_TL_GRIDLINE_VERTICAL   = 1;
   AIMPUI_FLAGS_TL_GRIDLINE_HORIZONTAL = 2;
 
+  // Flags for IAIMPUIColorPickerDialog
+  AIMPUI_FLAGS_COLORPICKER_ALLOWALPHA = 1;
+
   // Check State
   AIMPUI_CHECKSTATE_UNCHECKED = 0;
   AIMPUI_CHECKSTATE_CHECKED   = 1;
@@ -373,10 +417,16 @@ const
   AIMPUI_COMBOBOX_STYLE_EDIT = 0;
   AIMPUI_COMBOBOX_STYLE_LIST = 1;
 
+  // Slider Labels Position
+  AIMPUI_SLIDER_LABELPOSITION_AROUND_EDGES = 0;
+  AIMPUI_SLIDER_LABELPOSITION_BELOW = 1;
+  AIMPUI_SLIDER_LABELPOSITION_ABOVE = 2;
+
   // CheckModes
   AIMPUI_CHECKMODE_NONE 	  	    = 0;
   AIMPUI_CHECKMODE_CUSTOM  	      = 1;
   AIMPUI_CHECKMODE_TOGGLE_ENABLED = 2;
+  AIMPUI_CHECKMODE_MINIMIZE       = 3; // v6.0
 
   // Alignment
   AIMPUI_ALIGN_NEAR   = 0; // left/top
@@ -388,6 +438,15 @@ const
   AIMPUI_VALIDATIONLABEL_GLYPH_WARNING          = 1;
   AIMPUI_VALIDATIONLABEL_GLYPH_ERROR            = 2;
   AIMPUI_VALIDATIONLABEL_GLYPH_CRITICAL_WARNING = 3;
+
+  // Position of Tabs in PageControl/TabControl
+  AIMPUI_TABS_POSITION_TOP    = 0;
+  AIMPUI_TABS_POSITION_BOTTOM = 0;
+
+  // Style of Tabs in PageControl/TabControl
+  AIMPUI_TABS_STYLE_CLASSIC  = 0;
+  AIMPUI_TABS_STYLE_BUTTONS	 = 1;
+  AIMPUI_TABS_STYLE_HYBRID	 = 2;
 
 //----------------------------------------------------------------------------------------------------------------------
 // Property IDs
@@ -444,10 +503,17 @@ const
   AIMPUI_BUTTON_PROPID_MODALRESULT  = AIMPUI_WINCONTROL_MAX_PROPID + 7;
   AIMPUI_BUTTON_PROPID_STYLE        = AIMPUI_WINCONTROL_MAX_PROPID + 8;
   AIMPUI_BUTTON_PROPID_TEXTSTYLE    = AIMPUI_WINCONTROL_MAX_PROPID + 9;  // v5.40
+  AIMPUI_BUTTON_PROPID_DOWN         = AIMPUI_WINCONTROL_MAX_PROPID + 10; // v6.00
 
   // PropID for IAIMPUIBaseButtonnedEdit
   AIMPUI_BUTTONEDEDIT_PROPID_BUTTONSIMAGES = AIMPUI_BASEEDIT_MAX_PROPID + 1;
   AIMPUI_BUTTONEDEDIT_MAX_PROPID           = AIMPUI_BASEEDIT_MAX_PROPID + 10;
+
+  // PropID for IAIMPUIColorButton
+  AIMPUI_COLORBUTTON_PROPID_CAPTION          = AIMPUI_WINCONTROL_MAX_PROPID + 1; // v6.00
+  AIMPUI_COLORBUTTON_PROPID_TEXTSTYLE        = AIMPUI_WINCONTROL_MAX_PROPID + 2; // v6.00
+  AIMPUI_COLORBUTTON_PROPID_VALUE            = AIMPUI_WINCONTROL_MAX_PROPID + 3; // v6.00, Int64 (ARGB)
+  AIMPUI_COLORBUTTON_PROPID_VALUE_ALLOWALPHA = AIMPUI_WINCONTROL_MAX_PROPID + 4; // v6.00, Int64 (ARGB)
 
   // PropID for IAIMPUIEditButton
   AIMPUI_EDITBUTTON_PROPID_CUSTOM     = 0;
@@ -464,7 +530,7 @@ const
   AIMPUI_CATEGORY_PROPID_CAPTION  = AIMPUI_WINCONTROL_MAX_PROPID + 2;
 
   // PropID for IAIMPUICheckBox and IAIMPUIRadioBox
-  AIMPUI_CHECKBOX_PROPID_AUTOSIZE = AIMPUI_WINCONTROL_MAX_PROPID + 1;
+  AIMPUI_CHECKBOX_PROPID_AUTOSIZE = AIMPUI_WINCONTROL_MAX_PROPID + 1; // default: true
   AIMPUI_CHECKBOX_PROPID_CAPTION  = AIMPUI_WINCONTROL_MAX_PROPID + 2;
   AIMPUI_CHECKBOX_PROPID_STATE    = AIMPUI_WINCONTROL_MAX_PROPID + 3; // ref.AIMPUI_CHECKSTATE_XXX
   AIMPUI_CHECKBOX_PROPID_WORDWRAP = AIMPUI_WINCONTROL_MAX_PROPID + 4;
@@ -482,6 +548,17 @@ const
   // PropID for IAIMPUIEdit
   AIMPUI_EDIT_PROPID_PASSWORDCHAR    = AIMPUI_BUTTONEDEDIT_MAX_PROPID + 2;
   AIMPUI_EDIT_PROPID_TEXTHINT        = AIMPUI_BUTTONEDEDIT_MAX_PROPID + 3;
+  AIMPUI_EDIT_MAX_PROPID             = AIMPUI_BUTTONEDEDIT_MAX_PROPID + 10;
+
+  // PropID for IAIMPUINumericEdit
+  AIMPUI_NUMERICEDIT_PROPID_MASK     = AIMPUI_EDIT_MAX_PROPID + 1; // ref.AIMPUI_NUMERICEDIT_XXX
+  AIMPUI_NUMERICEDIT_PROPID_VALUE    = AIMPUI_EDIT_MAX_PROPID + 2;
+  AIMPUI_NUMERICEDIT_MASK_DECIMALS   = 1;
+  AIMPUI_NUMERICEDIT_MASK_NEGATIVE   = 2;
+  AIMPUI_NUMERICEDIT_MASK_ZERO       = 4;
+
+  // PropID for IAIMPUIDateEdit / IAIMPUIDateTimeEdit
+  AIMPUI_DATEEDIT_PROPID_VALUE       = AIMPUI_BUTTONEDEDIT_MAX_PROPID + 1;
 
   // PropID for IAIMPUIGroupBox
   AIMPUI_GROUPBOX_PROPID_AUTOSIZE    = AIMPUI_WINCONTROL_MAX_PROPID + 1;
@@ -490,10 +567,11 @@ const
   AIMPUI_GROUPBOX_PROPID_CHECKMODE   = AIMPUI_WINCONTROL_MAX_PROPID + 4; // ref.AIMPUI_CHECKMODE_XXX
   AIMPUI_GROUPBOX_PROPID_CHECKED     = AIMPUI_WINCONTROL_MAX_PROPID + 5; // ref.AIMPUI_CHECKSTATE_XXX
   AIMPUI_GROUPBOX_PROPID_CAPTION     = AIMPUI_WINCONTROL_MAX_PROPID + 6;
+  AIMPUI_GROUPBOX_PROPID_PADDING     = AIMPUI_WINCONTROL_MAX_PROPID + 7; // v6.0
 
   // PropID for IAIMPUIImage
-  AIMPUI_IMAGE_PROPID_IMAGE            = AIMPUI_WINCONTROL_MAX_PROPID + 1;
-  AIMPUI_IMAGE_PROPID_IMAGESTRETCHMODE = AIMPUI_WINCONTROL_MAX_PROPID + 2; // ref. AIMP_IMAGE_DRAW_STRETCHMODE_XXX
+  AIMPUI_IMAGE_PROPID_IMAGE            = AIMPUI_WINCONTROL_MAX_PROPID + 1; // ref. IAIMPImage
+  AIMPUI_IMAGE_PROPID_IMAGESTRETCHMODE = AIMPUI_WINCONTROL_MAX_PROPID + 2; // ref. AIMP_IMAGE_DRAW_STRETCHMODE_XXX (apiObjects)
   AIMPUI_IMAGE_PROPID_IMAGEINDEX       = AIMPUI_WINCONTROL_MAX_PROPID + 3;
   AIMPUI_IMAGE_PROPID_IMAGELIST        = AIMPUI_WINCONTROL_MAX_PROPID + 4;
 
@@ -512,18 +590,21 @@ const
   AIMPUI_LABEL_PROPID_TRANSPARENT    = AIMPUI_CONTROL_MAX_PROPID + 8;
   AIMPUI_LABEL_PROPID_URL            = AIMPUI_CONTROL_MAX_PROPID + 9;
   AIMPUI_LABEL_PROPID_WORDWRAP       = AIMPUI_CONTROL_MAX_PROPID + 10;
+  AIMPUI_LABEL_PROPID_TEXTSIZE       = AIMPUI_CONTROL_MAX_PROPID + 11; // v6.0, Int32
   AIMPUI_LABEL_MAX_PROPID            = AIMPUI_CONTROL_MAX_PROPID + 20;
 
   // PropID for IAIMPUIMemo
-  AIMPUI_MEMO_PROPID_CARET_XY      = AIMPUI_BASEEDIT_MAX_PROPID + 1;
+  AIMPUI_MEMO_PROPID_CARET_XY        = AIMPUI_BASEEDIT_MAX_PROPID + 1;
 
   // PropID for IAIMPUITabSheet
-  AIMPUI_TABSHEET_PROPID_CAPTION   = AIMPUI_WINCONTROL_MAX_PROPID + 1;
-  AIMPUI_TABSHEET_PROPID_INDEX     = AIMPUI_WINCONTROL_MAX_PROPID + 2;
-  AIMPUI_TABSHEET_PROPID_VISIBLE   = AIMPUI_WINCONTROL_MAX_PROPID + 3;
+  AIMPUI_TABSHEET_PROPID_CAPTION     = AIMPUI_WINCONTROL_MAX_PROPID + 1;
+  AIMPUI_TABSHEET_PROPID_INDEX       = AIMPUI_WINCONTROL_MAX_PROPID + 2;
+  AIMPUI_TABSHEET_PROPID_VISIBLE     = AIMPUI_WINCONTROL_MAX_PROPID + 3;
 
   // PropID for IAIMPUIPageControl
-  AIMPUI_PAGECONTROL_PROPID_ACTIVE = AIMPUI_WINCONTROL_MAX_PROPID + 1;
+  AIMPUI_PAGECONTROL_PROPID_ACTIVE      = AIMPUI_WINCONTROL_MAX_PROPID + 1;
+  AIMPUI_PAGECONTROL_PROPID_TABPOSITION = AIMPUI_WINCONTROL_MAX_PROPID + 2; // v6.00, ref. AIMPUI_TABS_POSITION_XXX
+  AIMPUI_PAGECONTROL_PROPID_STYLE       = AIMPUI_WINCONTROL_MAX_PROPID + 3; // v6.00, ref. AIMPUI_TABS_STYLE_XXX
 
   // PropID for IAIMPUIPanel
   AIMPUI_PANEL_PROPID_AUTOSIZE    = AIMPUI_WINCONTROL_MAX_PROPID + 1;
@@ -536,19 +617,28 @@ const
   AIMPUI_PROGRESSBAR_PROPID_MAX           = AIMPUI_WINCONTROL_MAX_PROPID + 2;
   AIMPUI_PROGRESSBAR_PROPID_MIN           = AIMPUI_WINCONTROL_MAX_PROPID + 3;
   AIMPUI_PROGRESSBAR_PROPID_PROGRESS      = AIMPUI_WINCONTROL_MAX_PROPID + 4;
+  AIMPUI_PROGRESSBAR_PROPID_AUTOSIZE      = AIMPUI_WINCONTROL_MAX_PROPID + 5; // v6.00
 
   // PropID for IAIMPUIScrollBox
   AIMPUI_SCROLLBOX_PROPID_BORDERS    = AIMPUI_WINCONTROL_MAX_PROPID + 1;
 
   // PropID for IAIMPUISlider
-  AIMPUI_SLIDER_PROPID_HORIZONTAL    = AIMPUI_WINCONTROL_MAX_PROPID + 1;
-  AIMPUI_SLIDER_PROPID_MARKS         = AIMPUI_WINCONTROL_MAX_PROPID + 2;
-  AIMPUI_SLIDER_PROPID_PAGESIZE      = AIMPUI_WINCONTROL_MAX_PROPID + 3;
-  AIMPUI_SLIDER_PROPID_TRANSPARENT   = AIMPUI_WINCONTROL_MAX_PROPID + 4;
-  AIMPUI_SLIDER_PROPID_VALUE         = AIMPUI_WINCONTROL_MAX_PROPID + 5;
-  AIMPUI_SLIDER_PROPID_VALUEDEFAULT  = AIMPUI_WINCONTROL_MAX_PROPID + 6;
-  AIMPUI_SLIDER_PROPID_VALUEMAX      = AIMPUI_WINCONTROL_MAX_PROPID + 7;
-  AIMPUI_SLIDER_PROPID_VALUEMIN      = AIMPUI_WINCONTROL_MAX_PROPID + 8;
+  AIMPUI_SLIDER_PROPID_HORIZONTAL          = AIMPUI_WINCONTROL_MAX_PROPID + 1;
+  AIMPUI_SLIDER_PROPID_MARKS               = AIMPUI_WINCONTROL_MAX_PROPID + 2;
+  AIMPUI_SLIDER_PROPID_PAGESIZE            = AIMPUI_WINCONTROL_MAX_PROPID + 3;
+  AIMPUI_SLIDER_PROPID_TRANSPARENT         = AIMPUI_WINCONTROL_MAX_PROPID + 4;
+  AIMPUI_SLIDER_PROPID_VALUE               = AIMPUI_WINCONTROL_MAX_PROPID + 5;
+  AIMPUI_SLIDER_PROPID_VALUEDEFAULT        = AIMPUI_WINCONTROL_MAX_PROPID + 6;
+  AIMPUI_SLIDER_PROPID_VALUEMAX            = AIMPUI_WINCONTROL_MAX_PROPID + 7;
+  AIMPUI_SLIDER_PROPID_VALUEMIN            = AIMPUI_WINCONTROL_MAX_PROPID + 8;
+  AIMPUI_SLIDER_PROPID_AUTOSIZE            = AIMPUI_WINCONTROL_MAX_PROPID + 9;  // v6.00
+  AIMPUI_SLIDER_PROPID_LABELPOSITION       = AIMPUI_WINCONTROL_MAX_PROPID + 10; // v6.00 // ref. AIMPUI_SLIDER_LABELPOSITION_XXX
+  AIMPUI_SLIDER_PROPID_LABELVALUE          = AIMPUI_WINCONTROL_MAX_PROPID + 11; // v6.00
+  AIMPUI_SLIDER_PROPID_LABELVALUE_WIDTH    = AIMPUI_WINCONTROL_MAX_PROPID + 12; // v6.00
+  AIMPUI_SLIDER_PROPID_LABELVALUEMIN       = AIMPUI_WINCONTROL_MAX_PROPID + 13; // v6.00
+  AIMPUI_SLIDER_PROPID_LABELVALUEMIN_WIDTH = AIMPUI_WINCONTROL_MAX_PROPID + 14; // v6.00
+  AIMPUI_SLIDER_PROPID_LABELVALUEMAX       = AIMPUI_WINCONTROL_MAX_PROPID + 15; // v6.00
+  AIMPUI_SLIDER_PROPID_LABELVALUEMAX_WIDTH = AIMPUI_WINCONTROL_MAX_PROPID + 16; // v6.00
 
   // PropID for IAIMPUISplitter
   AIMPUI_SPLITTER_PROPID_CANHIDE     = AIMPUI_WINCONTROL_MAX_PROPID + 1;
@@ -560,13 +650,19 @@ const
   AIMPUI_SPINEDIT_PROPID_MAXVALUE    = AIMPUI_WINCONTROL_MAX_PROPID + 3;
   AIMPUI_SPINEDIT_PROPID_MINVALUE    = AIMPUI_WINCONTROL_MAX_PROPID + 4;
   AIMPUI_SPINEDIT_PROPID_VALUE       = AIMPUI_WINCONTROL_MAX_PROPID + 5;
-  AIMPUI_SPINEDIT_PROPID_VALUETYPE   = AIMPUI_WINCONTROL_MAX_PROPID + 6;
+  AIMPUI_SPINEDIT_PROPID_VALUETYPE   = AIMPUI_WINCONTROL_MAX_PROPID + 6; // ref.to AIMPUI_SPINEDIT_VALUETYPE_XXX
+
+  AIMPUI_SPINEDIT_VALUETYPE_INTEGER  = 0;
+  AIMPUI_SPINEDIT_VALUETYPE_FLOAT    = 1;
 
   // PropID for IAIMPUITabControl
   AIMPUI_TABCONTROL_PROPID_ACTIVETABINDEX = AIMPUI_WINCONTROL_MAX_PROPID + 1;
+  AIMPUI_TABCONTROL_PROPID_TABPOSITION    = AIMPUI_WINCONTROL_MAX_PROPID + 2; // v6.0, ref. AIMPUI_TABS_POSITION_XXX
+  AIMPUI_TABCONTROL_PROPID_STYLE          = AIMPUI_WINCONTROL_MAX_PROPID + 3; // v6.0, ref. AIMPUI_TABS_STYLE_XXX
+  AIMPUI_TABCONTROL_PROPID_PADDING        = AIMPUI_WINCONTROL_MAX_PROPID + 4; // v6.0
 
   // PropID for IAIMPUITimeEdit
-  AIMPUI_TIMEDIT_PROPID_VALUE = AIMPUI_WINCONTROL_MAX_PROPID + 1;
+  AIMPUI_TIMEEDIT_PROPID_VALUE            = AIMPUI_WINCONTROL_MAX_PROPID + 1;
 
   // PropID for IAIMPUITreeListColumn
   AIMPUI_TL_COLUMN_PROPID_CAN_RESIZE      = 1;
@@ -626,6 +722,18 @@ const
   AIMPUI_TL_PROPID_NODE_IMAGE_ALIGNMENT       = AIMPUI_WINCONTROL_MAX_PROPID + 28;
   AIMPUI_TL_PROPID_NODE_IMAGES                = AIMPUI_WINCONTROL_MAX_PROPID + 29;
   AIMPUI_TL_PROPID_SORTING_MODE               = AIMPUI_WINCONTROL_MAX_PROPID + 30;
+  AIMPUI_TL_MAX_PROPID                        = AIMPUI_WINCONTROL_MAX_PROPID + 60;
+
+  // PropID for IAIMPUICardView (inherited from IAIMPUITreeList)
+  AIMPUI_CV_PROPID_CARD_WIDTH                 = AIMPUI_TL_MAX_PROPID + 1; // 0 - table layout
+  AIMPUI_CV_PROPID_GLYPH_FRAME                = AIMPUI_TL_MAX_PROPID + 2; // Int32 (0/1 - boolean)
+  AIMPUI_CV_PROPID_GLYPH_SIZE                 = AIMPUI_TL_MAX_PROPID + 3; // Int32 (Low: X, High: Y)
+  AIMPUI_CV_PROPID_SETTINGS_BUTTON            = AIMPUI_TL_MAX_PROPID + 4; // 0 - disabled
+
+  // PropID for IAIMPUICardViewItem (inherited from IAIMPUITreeListNode)
+  AIMPUI_CV_ITEM_PROPID_CAN_DELETE            = 20;
+  AIMPUI_CV_ITEM_PROPID_GLYPH                 = 21;
+  AIMPUI_CV_ITEM_PROPID_SETTINGS_BUTTON       = 22;
 
   // PropID for IAIMPUIValidationLabel
   AIMPUI_VALIDATIONLABEL_PROPID_GLYPH = AIMPUI_LABEL_MAX_PROPID + 1; // ref.AIMPUI_VALIDATIONLABEL_GLYPH_XXX
@@ -639,16 +747,23 @@ const
   AIMPUI_FORM_PROPID_PADDING       = AIMPUI_WINCONTROL_MAX_PROPID + 6;
   AIMPUI_FORM_PROPID_SHOWONTASKBAR = AIMPUI_WINCONTROL_MAX_PROPID + 7;
   AIMPUI_FORM_PROPID_STYLE         = AIMPUI_WINCONTROL_MAX_PROPID + 8;
+  AIMPUI_FORM_PROPID_STAYONTOP     = AIMPUI_WINCONTROL_MAX_PROPID + 9; // v6.0
+  AIMPUI_FORM_PROPID_MODALRESULT   = AIMPUI_WINCONTROL_MAX_PROPID + 10; // v6.0, ref. AIMPUI_FLAGS_MODALRESULT_XXX
+  AIMPUI_FORM_PROPID_CLIENTHEIGHT  = AIMPUI_WINCONTROL_MAX_PROPID + 11; // v6.0
+  AIMPUI_FORM_PROPID_CLIENTWIDTH   = AIMPUI_WINCONTROL_MAX_PROPID + 12; // v6.0
 
   // PropID for IAIMPUIProgressDialog
   AIMPUI_PROGRESSDLG_PROPID_CAPTION                  = 1;
   AIMPUI_PROGRESSDLG_PROPID_MESSAGE                  = 2;
   AIMPUI_PROGRESSDLG_PROPID_SHOW_PROGRESS_ON_TASKBAR = 3;
 
+  // PropID for IAIMPUIPathChooser
+  AIMPUI_PATHCHOOSER_PROPID_COLUMNS = AIMPUI_WINCONTROL_MAX_PROPID + 1; // v6.0
+
   // PropID for IAIMPUIMode
   AIMPUI_MODE_PROPID_ACCENT = 1;
-  AIMPUI_MODE_PROPID_DPI    = 2;
-  AIMPUI_MODE_PROPID_STYLE  = 3;
+  AIMPUI_MODE_PROPID_DPI    = 2; // 0 is auto
+  AIMPUI_MODE_PROPID_STYLE  = 3; // AIMPUI_STYLE_DARK / AIMPUI_STYLE_LIGHT
 
   // PropID for IAIMPUITrayIcon
   AIMPUI_TRAYICON_PROPID_ID        = 1; // IAIMPString
@@ -661,6 +776,16 @@ const
   AIMPUI_TRAYICON_NOTIFY_FLAGS_INFO    = 0;
   AIMPUI_TRAYICON_NOTIFY_FLAGS_ERROR   = 1;
   AIMPUI_TRAYICON_NOTIFY_FLAGS_WARNING = 2;
+
+  // PropID for IAIMPUIFont
+  AIMPUI_FONT_PROPID_NAME   = 1; // IAIMPString
+  AIMPUI_FONT_PROPID_COLOR  = 2; // Int64
+  AIMPUI_FONT_PROPID_STYLE  = 3; // ref.AIMPUI_FLAGS_FONT_XXX
+  AIMPUI_FONT_PROPID_SIZE   = 4; // Int32
+  AIMPUI_FONT_PROPID_SPECS  = 5; // IAIMPString
+
+ // PropID for IAIMPUIImageList3
+ AIMPUI_IMAGELIST_PROPID_ALLOWCOLORATION = 1; // v6.0, Int32
 
 type
 //----------------------------------------------------------------------------------------------------------------------
@@ -697,8 +822,6 @@ type
 //----------------------------------------------------------------------------------------------------------------------
 
   TAIMPUIMouseButton   = (umbLeft = 0, umbRight = 1, umbMiddle = 2);
-  TAIMPUITextAlignment = (utaLeftJustify = 0, utaRightJustify = 1, utaCenter = 2);
-  TAIMPUITextVerticalAlignment = (utvaTop = 0, utvaBottom = 1, utvaCenter = 2);
 
   { IAIMPUIChangeEvents }
 
@@ -763,19 +886,31 @@ type
 
   { TAIMPUIControlPlacement }
 
-  TAIMPUIControlAlignment = (ualNone = 0, ualTop = 1, ualBottom = 2, ualLeft = 3, ualRight = 4, ualClient = 5);
+  TAIMPUIControlAlignment = (
+    ualNone = 0,
+    ualTop = 1,
+    ualBottom = 2,
+    ualLeft = 3,
+    ualRight = 4,
+    ualClient = 5
+  );
 
   TAIMPUIControlPlacement = packed record
     Alignment: TAIMPUIControlAlignment;
     AlignmentMargins: TRect;
     Anchors: TRect;
     Bounds: TRect;
-    constructor Create(AAlignment: TAIMPUIControlAlignment; ASize: Integer); overload;
-    constructor Create(AAlignment: TAIMPUIControlAlignment; ASize: Integer; const AAlignmentMargins: TRect); overload;
-    constructor Create(AAlignment: TAIMPUIControlAlignment; const ABounds, AAlignmentMargins: TRect); overload;
-    constructor Create(AAlignment: TAIMPUIControlAlignment; const ABounds: TRect); overload;
-    constructor Create(const ABounds, AAnchors: TRect); overload;
-    constructor Create(const ABounds: TRect); overload;
+
+    class function Create(AAlignment: TAIMPUIControlAlignment;
+      ASize: Integer): TAIMPUIControlPlacement; overload; static;
+    class function Create(AAlignment: TAIMPUIControlAlignment;
+      ASize: Integer; const AAlignmentMargins: TRect): TAIMPUIControlPlacement; overload; static;
+    class function Create(AAlignment: TAIMPUIControlAlignment;
+      const ABounds, AAlignmentMargins: TRect): TAIMPUIControlPlacement; overload; static;
+    class function Create(AAlignment: TAIMPUIControlAlignment;
+      const ABounds: TRect): TAIMPUIControlPlacement; overload; static;
+    class function Create(const ABounds, AAnchors: TRect): TAIMPUIControlPlacement; overload; static;
+    class function Create(const ABounds: TRect): TAIMPUIControlPlacement; overload; static;
     procedure Reset;
   end;
 
@@ -821,19 +956,15 @@ type
     function SetFocus: HRESULT; stdcall;
   end;
 
-  { IAIMPUIWndProcEvents }
-
-  IAIMPUIWndProcEvents = interface
-  [SID_IAIMPUIWndProcEvents]
-    function OnBeforeWndProc(Message: LongWord; ParamW: WPARAM;
-      ParamL: LPARAM; var Result: LRESULT): LongBool; stdcall;
-    procedure OnAfterWndProc(Message: LongWord; ParamW: WPARAM;
-      ParamL: LPARAM; var Result: LRESULT); stdcall;
-  end deprecated;
-
 //----------------------------------------------------------------------------------------------------------------------
 // Non-Visual Components Interfaces
 //----------------------------------------------------------------------------------------------------------------------
+
+  { IAIMPUIFont }
+
+  IAIMPUIFont = interface(IAIMPPropertyList) // v6.0
+  [SID_IAIMPUIFont]
+  end;
 
   { IAIMPUIImageList }
 
@@ -849,11 +980,27 @@ type
     function SetSize(Size: TSize): HRESULT; stdcall;
   end;
 
-  { IAIMPUIImageList2 }
+//  { IAIMPUIImageList2 }
+//
+//  IAIMPUIImageList2 = interface
+//  [SID_IAIMPUIImageList2]
+//    function DrawEx(Canvas: HCANVAS; Index: Integer; const R: TRect; Enabled: LongBool): HRESULT; stdcall;
+//  end deprecated 'Use the IAIMPUIImageList3';
+//
+  { IAIMPUIImageList3 }
 
-  IAIMPUIImageList2 = interface
-  [SID_IAIMPUIImageList2]
+  IAIMPUIImageList3 = interface(IAIMPPropertyList) // v6.0
+  [SID_IAIMPUIImageList3]
+    function Add(Image: IAIMPImage): HRESULT; stdcall;
+    function Clear: HRESULT; stdcall;
+    function Delete(Index: Integer): HRESULT; stdcall;
+    function Draw(Canvas: HCANVAS; Index, X, Y: Integer; Enabled: LongBool): HRESULT; stdcall;
     function DrawEx(Canvas: HCANVAS; Index: Integer; const R: TRect; Enabled: LongBool): HRESULT; stdcall;
+    function LoadFromStream(Stream: IAIMPStream): HRESULT; stdcall;
+    function GetCount: Integer; stdcall;
+    function GetImage(Index: Integer; Enabled: LongBool; out Image: IAIMPImage): HRESULT; stdcall;
+    function GetSize(out Size: TSize): HRESULT; stdcall;
+    function SetSize(Size: TSize): HRESULT; stdcall;
   end;
 
   { IAIMPUIMenuItem }
@@ -877,6 +1024,13 @@ type
     function GetCount: Integer; stdcall;
     function Popup(ScreenPoint: TPoint): HRESULT; stdcall;
     function Popup2(ScreenRect: TRect): HRESULT; stdcall;
+  end;
+
+  { IAIMPUIPopupMenu2 }
+
+  IAIMPUIPopupMenu2 = interface(IAIMPUIPopupMenu)
+  [SID_IAIMPUIPopupMenu2]
+    function PopupFromCursor: HRESULT; stdcall;
   end;
 
   { IAIMPUITrayIcon }
@@ -923,10 +1077,22 @@ type
     function ShowDropDownMenu: HRESULT; stdcall;
   end;
 
+  { IAIMPUIColorButton }
+
+  IAIMPUIColorButton = interface(IAIMPUIWinControl) // v6.0
+  [SID_IAIMPUIColorButton]
+  end;
+
   { IAIMPUIEditButton }
 
   IAIMPUIEditButton = interface(IAIMPPropertyList)
   [SID_IAIMPUIEditButton]
+  end;
+
+  { IAIMPUIToolButton }
+
+  IAIMPUIToolButton = interface(IAIMPUIButton) // v6.0
+  [SID_IAIMPUIToolButton]
   end;
 
   { IAIMPUIBaseButtonnedEdit }
@@ -944,6 +1110,7 @@ type
 
   IAIMPUIBaseComboBox = interface(IAIMPUIBaseButtonnedEdit)
   [SID_IAIMPUIBaseComboBox]
+    // use the IAIMPNamedContainer to bind custom data within the text
     function Add(Obj: IUnknown; ExtraData: Integer): HRESULT; stdcall;
     function Add2(List: IAIMPObjectList): HRESULT; stdcall;
     function Clear: HRESULT; stdcall;
@@ -985,10 +1152,28 @@ type
     function SetChecked(Index: Integer; Value: LongBool): HRESULT; stdcall;
   end;
 
+  { IAIMPUIDateEdit }
+
+  IAIMPUIDateEdit = interface(IAIMPUIBaseButtonnedEdit) // v6.00
+  [SID_IAIMPUIDateEdit]
+  end;
+
+  { IAIMPUIDateTimeEdit }
+
+  IAIMPUIDateTimeEdit = interface(IAIMPUIDateEdit) // v6.00
+  [SID_IAIMPUIDateTimeEdit]
+  end;
+
   { IAIMPUIEdit }
 
   IAIMPUIEdit = interface(IAIMPUIBaseButtonnedEdit)
   [SID_IAIMPUIEdit]
+  end;
+
+  { IAIMPUINumericEdit }
+
+  IAIMPUINumericEdit = interface(IAIMPUIEdit) // v6.00
+  [SID_IAIMPUINumericEdit]
   end;
 
   { IAIMPUIGroupBox }
@@ -1265,6 +1450,43 @@ type
     procedure OnStructChanged(Sender: IAIMPUITreeList); stdcall;
   end;
 
+  { IAIMPUITreeListDeleteEvents }
+
+  IAIMPUITreeListDeleteEvents = interface(IUnknown) // v6.0
+  [SID_IAIMPUITreeListDeleteEvents]
+    procedure OnDeleteSelected(Sender: IAIMPUITreeList; var Allow: LongBool); stdcall;
+  end;
+
+  { IAIMPUICardView }
+
+  IAIMPUICardView = interface(IAIMPUITreeList) // v6.0
+  [SID_IAIMPUICardView]
+  end;
+
+  { IAIMPUICardViewItem }
+
+  IAIMPUICardViewItem = interface(IAIMPUITreeListNode) // v6.0
+  [SID_IAIMPUICardViewItem]
+  end;
+
+  { IAIMPUICardViewEvents }
+
+  IAIMPUICardViewEvents = interface(IUnknown) // v6.0
+  [SID_IAIMPUICardViewEvents]
+    procedure OnItemSettings(Sender: IAIMPUICardView; Item: IAIMPUICardViewItem); stdcall;
+  end;
+
+  { IAIMPUIPathChooser }
+
+  IAIMPUIPathChooser = interface(IAIMPUIWinControl) // v6.0
+  [SID_IAIMPUIPathChooser]
+    function Add(Path: IAIMPString; Recursive: LongBool): HRESULT; stdcall;
+    function Clear: HRESULT; stdcall;
+    function Delete(Index: Integer): HRESULT;
+    function Get(Index: Integer; out Path: IAIMPString; out Recursive: LongBool): HRESULT; stdcall;
+    function GetCount: Integer; stdcall;
+  end;
+
   { IAIMPUIRadioBox }
 
   IAIMPUIRadioBox = interface(IAIMPUICheckBox)
@@ -1288,8 +1510,20 @@ type
     function Close: HRESULT; stdcall;
     function GetFocusedControl(out Control: IAIMPUIWinControl): HRESULT; stdcall;
     function Localize: HRESULT; stdcall;
-    function Release(Postponed: LongBool): HRESULT; stdcall;
+    function Destroy(Postponed: LongBool): HRESULT; stdcall;
     function ShowModal: Integer; stdcall;
+  end;
+
+  { IAIMPUIForm2 }
+
+  IAIMPUIForm2 = interface(IAIMPUIForm) // v6.00
+  [SID_IAIMPUIForm2]
+    function BringToTop: HRESULT; stdcall;
+    function ConfigLoad: HRESULT; stdcall;
+    function ConfigSave: HRESULT; stdcall;
+    function Hide: HRESULT; stdcall;
+    function Show: HRESULT; stdcall;
+    function ShowNoActivate: HRESULT; stdcall;
   end;
 
   { IAIMPUIFormEvents }
@@ -1364,17 +1598,17 @@ type
   IAIMPUIInputDialog = interface
   [SID_IAIMPUIInputDialog]
     function Execute(OwnerWnd: HWND; Caption: IAIMPString;
-      EventsHandler: IUnknown; Text: IAIMPString; var Value: OleVariant): HRESULT; stdcall;
+      EventsHandler: IUnknown; Text: IAIMPString; var Value: VarValue): HRESULT; stdcall;
     function Execute2(OwnerWnd: HWND; Caption: IAIMPString;
       EventsHandler: IUnknown; TextForValues: IAIMPObjectList;
-      Values: POleVariant; ValueCount: Integer): HRESULT; stdcall;
+      Values: PVarValue; ValueCount: Integer): HRESULT; stdcall;
   end;
 
   { IAIMPUIInputDialogEvents }
 
   IAIMPUIInputDialogEvents = interface
   [SID_IAIMPUIInputDialogEvents]
-    function OnValidate(const Value: OleVariant; ValueIndex: Integer): HRESULT; stdcall;
+    function OnValidate(const Value: VarValue; ValueIndex: Integer): HRESULT; stdcall;
   end;
 
   { IAIMPUIMessageDialog }
@@ -1400,12 +1634,30 @@ type
     procedure OnCanceled; stdcall;
   end;
 
+  { IAIMPUIColorPickerDialog }
+
+  IAIMPUIColorPickerDialog = interface // v6.0
+  [SID_IAIMPUIColorPickerDialog]
+    function Execute(OwnerWnd: HWND; Caption: IAIMPString;
+      Flags: LongWord; var Color: LongWord): HRESULT; stdcall;
+  end;
+
+  { IAIMPUIFontPickerDialog }
+
+  IAIMPUIFontPickerDialog = interface // v6.0
+  [SID_IAIMPUIFontPickerDialog]
+    function Execute(OwnerWnd: HWND; Caption: IAIMPString;
+      Flags: LongWord; Font: IAIMPUIFont): HRESULT; stdcall;
+  end;
+
 //----------------------------------------------------------------------------------------------------------------------
 // GUI Service
 //----------------------------------------------------------------------------------------------------------------------
 
 const
-  AIMPUI_SERVICE_CREATEFORM_FLAGS_CHILD = 1;
+  AIMPUI_SERVICE_CREATEFORM_FLAGS_REGULAR = 0;
+  AIMPUI_SERVICE_CREATEFORM_FLAGS_CHILD   = 1;
+  AIMPUI_SERVICE_CREATEFORM_FLAGS_LAYERED = 2; // v6.00
 
 type
 
@@ -1417,60 +1669,63 @@ type
       EventsHandler: IUnknown; const IID: TGUID; out Control): HRESULT; stdcall;
     function CreateForm(OwnerWindow: HWND; Flags: LongWord; Name: IAIMPString;
       EventsHandler: IUnknown; out Form: IAIMPUIForm): HRESULT; stdcall;
-    function CreateObject(Owner: IAIMPUIForm; EventsHandler: IUnknown; const IID: TGUID; out Obj): HRESULT; stdcall;
+    function CreateObject(Owner: IAIMPUIForm;
+      EventsHandler: IUnknown; const IID: TGUID; out Obj): HRESULT; stdcall;
   end;
 
 implementation
 
 { TAIMPUIControlPlacement }
 
-constructor TAIMPUIControlPlacement.Create(
-  AAlignment: TAIMPUIControlAlignment; ASize: Integer);
-var
-  R: TRect;
+class function TAIMPUIControlPlacement.Create(
+  AAlignment: TAIMPUIControlAlignment; ASize: Integer): TAIMPUIControlPlacement;
 begin
-  R := Rect(0, 0, 0, 0);
+  Result.Reset;
+  Result.Alignment := AAlignment;
   if AAlignment in [ualTop, ualBottom, ualClient] then
-    R.Bottom := ASize;
+    Result.Bounds.Bottom := Result.Bounds.Top + ASize;
   if AAlignment in [ualLeft, ualRight, ualClient] then
-    R.Right := ASize;
-  Create(AAlignment, R);
+    Result.Bounds.Right := Result.Bounds.Left + ASize;
 end;
 
-constructor TAIMPUIControlPlacement.Create(
+class function TAIMPUIControlPlacement.Create(
+  AAlignment: TAIMPUIControlAlignment; ASize: Integer;
+  const AAlignmentMargins: TRect): TAIMPUIControlPlacement;
+begin
+  Result := Create(AAlignment, ASize);
+  Result.AlignmentMargins := AAlignmentMargins;
+end;
+
+class function TAIMPUIControlPlacement.Create(
   AAlignment: TAIMPUIControlAlignment;
-  ASize: Integer; const AAlignmentMargins: TRect);
+  const ABounds, AAlignmentMargins: TRect): TAIMPUIControlPlacement;
 begin
-  Create(AAlignment, ASize);
-  AlignmentMargins := AAlignmentMargins;
+  Result.Reset;
+  Result.Alignment := AAlignment;
+  Result.AlignmentMargins := AAlignmentMargins;
 end;
 
-constructor TAIMPUIControlPlacement.Create(
-  AAlignment: TAIMPUIControlAlignment;
-  const ABounds, AAlignmentMargins: TRect);
+class function TAIMPUIControlPlacement.Create(
+  AAlignment: TAIMPUIControlAlignment; const ABounds: TRect): TAIMPUIControlPlacement;
 begin
-  Create(AAlignment, ABounds);
-  AlignmentMargins := AAlignmentMargins;
+  Result.Reset;
+  Result.Alignment := AAlignment;
+  Result.Bounds := ABounds;
 end;
 
-constructor TAIMPUIControlPlacement.Create(
-  AAlignment: TAIMPUIControlAlignment; const ABounds: TRect);
+class function TAIMPUIControlPlacement.Create(
+  const ABounds, AAnchors: TRect): TAIMPUIControlPlacement;
 begin
-  Reset;
-  Alignment := AAlignment;
-  Bounds := ABounds;
+  Result.Reset;
+  Result.Bounds := ABounds;
+  Result.Anchors := AAnchors;
 end;
 
-constructor TAIMPUIControlPlacement.Create(const ABounds, AAnchors: TRect);
+class function TAIMPUIControlPlacement.Create(
+  const ABounds: TRect): TAIMPUIControlPlacement;
 begin
-  Create(ABounds);
-  Anchors := AAnchors;
-end;
-
-constructor TAIMPUIControlPlacement.Create(const ABounds: TRect);
-begin
-  Reset;
-  Bounds := ABounds;
+  Result.Reset;
+  Result.Bounds := ABounds;
 end;
 
 procedure TAIMPUIControlPlacement.Reset;
@@ -1478,11 +1733,13 @@ begin
   Alignment := ualNone;
   AlignmentMargins := Rect(3, 3, 3, 3);
   Anchors := Rect(1, 1, 0, 0);
+  Bounds := Rect(0, 0, 0, 0);
 end;
 
 { TAIMPUIControlPlacementConstraints }
 
-constructor TAIMPUIControlPlacementConstraints.Create(AMinWidth, AMinHeight, AMaxWidth, AMaxHeight: Integer);
+constructor TAIMPUIControlPlacementConstraints.Create(
+  AMinWidth, AMinHeight, AMaxWidth, AMaxHeight: Integer);
 begin
   MaxHeight := AMaxHeight;
   MaxWidth := AMaxWidth;

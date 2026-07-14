@@ -3,12 +3,12 @@
 //  Project:   AIMP
 //             Programming Interface
 //
-//  Target:    v5.40 build 2650
+//  Target:    v6.00 build 3000
 //
 //  Purpose:   Core API
 //
 //  Author:    Artem Izmaylov
-//             © 2006-2025
+//             © 2006-2026
 //             www.aimp.ru
 //
 //  FPC:       OK
@@ -20,7 +20,8 @@ unit apiCore;
 interface
 
 uses
-  apiObjects;
+  apiObjects,
+  apiTypes;
 
 const
   SID_IAIMPCore = '{41494D50-436F-7265-0000-000000000000}';
@@ -34,6 +35,9 @@ const
 
   SID_IAIMPServiceConfig = '{41494D50-5372-7643-6667-000000000000}';
   IID_IAIMPServiceConfig: TGUID = SID_IAIMPServiceConfig;
+
+  SID_IAIMPServiceLog = '{41494D50-5372-764C-6F67-000000000000}';
+  IID_IAIMPServiceLog: TGUID = SID_IAIMPServiceLog;
 
   SID_IAIMPServiceShutdown = '{41494D50-5372-7653-6875-74646F776E00}';
   IID_IAIMPServiceShutdown: TGUID = SID_IAIMPServiceShutdown;
@@ -103,6 +107,14 @@ type
   IAIMPServiceConfig = interface(IAIMPConfig)
   [SID_IAIMPServiceConfig]
     function FlushCache: HRESULT; stdcall;
+  end;
+
+  { IAIMPServiceLog }
+
+  IAIMPServiceLog = interface // v6.0
+  [SID_IAIMPServiceLog]
+    procedure Add1(Text: PAnsiChar; Flags: LongWord); stdcall;
+    procedure Add2(Text: PWideChar; Flags: LongWord); stdcall;
   end;
 
   { IAIMPServiceShutdown }

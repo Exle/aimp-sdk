@@ -8,7 +8,7 @@
 //  Purpose:   CDDA Plugin Internal API
 //
 //  Author:    Artem Izmaylov
-//             © 2006-2025
+//             © 2006-2026
 //             www.aimp.ru
 //
 //  FPC:       OK

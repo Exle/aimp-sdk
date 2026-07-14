@@ -1,5 +1,9 @@
 ﻿program uRemoteAccessDemo;
 
+{$IFNDEF MSWINDOWS}
+  {$MESSAGE FATAL ' Remote API available for Windows platform only '}
+{$ENDIF}
+
 uses
   Forms,
   uRemoteAccessDemoMain in 'uRemoteAccessDemoMain.pas' {frmRemoteAccessDemo};

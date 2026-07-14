@@ -3,12 +3,12 @@
 //  Project:   AIMP
 //             Programming Interface
 //
-//  Target:    v5.40 build 2650
+//  Target:    v6.00 build 3000
 //
 //  Purpose:   General Wrappers
 //
 //  Author:    Artem Izmaylov
-//             © 2006-2025
+//             © 2006-2026
 //             www.aimp.ru
 //
 //  FPC:       OK
@@ -21,13 +21,11 @@ interface
 
 uses
 {$IFDEF FPC}
-  LCLIntf,
   LCLType,
 {$ELSE}
   Windows,
 {$ENDIF}
   // System
-  Classes,
   Math,
   SysUtils,
   Types,
@@ -69,7 +67,7 @@ type
   { TAIMPExtensionFileFormat }
 
   TAIMPExtensionFileFormat = class(TInterfacedObjectEx, IAIMPExtensionFileFormat)
-  private
+  strict private
     FDescription: string;
     FExtList: string;
     FFlags: Cardinal;
@@ -94,39 +92,33 @@ type
     // IAIMPPropertyList
     procedure DoBeginUpdate; virtual;
     procedure DoEndUpdate; virtual;
-    procedure DoGetValueAsFloat(PropertyID: Integer; out Value: Double; var Result: HRESULT); virtual;
-    procedure DoGetValueAsInt32(PropertyID: Integer; out Value: Integer; var Result: HRESULT); virtual;
-    procedure DoGetValueAsInt64(PropertyID: Integer; out Value: Int64; var Result: HRESULT); virtual;
-    function DoGetValueAsObject(PropertyID: Integer): IUnknown; virtual;
-    procedure DoGetValueAsVariant(PropertyID: Integer; out Value: OleVariant; var Result: HRESULT); virtual;
-    procedure DoSetValueAsFloat(PropertyID: Integer; const Value: Double; var Result: HRESULT); virtual;
-    procedure DoSetValueAsInt32(PropertyID: Integer; const Value: Integer; var Result: HRESULT); virtual;
-    procedure DoSetValueAsInt64(PropertyID: Integer; const Value: Int64; var Result: HRESULT); virtual;
-    procedure DoSetValueAsObject(PropertyID: Integer; const Value: IUnknown; var Result: HRESULT); virtual;
-    procedure DoSetValueAsVariant(PropertyID: Integer; const Value: OleVariant; var Result: HRESULT); virtual;
+    procedure DoGetValue(PropID: Integer; out Value: Variant; var Result: HRESULT); virtual;
+    function DoGetValueAsObject(PropID: Integer): IUnknown; virtual;
     function DoReset: HRESULT; virtual;
+    procedure DoSetValue(PropID: Integer; const Value: Variant; var Result: HRESULT); virtual;
+    procedure DoSetValueAsObject(PropID: Integer; const Value: IUnknown; var Result: HRESULT); virtual;
   public
     // IAIMPPropertyList
     procedure BeginUpdate; stdcall;
     procedure EndUpdate; stdcall;
-    function GetValueAsFloat(PropertyID: Integer; out Value: Double): HRESULT; stdcall;
-    function GetValueAsInt32(PropertyID: Integer; out Value: Integer): HRESULT; stdcall;
-    function GetValueAsInt64(PropertyID: Integer; out Value: Int64): HRESULT; stdcall;
-    function GetValueAsObject(PropertyID: Integer; const IID: TGUID; out Value): HRESULT; stdcall;
-    function SetValueAsFloat(PropertyID: Integer; const Value: Double): HRESULT; stdcall;
-    function SetValueAsInt32(PropertyID: Integer; Value: Integer): HRESULT; stdcall;
-    function SetValueAsInt64(PropertyID: Integer; const Value: Int64): HRESULT; stdcall;
-    function SetValueAsObject(PropertyID: Integer; Value: IInterface): HRESULT; stdcall;
+    function GetValueAsFloat(PropID: Integer; out Value: Double): HRESULT; stdcall;
+    function GetValueAsInt32(PropID: Integer; out Value: Integer): HRESULT; stdcall;
+    function GetValueAsInt64(PropID: Integer; out Value: Int64): HRESULT; stdcall;
+    function GetValueAsObject(PropID: Integer; const IID: TGUID; out Value): HRESULT; stdcall;
+    function SetValueAsFloat(PropID: Integer; const Value: Double): HRESULT; stdcall;
+    function SetValueAsInt32(PropID: Integer; Value: Integer): HRESULT; stdcall;
+    function SetValueAsInt64(PropID: Integer; const Value: Int64): HRESULT; stdcall;
+    function SetValueAsObject(PropID: Integer; Value: IInterface): HRESULT; stdcall;
     function Reset: HRESULT; stdcall;
     // IAIMPPropertyList2
-    function GetValueAsVariant(PropertyID: Integer; out Value: OleVariant): HRESULT; stdcall;
-    function SetValueAsVariant(PropertyID: Integer; const Value: OleVariant): HRESULT; stdcall;
+    function GetValueAsVariant(PropID: Integer; out Value: VarValue): HRESULT; stdcall;
+    function SetValueAsVariant(PropID: Integer; const Value: VarValue): HRESULT; stdcall;
   end;
 
   { TAIMPServiceConfig }
 
-  TAIMPServiceConfig = class(TObject)
-  private
+  TAIMPServiceConfig = class
+  strict private
     FService: IAIMPServiceConfig;
   public
     constructor Create;
@@ -148,76 +140,15 @@ type
     property Service: IAIMPServiceConfig read FService;
   end;
 
-  { TAIMPStreamWrapper }
-
-  TAIMPStreamWrapper = class(TStream)
-  private
-    FSource: IAIMPStream;
-  protected
-    function GetSize: Int64; override;
-    procedure SetSize(const NewSize: Int64); override;
-  public
-    constructor Create(ASource: IAIMPStream); virtual;
-    function Read(var Buffer; Count: Longint): Longint; override;
-    function Seek(const Offset: Int64; Origin: TSeekOrigin): Int64; override;
-    function Write(const Buffer; Count: Longint): Longint; override;
-  end;
-
-  { TAIMPStreamAdapter }
-
-  TAIMPStreamAdapter = class(TInterfacedObjectEx, IAIMPStream)
-  private
-    FOwnership: TStreamOwnership;
-  protected
-    FSource: TStream;
-    FSourceIsReadOnly: Boolean;
-
-    function TestSource(ASource: TStream): Boolean; virtual;
-    // IAIMPStream
-    function GetSize: Int64; stdcall;
-    function SetSize(const Value: Int64): HRESULT; stdcall;
-    function GetPosition: Int64; stdcall;
-    function Seek(const Offset: Int64; Mode: Integer): HRESULT; stdcall;
-    function Read(Buffer: PByte; Count: LongWord): Integer; virtual; stdcall;
-    function Write(Buffer: PByte; Count: LongWord; Written: PLongWord = nil): HRESULT; stdcall;
-  public
-    constructor Create(ASource: TStream; AOwnership: TStreamOwnership = soOwned);
-    constructor CreateFromResource(const AName: string; AType: PChar);
-    destructor Destroy; override;
-  end;
-
-  { TAIMPMemoryStreamAdapter }
-
-  TAIMPMemoryStreamAdapter = class(TAIMPStreamAdapter, IAIMPMemoryStream)
-  protected
-    function TestSource(ASource: TStream): Boolean; override;
-    // IAIMPMemoryStream
-    function GetData: PByte; stdcall;
-  public
-    constructor Create; overload;
-  end;
-
-  { TAIMPFileStreamAdapter }
-
-  TAIMPFileStreamAdapter = class(TAIMPStreamAdapter, IAIMPFileStream)
-  protected
-    function CreateStream(const AFileName: string; AMode: Integer): TStream; virtual;
-    function Read(Buffer: PByte; Count: DWORD): Integer; override;
-    function TestSource(ASource: TStream): Boolean; override;
-    // IAIMPFileStream
-    function GetClipping(out Offset, Size: Int64): HRESULT; virtual; stdcall;
-    function GetFileName(out S: IAIMPString): HRESULT; virtual; stdcall;
-  public
-    constructor Create(const AFileName: IAIMPString; AMode: Integer); overload;
-    constructor Create(const AFileName: string; AMode: Integer); overload;
-  end;
-
 var
-  FInternalConverter: function (const AString: IAIMPString): string = nil;
+  FInternalStringConverter1: function (const AString: IAIMPString): string = nil;
+  FInternalStringConverter2: function (const AString: string): IAIMPString = nil;
 
 procedure CheckResult(R: HRESULT; const AMessage: string = '%d');
 
 // Core
+function CoreCheckVersion(Core: IAIMPCore;
+  VersionID: Integer; BuildNumber: Integer = 0): Boolean;
 procedure CoreCreateObject(const IID: TGUID; out Obj);
 function CoreGetProfilePath: string;
 function CoreGetService(const IID: TGUID; out Obj): LongBool;
@@ -240,6 +171,8 @@ function LangLoadStringEx(const KeyPath: string; const Args: array of const): IA
 // Strings
 function IAIMPStringToString(const S: IAIMPString): string; inline;
 function MakeString(const S: string): IAIMPString;
+function MakeStringPair(const S: string; const Data: Pointer): IAIMPNamedContainer; overload; // v6.00
+function MakeStringPair(const S: string; const Obj: IUnknown): IAIMPNamedContainer; overload; // v6.00
 function StrCompare(const S1: IAIMPString; const S2: IAIMPString; IgnoreCase: Boolean = False): Integer; overload;
 function StrCompare(const S1: IAIMPString; const S2: string; IgnoreCase: Boolean = False): Integer; overload;
 
@@ -261,8 +194,8 @@ procedure PropListSetStr(const List: IAIMPPropertyList; ID: Integer; const S: st
 // Message Dispatcher
 function ApplicationIsLoaded: LongBool;
 function MessageDispatcherSend(Message: Integer; Param1: Integer = 0; Param2: Pointer = nil): HRESULT;
-function MessageDispatcherGetPropValue(PropertyID: Integer; ValueBuffer: Pointer): HRESULT;
-function MessageDispatcherSetPropValue(PropertyID: Integer; ValueBuffer: Pointer): HRESULT;
+function MessageDispatcherGetPropValue(PropID: Integer; ValueBuffer: Pointer): HRESULT;
+function MessageDispatcherSetPropValue(PropID: Integer; ValueBuffer: Pointer): HRESULT;
 implementation
 
 uses
@@ -281,9 +214,24 @@ begin
     raise Exception.CreateFmt(AMessage, [R]);
 end;
 
-//----------------------------------------------------------------------------------------------------------------------
-// Core
-//----------------------------------------------------------------------------------------------------------------------
+function MainWindowGetHandle: HWND;
+begin
+  if Failed(MessageDispatcherSend(AIMP_MSG_PROPERTY_HWND, AIMP_MPH_MAINFORM, @Result)) then
+    Result := 0;
+end;
+
+{$REGION ' Core '}
+
+function CoreCheckVersion(Core: IAIMPCore;
+  VersionID: Integer; BuildNumber: Integer = 0): Boolean;
+var
+  LService: IAIMPServiceVersionInfo;
+begin
+  Result := (Core <> nil) and
+    (Core.QueryInterface(IAIMPServiceVersionInfo, LService) = S_OK) and
+    (LService.GetVersionID >= VersionID) and
+    (LService.GetBuildNumber >= BuildNumber);
+end;
 
 procedure CoreCreateObject(const IID: TGUID; out Obj);
 begin
@@ -325,19 +273,9 @@ begin
   Result := E_UNEXPECTED;
 end;
 
-//----------------------------------------------------------------------------------------------------------------------
-// Window Handles
-//----------------------------------------------------------------------------------------------------------------------
+{$ENDREGION}
 
-function MainWindowGetHandle: HWND;
-begin
-  if Failed(MessageDispatcherGetPropValue(AIMP_MSG_PROPERTY_HWND, @Result)) then
-    Result := 0;
-end;
-
-//----------------------------------------------------------------------------------------------------------------------
-// Localization
-//----------------------------------------------------------------------------------------------------------------------
+{$REGION ' Localizations '}
 
 function LangGetName: string;
 var
@@ -407,14 +345,14 @@ begin
     Result := E_NOINTERFACE;
 end;
 
-//----------------------------------------------------------------------------------------------------------------------
-// Strings
-//----------------------------------------------------------------------------------------------------------------------
+{$ENDREGION}
+
+{$REGION ' Strings '}
 
 function IAIMPStringToString(const S: IAIMPString): string;
 begin
-  if Assigned(FInternalConverter) then
-    Result := FInternalConverter(S)
+  if Assigned(FInternalStringConverter1) then
+    Result := FInternalStringConverter1(S)
   else
     if S <> nil then
       SetString(Result, S.GetData, S.GetLength)
@@ -424,8 +362,24 @@ end;
 
 function MakeString(const S: string): IAIMPString;
 begin
-  CoreCreateObject(IID_IAIMPString, Result);
+  if Assigned(FInternalStringConverter2) then
+    Exit(FInternalStringConverter2(S));
+  CoreCreateObject(IAIMPString, Result);
   Result.SetData(PChar(S), Length(S));
+end;
+
+function MakeStringPair(const S: string; const Data: Pointer): IAIMPNamedContainer; overload; // v6.00
+begin
+  CoreCreateObject(IAIMPNamedContainer, Result);
+  Result.SetData(PChar(S), Length(S));
+  Result.SetCustomData(Data);
+end;
+
+function MakeStringPair(const S: string; const Obj: IUnknown): IAIMPNamedContainer; overload; // v6.00
+begin
+  CoreCreateObject(IAIMPNamedContainer, Result);
+  Result.SetData(PChar(S), Length(S));
+  Result.SetCustomObject(Obj);
 end;
 
 function StrCompare(const S1: IAIMPString; const S2: IAIMPString; IgnoreCase: Boolean): Integer;
@@ -450,9 +404,9 @@ begin
     Result := 0;
 end;
 
-//----------------------------------------------------------------------------------------------------------------------
-// PropList
-//----------------------------------------------------------------------------------------------------------------------
+{$ENDREGION}
+
+{$REGION ' PropertyList '}
 
 function EnsurePropListNotNil(const List: IAIMPPropertyList): IAIMPPropertyList; inline;
 begin
@@ -545,9 +499,234 @@ begin
   CheckResult(EnsurePropListNotNil(List).SetValueAsObject(ID, MakeString(S)));
 end;
 
-//----------------------------------------------------------------------------------------------------------------------
-// Message Dispatcher
-//----------------------------------------------------------------------------------------------------------------------
+{ TAIMPPropertyList }
+
+function TAIMPPropertyList.CheckAccess(out AResult: HRESULT): Boolean;
+begin
+  Result := True;
+  AResult := S_OK;
+end;
+
+procedure TAIMPPropertyList.DoBeginUpdate;
+begin
+  // do nothing
+end;
+
+procedure TAIMPPropertyList.DoEndUpdate;
+begin
+  // do nothing
+end;
+
+procedure TAIMPPropertyList.DoGetValue(
+  PropID: Integer; out Value: Variant; var Result: HRESULT);
+begin
+  Result := E_INVALIDARG;
+end;
+
+function TAIMPPropertyList.DoGetValueAsObject(PropID: Integer): IUnknown;
+var
+  LResult: HRESULT;
+  LValue: Variant;
+begin
+  LResult := S_OK;
+  DoGetValue(PropID, LValue, LResult);
+  // Usually, PropID = 0 is reserved for custom object,
+  // but some old API may override the property for it own usage
+  if (LResult = E_INVALIDARG) and (PropID = 0) then
+    Result := FCustomObject
+  else if Succeeded(LResult) then
+    Result := MakeString(LValue)
+  else
+    Result := nil;
+end;
+
+function TAIMPPropertyList.DoReset: HRESULT;
+begin
+  Result := E_NOTIMPL;
+end;
+
+procedure TAIMPPropertyList.DoSetValue(
+  PropID: Integer; const Value: Variant; var Result: HRESULT);
+begin
+  Result := E_INVALIDARG;
+end;
+
+procedure TAIMPPropertyList.DoSetValueAsObject(
+  PropID: Integer; const Value: IUnknown; var Result: HRESULT);
+var
+  LString: IAIMPString;
+begin
+  if PropID = 0 then
+    FCustomObject := Value
+  else
+    if Supports(Value, IAIMPString, LString) then
+      DoSetValue(PropID, IAIMPStringToString(LString), Result)
+    else
+      Result := E_NOTIMPL;
+end;
+
+procedure TAIMPPropertyList.BeginUpdate;
+var
+  X: HRESULT;
+begin
+  if CheckAccess(X) then
+    DoBeginUpdate;
+end;
+
+procedure TAIMPPropertyList.EndUpdate;
+var
+  X: HRESULT;
+begin
+  if CheckAccess(X) then
+    DoEndUpdate;
+end;
+
+function TAIMPPropertyList.GetValueAsFloat(PropID: Integer; out Value: Double): HRESULT;
+var
+  LValue: Variant;
+begin
+  if CheckAccess(Result) then
+  try
+    Result := S_OK;
+    DoGetValue(PropID, LValue, Result);
+    if Succeeded(Result) then
+      Value := LValue;
+  except
+    Result := E_UNEXPECTED;
+  end;
+end;
+
+function TAIMPPropertyList.GetValueAsInt32(PropID: Integer; out Value: Integer): HRESULT;
+var
+  LValue: Variant;
+begin
+  if CheckAccess(Result) then
+  try
+    Result := S_OK;
+    DoGetValue(PropID, LValue, Result);
+    if Succeeded(Result) then
+      Value := LValue;
+  except
+    Result := E_UNEXPECTED;
+  end;
+end;
+
+function TAIMPPropertyList.GetValueAsInt64(PropID: Integer; out Value: Int64): HRESULT;
+var
+  LValue: Variant;
+begin
+  if CheckAccess(Result) then
+  try
+    Result := S_OK;
+    DoGetValue(PropID, LValue, Result);
+    if Succeeded(Result) then
+      Value := LValue;
+  except
+    Result := E_UNEXPECTED;
+  end;
+end;
+
+function TAIMPPropertyList.GetValueAsObject(PropID: Integer; const IID: TGUID; out Value): HRESULT;
+var
+  LIntf: IUnknown;
+begin
+  if CheckAccess(Result) then
+  try
+    LIntf := DoGetValueAsObject(PropID);
+    if LIntf <> nil then
+      Result := LIntf.QueryInterface(IID, Value)
+    else
+      Result := E_INVALIDARG;
+  except
+    Result := E_UNEXPECTED;
+  end;
+end;
+
+function TAIMPPropertyList.GetValueAsVariant(PropID: Integer; out Value: VarValue): HRESULT;
+var
+  LValue: Variant;
+begin
+  if CheckAccess(Result) then
+  try
+    Result := S_OK;
+    DoGetValue(PropID, LValue, Result);
+    if Succeeded(Result) then
+      Value := VarValueInit(LValue)
+    else
+      Value := VarValueNull;
+  except
+    Result := E_UNEXPECTED;
+  end;
+end;
+
+function TAIMPPropertyList.SetValueAsFloat(PropID: Integer; const Value: Double): HRESULT;
+begin
+  if CheckAccess(Result) then
+  try
+    Result := S_OK;
+    DoSetValue(PropID, Value, Result);
+  except
+    Result := E_UNEXPECTED;
+  end;
+end;
+
+function TAIMPPropertyList.SetValueAsInt32(PropID, Value: Integer): HRESULT;
+begin
+  if CheckAccess(Result) then
+  try
+    Result := S_OK;
+    DoSetValue(PropID, Value, Result)
+  except
+    Result := E_UNEXPECTED;
+  end;
+end;
+
+function TAIMPPropertyList.SetValueAsInt64(PropID: Integer; const Value: Int64): HRESULT;
+begin
+  if CheckAccess(Result) then
+  try
+    Result := S_OK;
+    DoSetValue(PropID, Value, Result);
+  except
+    Result := E_UNEXPECTED;
+  end;
+end;
+
+function TAIMPPropertyList.SetValueAsObject(PropID: Integer; Value: IInterface): HRESULT;
+begin
+  if CheckAccess(Result) then
+  try
+    Result := S_OK;
+    DoSetValueAsObject(PropID, Value, Result);
+  except
+    Result := E_UNEXPECTED;
+  end;
+end;
+
+function TAIMPPropertyList.SetValueAsVariant(PropID: Integer; const Value: VarValue): HRESULT;
+begin
+  if CheckAccess(Result) then
+  try
+    Result := S_OK;
+    DoSetValue(PropID, VarValueToVariant(Value), Result);
+  except
+    Result := E_UNEXPECTED;
+  end;
+end;
+
+function TAIMPPropertyList.Reset: HRESULT;
+begin
+  if CheckAccess(Result) then
+  try
+    Result := DoReset;
+  except
+    Result := E_UNEXPECTED;
+  end;
+end;
+
+{$ENDREGION}
+
+{$REGION ' MessageDispatcher '}
 
 function ApplicationIsLoaded: LongBool;
 begin
@@ -565,15 +744,17 @@ begin
     Result := E_NOINTERFACE;
 end;
 
-function MessageDispatcherGetPropValue(PropertyID: Integer; ValueBuffer: Pointer): HRESULT;
+function MessageDispatcherGetPropValue(PropID: Integer; ValueBuffer: Pointer): HRESULT;
 begin
-  Result := MessageDispatcherSend(PropertyID, AIMP_MSG_PROPVALUE_GET, ValueBuffer);
+  Result := MessageDispatcherSend(PropID, AIMP_MSG_PROPVALUE_GET, ValueBuffer);
 end;
 
-function MessageDispatcherSetPropValue(PropertyID: Integer; ValueBuffer: Pointer): HRESULT;
+function MessageDispatcherSetPropValue(PropID: Integer; ValueBuffer: Pointer): HRESULT;
 begin
-  Result := MessageDispatcherSend(PropertyID, AIMP_MSG_PROPVALUE_SET, ValueBuffer);
+  Result := MessageDispatcherSend(PropID, AIMP_MSG_PROPVALUE_SET, ValueBuffer);
 end;
+
+{$ENDREGION}
 
 { TInterfacedObjectEx }
 
@@ -632,8 +813,8 @@ end;
 
 { TAIMPExtensionFileFormat }
 
-constructor TAIMPExtensionFileFormat.Create(const ADescription, AExtList: string;
-  AFlags: Cardinal = AIMP_SERVICE_FILEFORMATS_CATEGORY_AUDIO);
+constructor TAIMPExtensionFileFormat.Create(
+  const ADescription, AExtList: string; AFlags: Cardinal);
 begin
   inherited Create;
   FFlags := AFlags;
@@ -666,248 +847,6 @@ begin
   try
     Flags := FFlags;
     Result := S_OK;
-  except
-    Result := E_UNEXPECTED;
-  end;
-end;
-
-{ TAIMPPropertyList }
-
-function TAIMPPropertyList.CheckAccess(out AResult: HRESULT): Boolean;
-begin
-  Result := True;
-  AResult := S_OK;
-end;
-
-procedure TAIMPPropertyList.DoBeginUpdate;
-begin
-  // do nothing
-end;
-
-procedure TAIMPPropertyList.DoEndUpdate;
-begin
-  // do nothing
-end;
-
-procedure TAIMPPropertyList.DoGetValueAsFloat(PropertyID: Integer; out Value: Double; var Result: HRESULT);
-var
-  AVarValue: OleVariant;
-begin
-  DoGetValueAsVariant(PropertyID, AVarValue, Result);
-  if Succeeded(Result) then
-    Value := AVarValue;
-end;
-
-procedure TAIMPPropertyList.DoGetValueAsInt32(PropertyID: Integer; out Value: Integer; var Result: HRESULT);
-var
-  AVarValue: OleVariant;
-begin
-  DoGetValueAsVariant(PropertyID, AVarValue, Result);
-  if Succeeded(Result) then
-    Value := AVarValue;
-end;
-
-procedure TAIMPPropertyList.DoGetValueAsInt64(PropertyID: Integer; out Value: Int64; var Result: HRESULT);
-var
-  AVarValue: OleVariant;
-begin
-  DoGetValueAsVariant(PropertyID, AVarValue, Result);
-  if Succeeded(Result) then
-    Value := AVarValue;
-end;
-
-function TAIMPPropertyList.DoGetValueAsObject(PropertyID: Integer): IUnknown;
-var
-  AValue: OleVariant;
-begin
-  if PropertyID = 0 then
-    Result := FCustomObject
-  else
-    if Succeeded(GetValueAsVariant(PropertyID, AValue)) then
-      Result := MakeString(AValue)
-    else
-      Result := nil;
-end;
-
-procedure TAIMPPropertyList.DoGetValueAsVariant(PropertyID: Integer; out Value: OleVariant; var Result: HRESULT);
-begin
-  Result := E_NOTIMPL;
-end;
-
-function TAIMPPropertyList.DoReset: HRESULT;
-begin
-  Result := E_NOTIMPL;
-end;
-
-procedure TAIMPPropertyList.DoSetValueAsFloat(PropertyID: Integer; const Value: Double; var Result: HRESULT);
-begin
-  DoSetValueAsVariant(PropertyID, Value, Result);
-end;
-
-procedure TAIMPPropertyList.DoSetValueAsInt32(PropertyID: Integer; const Value: Integer; var Result: HRESULT);
-begin
-  DoSetValueAsVariant(PropertyID, Value, Result);
-end;
-
-procedure TAIMPPropertyList.DoSetValueAsInt64(PropertyID: Integer; const Value: Int64; var Result: HRESULT);
-begin
-  DoSetValueAsVariant(PropertyID, Value, Result);
-end;
-
-procedure TAIMPPropertyList.DoSetValueAsObject(PropertyID: Integer; const Value: IInterface; var Result: HRESULT);
-var
-  AStrIntf: IAIMPString;
-begin
-  if PropertyID = 0 then
-    FCustomObject := Value
-  else
-    if Supports(Value, IAIMPString, AStrIntf) then
-      DoSetValueAsVariant(PropertyID, IAIMPStringToString(AStrIntf), Result)
-    else
-      Result := E_NOTIMPL;
-end;
-
-procedure TAIMPPropertyList.DoSetValueAsVariant(PropertyID: Integer; const Value: OleVariant; var Result: HRESULT);
-begin
-  Result := E_NOTIMPL;
-end;
-
-procedure TAIMPPropertyList.BeginUpdate;
-var
-  X: HRESULT;
-begin
-  if CheckAccess(X) then
-    DoBeginUpdate;
-end;
-
-procedure TAIMPPropertyList.EndUpdate;
-var
-  X: HRESULT;
-begin
-  if CheckAccess(X) then
-    DoEndUpdate;
-end;
-
-function TAIMPPropertyList.GetValueAsFloat(PropertyID: Integer; out Value: Double): HRESULT;
-begin
-  if CheckAccess(Result) then
-  try
-    Result := S_OK;
-    DoGetValueAsFloat(PropertyID, Value, Result);
-  except
-    Result := E_UNEXPECTED;
-  end;
-end;
-
-function TAIMPPropertyList.GetValueAsInt32(PropertyID: Integer; out Value: Integer): HRESULT;
-begin
-  if CheckAccess(Result) then
-  try
-    Result := S_OK;
-    DoGetValueAsInt32(PropertyID, Value, Result);
-  except
-    Result := E_UNEXPECTED;
-  end;
-end;
-
-function TAIMPPropertyList.GetValueAsInt64(PropertyID: Integer; out Value: Int64): HRESULT;
-begin
-  if CheckAccess(Result) then
-  try
-    Result := S_OK;
-    DoGetValueAsInt64(PropertyID, Value, Result);
-  except
-    Result := E_UNEXPECTED;
-  end;
-end;
-
-function TAIMPPropertyList.GetValueAsObject(PropertyID: Integer; const IID: TGUID; out Value): HRESULT;
-var
-  AIntf: IUnknown;
-begin
-  if CheckAccess(Result) then
-  try
-    AIntf := DoGetValueAsObject(PropertyID);
-    if AIntf <> nil then
-      Result := AIntf.QueryInterface(IID, Value)
-    else
-      Result := E_INVALIDARG;
-  except
-    Result := E_UNEXPECTED;
-  end;
-end;
-
-function TAIMPPropertyList.GetValueAsVariant(PropertyID: Integer; out Value: OleVariant): HRESULT;
-begin
-  if CheckAccess(Result) then
-  try
-    Result := S_OK;
-    DoGetValueAsVariant(PropertyID, Value, Result);
-  except
-    Result := E_UNEXPECTED;
-  end;
-end;
-
-function TAIMPPropertyList.SetValueAsFloat(PropertyID: Integer; const Value: Double): HRESULT;
-begin
-  if CheckAccess(Result) then
-  try
-    Result := S_OK;
-    DoSetValueAsFloat(PropertyID, Value, Result);
-  except
-    Result := E_UNEXPECTED;
-  end;
-end;
-
-function TAIMPPropertyList.SetValueAsInt32(PropertyID, Value: Integer): HRESULT;
-begin
-  if CheckAccess(Result) then
-  try
-    Result := S_OK;
-    DoSetValueAsInt32(PropertyID, Value, Result);
-  except
-    Result := E_UNEXPECTED;
-  end;
-end;
-
-function TAIMPPropertyList.SetValueAsInt64(PropertyID: Integer; const Value: Int64): HRESULT;
-begin
-  if CheckAccess(Result) then
-  try
-    Result := S_OK;
-    DoSetValueAsInt64(PropertyID, Value, Result);
-  except
-    Result := E_UNEXPECTED;
-  end;
-end;
-
-function TAIMPPropertyList.SetValueAsObject(PropertyID: Integer; Value: IInterface): HRESULT;
-begin
-  if CheckAccess(Result) then
-  try
-    Result := S_OK;
-    DoSetValueAsObject(PropertyID, Value, Result);
-  except
-    Result := E_UNEXPECTED;
-  end;
-end;
-
-function TAIMPPropertyList.SetValueAsVariant(PropertyID: Integer; const Value: OleVariant): HRESULT;
-begin
-  if CheckAccess(Result) then
-  try
-    Result := S_OK;
-    DoSetValueAsVariant(PropertyID, Value, Result);
-  except
-    Result := E_UNEXPECTED;
-  end;
-end;
-
-function TAIMPPropertyList.Reset: HRESULT;
-begin
-  if CheckAccess(Result) then
-  try
-    Result := DoReset;
   except
     Result := E_UNEXPECTED;
   end;
@@ -983,222 +922,6 @@ end;
 procedure TAIMPServiceConfig.WriteString(const AKeyPath: string; const AValue: string);
 begin
   FService.SetValueAsString(MakeString(AKeyPath), MakeString(AValue));
-end;
-
-{ TAIMPStreamWrapper }
-
-constructor TAIMPStreamWrapper.Create(ASource: IAIMPStream);
-begin
-  inherited Create;
-  FSource := ASource;
-end;
-
-function TAIMPStreamWrapper.Read(var Buffer; Count: Integer): Longint;
-begin
-  Result := FSource.Read(@Buffer, Count);
-end;
-
-function TAIMPStreamWrapper.Seek(const Offset: Int64; Origin: TSeekOrigin): Int64;
-begin
-  case Origin of
-    soBeginning:
-      FSource.Seek(Offset, AIMP_STREAM_SEEKMODE_FROM_BEGINNING);
-    soCurrent:
-      FSource.Seek(Offset, AIMP_STREAM_SEEKMODE_FROM_CURRENT);
-    soEnd:
-      FSource.Seek(Offset, AIMP_STREAM_SEEKMODE_FROM_END);
-  end;
-  Result := FSource.GetPosition;
-end;
-
-function TAIMPStreamWrapper.Write(const Buffer; Count: Integer): Longint;
-var
-  AWritten: DWORD;
-begin
-  if Succeeded(FSource.Write(@Buffer, Count, @AWritten)) then
-    Result := AWritten
-  else
-    Result := 0
-end;
-
-function TAIMPStreamWrapper.GetSize: Int64;
-begin
-  Result := FSource.GetSize;
-end;
-
-procedure TAIMPStreamWrapper.SetSize(const NewSize: Int64);
-begin
-  if Failed(FSource.SetSize(NewSize)) then
-    Abort;
-end;
-
-{ TAIMPStreamAdapter }
-
-constructor TAIMPStreamAdapter.Create(ASource: TStream; AOwnership: TStreamOwnership = soOwned);
-begin
-  inherited Create;
-  if not TestSource(ASource) then
-    raise EStreamError.Create('Unsupported stream class');
-  FSource := ASource;
-  FOwnership := AOwnership;
-end;
-
-constructor TAIMPStreamAdapter.CreateFromResource(const AName: string; AType: PChar);
-begin
-  Create(TResourceStream.Create(HINSTANCE, AName, AType));
-end;
-
-destructor TAIMPStreamAdapter.Destroy;
-begin
-  if FOwnership = soOwned then
-    FreeAndNil(FSource);
-  inherited Destroy;
-end;
-
-function TAIMPStreamAdapter.TestSource(ASource: TStream): Boolean;
-begin
-  Result := True;
-end;
-
-function TAIMPStreamAdapter.GetPosition: Int64;
-begin
-  Result := FSource.Position;
-end;
-
-function TAIMPStreamAdapter.GetSize: Int64;
-begin
-  Result := FSource.Size;
-end;
-
-function TAIMPStreamAdapter.Read(Buffer: PByte; Count: DWORD): Integer;
-begin
-  try
-    Result := FSource.Read(Buffer^, Count);
-  except
-    Result := -1;
-  end;
-end;
-
-function TAIMPStreamAdapter.Seek(const Offset: Int64; Mode: Integer): HRESULT;
-var
-  ASeekOrigin: TSeekOrigin;
-begin
-  case Mode of
-    AIMP_STREAM_SEEKMODE_FROM_BEGINNING:
-      ASeekOrigin := soBeginning;
-    AIMP_STREAM_SEEKMODE_FROM_CURRENT:
-      ASeekOrigin := soCurrent;
-    AIMP_STREAM_SEEKMODE_FROM_END:
-      ASeekOrigin := soEnd;
-  else
-    Exit(E_INVALIDARG);
-  end;
-
-  try
-    if FSource.Seek(Offset, ASeekOrigin) = Offset then
-      Result := S_OK
-    else
-      Result := E_FAIL;
-  except
-    Result := E_UNEXPECTED;
-  end;
-end;
-
-function TAIMPStreamAdapter.SetSize(const Value: Int64): HRESULT;
-begin
-  if FSourceIsReadOnly then
-    Result := E_NOTIMPL
-  else
-    try
-      FSource.Size := Value;
-      Result := S_OK;
-    except
-      Result := E_UNEXPECTED;
-    end;
-end;
-
-function TAIMPStreamAdapter.Write(Buffer: PByte; Count: LongWord; Written: PLongWord = nil): HRESULT;
-begin
-  if FSourceIsReadOnly then
-    Result := E_NOTIMPL
-  else
-    try
-      Count := FSource.Write(Buffer^, Count);
-      if Written <> nil then
-        Written^ := Count;
-      Result := S_OK;
-    except
-      Result := E_UNEXPECTED;
-    end;
-end;
-
-{ TAIMPMemoryStreamAdapter }
-
-constructor TAIMPMemoryStreamAdapter.Create;
-begin
-  inherited Create(TMemoryStream.Create);
-end;
-
-function TAIMPMemoryStreamAdapter.TestSource(ASource: TStream): Boolean;
-begin
-  Result := ASource is TMemoryStream;
-end;
-
-function TAIMPMemoryStreamAdapter.GetData: PByte;
-begin
-  Result := TMemoryStream(FSource).Memory;
-end;
-
-{ TAIMPFileStreamAdapter }
-
-constructor TAIMPFileStreamAdapter.Create(const AFileName: string; AMode: Integer);
-begin
-  Create(CreateStream(AFileName, AMode));
-end;
-
-constructor TAIMPFileStreamAdapter.Create(const AFileName: IAIMPString; AMode: Integer);
-begin
-  Create(IAIMPStringToString(AFileName), AMode);
-end;
-
-function TAIMPFileStreamAdapter.TestSource(ASource: TStream): Boolean;
-begin
-  Result := ASource is TFileStream;
-end;
-
-function TAIMPFileStreamAdapter.GetClipping(out Offset, Size: Int64): HRESULT;
-begin
-  Result := E_FAIL;
-end;
-
-function TAIMPFileStreamAdapter.GetFileName(out S: IAIMPString): HRESULT;
-begin
-  try
-    S := MakeString(TFileStream(FSource).FileName);
-    Result := S_OK;
-  except
-    Result := E_UNEXPECTED;
-  end;
-end;
-
-function TAIMPFileStreamAdapter.Read(Buffer: PByte; Count: DWORD): Integer;
-begin
-  try
-    Result := FSource.Read(Buffer^, Count);
-    if (Result = 0) and (Count > 0){$IFDEF MSWINDOWS}and (GetLastError <> ERROR_SUCCESS){$ENDIF} then
-    begin
-      if FSource.Position <> FSource.Size then
-        Result := -1;
-        //RaiseLastOSError;
-    end;
-  except
-    Result := -1;
-  end;
-end;
-
-function TAIMPFileStreamAdapter.CreateStream(const AFileName: string; AMode: Integer): TStream;
-begin
-  Result := TFileStream.Create(AFileName, AMode);
 end;
 
 end.

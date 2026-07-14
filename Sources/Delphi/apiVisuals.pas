@@ -3,12 +3,12 @@
 //  Project:   AIMP
 //             Programming Interface
 //
-//  Target:    v5.40 build 2650
+//  Target:    v6.00 build 3000
 //
 //  Purpose:   Visualization API
 //
 //  Author:    Artem Izmaylov
-//             © 2006-2025
+//             © 2006-2026
 //             www.aimp.ru
 //
 //  FPC:       OK
@@ -27,6 +27,9 @@ const
   SID_IAIMPExtensionEmbeddedVisualization = '{41494D50-4578-7445-6D62-645669730000}';
   IID_IAIMPExtensionEmbeddedVisualization: TGUID = SID_IAIMPExtensionEmbeddedVisualization;
 
+  SID_IAIMPVisualizationDirectOutput = '{41494D50-5669-7344-4F00-000000000000}';
+  IID_IAIMPVisualizationDirectOutput: TGUID = SID_IAIMPVisualizationDirectOutput;
+
   SID_IAIMPExtensionCustomVisualization = '{41494D50-4578-7443-7374-6D5669730000}';
   IID_IAIMPExtensionCustomVisualization: TGUID = SID_IAIMPExtensionCustomVisualization;
 
@@ -42,6 +45,7 @@ const
   AIMP_VISUAL_FLAGS_RQD_DATA_SPECTRUM             = 2;
   AIMP_VISUAL_FLAGS_NOT_SUSPEND                   = 4;
   AIMP_VISUAL_FLAGS_RQD_DATA_LOGARITHMIC_SPECTRUM = 8; // for internal use
+
 
   AIMP_VISUAL_SPECTRUM_SIZE = 256;
   AIMP_VISUAL_WAVEFORM_SIZE = 512;
@@ -101,7 +105,7 @@ type
 
   { IAIMPExtensionEmbeddedVisualization }
 
-  IAIMPExtensionEmbeddedVisualization = interface(IUnknown)
+  IAIMPExtensionEmbeddedVisualization = interface
   [SID_IAIMPExtensionEmbeddedVisualization]
     // Common information
     function GetFlags: Integer; stdcall;
@@ -114,6 +118,13 @@ type
     procedure Click(X, Y: Integer; Button: Integer); stdcall;
     procedure Draw(Canvas: HCANVAS; Data: PAIMPVisualData); stdcall;
     procedure Resize(NewWidth, NewHeight: Integer); stdcall;
+  end;
+
+  { IAIMPVisualizationDirectOutput }
+
+  IAIMPVisualizationDirectOutput = interface // v6.0
+  [SID_IAIMPVisualizationDirectOutput]
+    procedure Draw(Buffer: PRGBQuad; Data: PAIMPVisualData); stdcall;
   end;
 
   { IAIMPServiceVisualizations }

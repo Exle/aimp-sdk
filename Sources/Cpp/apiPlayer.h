@@ -3,22 +3,21 @@
 //  Project:   AIMP
 //             Programming Interface
 //
-//  Target:    v5.40 build 2650
+//  Target:    v6.00 build 3000
 //
 //  Purpose:   Player API
 //
 //  Author:    Artem Izmaylov
-//             © 2006-2025
+//             Â© 2006-2026
 //             www.aimp.ru
 //
 #ifndef apiPlayerH
 #define apiPlayerH
 
-#include <unknwn.h>
+#include "apiTypes.h"
 #include "apiObjects.h"
 #include "apiPlaylists.h"
 #include "apiFileManager.h"
-#include "apiTypes.h"
 
 static const GUID IID_IAIMPEqualizerBands = {0x41494D50, 0x4571, 0x4261, 0x6E, 0x64, 0x73, 0x00, 0x00, 0x00, 0x00, 0x00};
 static const GUID IID_IAIMPEqualizerPreset = {0x41494D50, 0x4571, 0x5072, 0x73, 0x74, 0x32, 0x00, 0x00, 0x00, 0x00, 0x00};
@@ -84,10 +83,10 @@ typedef TAIMPWaveformPeakInfo* PAIMPWaveformPeakInfo;
 class IAIMPEqualizerBands: public IUnknown
 {
 	public:
-		virtual int WINAPI GetBandCount() = 0;
-		virtual HRESULT WINAPI GetBandFrequency(int BandIndex, double* Freq) = 0;
-		virtual HRESULT WINAPI GetBandGain(int BandIndex, double* Gain) = 0;
-		virtual HRESULT WINAPI SetBandGain(int BandIndex, const double Gain) = 0;
+		virtual INT32 WINAPI GetBandCount() = 0;
+		virtual HRESULT WINAPI GetBandFrequency(INT32 BandIndex, DOUBLE* Freq) = 0;
+		virtual HRESULT WINAPI GetBandGain(INT32 BandIndex, DOUBLE* Gain) = 0;
+		virtual HRESULT WINAPI SetBandGain(INT32 BandIndex, const DOUBLE Gain) = 0;
 };
 
 /* IAIMPEqualizerPreset */
@@ -118,8 +117,8 @@ class IAIMPExtensionPlayerHook: public IUnknown
 class IAIMPExtensionPlaybackQueue: public IUnknown
 {
 	public:
-		virtual HRESULT WINAPI GetNext(IUnknown* Current, LongWord Flags, IAIMPPlaybackQueueItem* QueueItem) = 0;
-		virtual HRESULT WINAPI GetPrev(IUnknown* Current, LongWord Flags, IAIMPPlaybackQueueItem* QueueItem) = 0;
+		virtual HRESULT WINAPI GetNext(IUnknown* Current, DWORD Flags, IAIMPPlaybackQueueItem* QueueItem) = 0;
+		virtual HRESULT WINAPI GetPrev(IUnknown* Current, DWORD Flags, IAIMPPlaybackQueueItem* QueueItem) = 0;
 		virtual void WINAPI OnSelect(IAIMPPlaylistItem* Item, IAIMPPlaybackQueueItem* QueueItem) = 0;
 };
 
@@ -128,7 +127,7 @@ class IAIMPExtensionPlaybackQueue: public IUnknown
 class IAIMPExtensionPlaybackQueue2: public IAIMPExtensionPlaybackQueue
 {
 	public:
-		virtual HRESULT WINAPI GetInfo(IUnknown* Current, /*out*/ int* position, /*out*/ int* size) = 0;
+		virtual HRESULT WINAPI GetInfo(IUnknown* Current, /*out*/ INT32* position, /*out*/ INT32* size) = 0;
 };
 
 /* IAIMPExtensionWaveformProvider */
@@ -136,7 +135,7 @@ class IAIMPExtensionPlaybackQueue2: public IAIMPExtensionPlaybackQueue
 class IAIMPExtensionWaveformProvider : public IUnknown 
 {
 	public:
-		virtual HRESULT WINAPI Calculate(IAIMPString* FileURI, IAIMPTaskOwner* TaskOwner, PAIMPWaveformPeakInfo Peaks, int PeakCount) = 0;
+		virtual HRESULT WINAPI Calculate(IAIMPString* FileURI, IAIMPTaskOwner* TaskOwner, PAIMPWaveformPeakInfo Peaks, INT32 PeakCount) = 0;
 };
 
 /* IAIMPServicePlayer */
@@ -148,21 +147,21 @@ class IAIMPServicePlayer: public IUnknown // + IAIMPPropertyList
 		virtual HRESULT WINAPI Play(IAIMPPlaybackQueueItem* Item) = 0;
 		virtual HRESULT WINAPI Play2(IAIMPPlaylistItem* Item) = 0;
 		virtual HRESULT WINAPI Play3(IAIMPPlaylist* Playlist) = 0;
-		virtual HRESULT WINAPI Play4(IAIMPString* FileURI, LongWord Flags) = 0;
+		virtual HRESULT WINAPI Play4(IAIMPString* FileURI, DWORD Flags) = 0;
 		// Navigation
 		virtual HRESULT WINAPI GoToNext() = 0;
 		virtual HRESULT WINAPI GoToPrev() = 0;
 		// Playing File Control
-		virtual HRESULT WINAPI GetDuration(double* Seconds) = 0;
-		virtual HRESULT WINAPI GetPosition(double* Seconds) = 0;
-		virtual HRESULT WINAPI SetPosition(const double Seconds) = 0;
+		virtual HRESULT WINAPI GetDuration(DOUBLE* Seconds) = 0;
+		virtual HRESULT WINAPI GetPosition(DOUBLE* Seconds) = 0;
+		virtual HRESULT WINAPI SetPosition(const DOUBLE Seconds) = 0;
 		virtual HRESULT WINAPI GetMute(BOOL *Value) = 0;
 		virtual HRESULT WINAPI SetMute(const BOOL Value) = 0;
-		virtual HRESULT WINAPI GetVolume(float *Level) = 0;
-		virtual HRESULT WINAPI SetVolume(const float Level) = 0;
+		virtual HRESULT WINAPI GetVolume(SINGLE *Level) = 0;
+		virtual HRESULT WINAPI SetVolume(const SINGLE Level) = 0;
 		virtual HRESULT WINAPI GetInfo(IAIMPFileInfo** FileInfo) = 0;
 		virtual HRESULT WINAPI GetPlaylistItem(IAIMPPlaylistItem **Item) = 0;
-		virtual int WINAPI GetState() = 0; // AIMP_PLAYER_STATE_XXX
+		virtual INT32 WINAPI GetState() = 0; // AIMP_PLAYER_STATE_XXX
 		virtual HRESULT WINAPI Pause() = 0;
 		virtual HRESULT WINAPI Resume() = 0;
 		virtual HRESULT WINAPI Stop() = 0;
@@ -174,9 +173,9 @@ class IAIMPServicePlayer: public IUnknown // + IAIMPPropertyList
 class IAIMPServicePlayer2: public IAIMPServicePlayer
 {
 	public:
-		virtual HRESULT WINAPI Play(IAIMPPlaybackQueueItem* Item, float offset, LongWord flags) = 0;
-		virtual HRESULT WINAPI Play2(IAIMPPlaylistItem* Item, float offset, LongWord flags) = 0;
-		virtual HRESULT WINAPI Play4(IAIMPString* FileURI, float offset, LongWord flags) = 0;
+		virtual HRESULT WINAPI Play(IAIMPPlaybackQueueItem* Item, SINGLE offset, DWORD flags) = 0;
+		virtual HRESULT WINAPI Play2(IAIMPPlaylistItem* Item, SINGLE offset, DWORD flags) = 0;
+		virtual HRESULT WINAPI Play4(IAIMPString* FileURI, SINGLE offset, DWORD flags) = 0;
 };
 
 
@@ -188,10 +187,10 @@ class IAIMPServicePlayerEqualizer: public IAIMPEqualizerBands
 		virtual BOOL WINAPI GetActive() = 0;
 		virtual HRESULT WINAPI SetActive(BOOL Value) = 0;
 
-		virtual HRESULT WINAPI GetPreamp(double* Value) = 0;
-		virtual HRESULT WINAPI SetPreamp(const double Value) = 0;
+		virtual HRESULT WINAPI GetPreamp(DOUBLE* Value) = 0;
+		virtual HRESULT WINAPI SetPreamp(const DOUBLE Value) = 0;
 
-		virtual HRESULT WINAPI GetPreset(REFIID IID, void **Obj) = 0;
+		virtual HRESULT WINAPI GetPreset(CONSTIID IID, void **Obj) = 0;
 		virtual HRESULT WINAPI SetPreset(IAIMPEqualizerPreset *Preset) = 0;
 };
 
@@ -200,13 +199,13 @@ class IAIMPServicePlayerEqualizer: public IAIMPEqualizerBands
 class IAIMPServicePlayerEqualizerPresets: public IUnknown
 {
 	public:
-		virtual HRESULT WINAPI Add(IAIMPString* Name, REFIID IID, void **Obj) = 0;
-		virtual HRESULT WINAPI FindByName(IAIMPString* Name, REFIID IID, void **Obj) = 0;
+		virtual HRESULT WINAPI Add(IAIMPString* Name, CONSTIID IID, void **Obj) = 0;
+		virtual HRESULT WINAPI FindByName(IAIMPString* Name, CONSTIID IID, void **Obj) = 0;
 		virtual HRESULT WINAPI Delete(IAIMPEqualizerPreset *Preset) = 0;
-		virtual HRESULT WINAPI Delete2(int Index) = 0;
+		virtual HRESULT WINAPI Delete2(INT32 Index) = 0;
 
-		virtual HRESULT WINAPI GetPreset(int Index, REFIID IID, void **Obj) = 0;
-		virtual int WINAPI GetPresetCount() = 0;
+		virtual HRESULT WINAPI GetPreset(INT32 Index, CONSTIID IID, void **Obj) = 0;
+		virtual INT32 WINAPI GetPresetCount() = 0;
 };
 
 /* IAIMPServicePlaybackQueue */
@@ -223,7 +222,7 @@ class IAIMPServicePlaybackQueue: public IUnknown
 class IAIMPServicePlaybackQueue2: public IAIMPServicePlaybackQueue
 {
 	public:
-		virtual VOID WINAPI NotifyChanged(IAIMPExtensionPlaybackQueue* Sender) = 0;
+		virtual void WINAPI NotifyChanged(IAIMPExtensionPlaybackQueue* Sender) = 0;
 };
 
 /* IAIMPServiceWaveform */
