@@ -34,7 +34,7 @@ IAIMPString* MakeString(IAIMPCore* core, const TChar* text)
 	return nullptr;
 }
 
-IAIMPString* MakeString(IAIMPCore* core, const std::string text)
+IAIMPString* MakeString(IAIMPCore* core, const std::string& text)
 {
 #ifdef _WIN32
 	std::wstring wstr(text.begin(), text.end());
@@ -44,7 +44,7 @@ IAIMPString* MakeString(IAIMPCore* core, const std::string text)
 #endif
 }
 
-IAIMPString* MakeString(IAIMPCore* core, const std::wstring text)
+IAIMPString* MakeString(IAIMPCore* core, const std::wstring& text)
 {
 #ifdef _WIN32
 	return MakeString(core, text.c_str());

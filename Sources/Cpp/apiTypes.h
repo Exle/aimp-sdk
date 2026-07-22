@@ -175,20 +175,20 @@
 #endif
 
   void VarValueFree(VarValue* value);
-  void VarValueCopy(VarValue* target, const VarValue source);
+  void VarValueCopy(VarValue* target, const VarValue& source);
   void VarValueInit(VarValue* target, const PChar value);
   void VarValueInit(VarValue* target, INT32 value);
   void VarValueInit(VarValue* target, INT64 value);
   void VarValueInit(VarValue* target, double value);
-  bool VarValueIsFloat(const VarValue source);
-  bool VarValueIsInt32(const VarValue source);
-  bool VarValueIsInt64(const VarValue source);
-  bool VarValueIsString(const VarValue source);
+  bool VarValueIsFloat(const VarValue& source);
+  bool VarValueIsInt32(const VarValue& source);
+  bool VarValueIsInt64(const VarValue& source);
+  bool VarValueIsString(const VarValue& source);
   VarValue VarValueNull();
-  double VarValueToFloat(const VarValue source);
-  INT32  VarValueToInt32(const VarValue source);
-  INT64  VarValueToInt64(const VarValue source);
-  PChar  VarValueToString(const VarValue source);
+  double VarValueToFloat(const VarValue& source);
+  INT32  VarValueToInt32(const VarValue& source);
+  INT64  VarValueToInt64(const VarValue& source);
+  PChar  VarValueToString(const VarValue& source);
 
   bool Failed(HRESULT code);
   bool Succeeded(HRESULT code);

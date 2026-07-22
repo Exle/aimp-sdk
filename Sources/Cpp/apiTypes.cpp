@@ -45,7 +45,7 @@ void VarValueFree(VarValue* value)
 	#endif
 }
 
-void VarValueCopy(VarValue* target, const VarValue source)
+void VarValueCopy(VarValue* target, const VarValue& source)
 {
 	if (VarValueIsInt32(source))
 		VarValueInit(target, VarValueToInt32(source));
@@ -101,7 +101,7 @@ void VarValueInit(VarValue* target, double value)
 	#endif // API_VAR_NEXTGEN
 }
 
-bool VarValueIsFloat(const VarValue source)
+bool VarValueIsFloat(const VarValue& source)
 {
 	#ifdef API_VAR_NEXTGEN
 		return source->type == vvFloat;
@@ -110,7 +110,7 @@ bool VarValueIsFloat(const VarValue source)
 	#endif
 }
 
-bool VarValueIsInt32(const VarValue source)
+bool VarValueIsInt32(const VarValue& source)
 {
 	#ifdef API_VAR_NEXTGEN
 		return source->type == vvInt32;
@@ -125,7 +125,7 @@ bool VarValueIsInt32(const VarValue source)
 	#endif
 }
 
-bool VarValueIsInt64(const VarValue source)
+bool VarValueIsInt64(const VarValue& source)
 {
 	#ifdef API_VAR_NEXTGEN
 		return source->type == vvInt64;
@@ -134,7 +134,7 @@ bool VarValueIsInt64(const VarValue source)
 	#endif
 }
 
-bool VarValueIsString(const VarValue source)
+bool VarValueIsString(const VarValue& source)
 {
 	#ifdef API_VAR_NEXTGEN
 		return source->type == vvString;
@@ -154,7 +154,7 @@ VarValue VarValueNull()
 	#endif
 }
 
-double VarValueToFloat(const VarValue source)
+double VarValueToFloat(const VarValue& source)
 {
 	#ifdef API_VAR_NEXTGEN
 		if (VarValueIsFloat(source))
@@ -177,7 +177,7 @@ double VarValueToFloat(const VarValue source)
 		return 0.0;
 }
 
-INT32 VarValueToInt32(const VarValue source)
+INT32 VarValueToInt32(const VarValue& source)
 {
 	#ifdef API_VAR_NEXTGEN
 		if (VarValueIsInt32(source))
@@ -205,7 +205,7 @@ INT32 VarValueToInt32(const VarValue source)
 		return 0;
 }
 
-INT64  VarValueToInt64(const VarValue source)
+INT64  VarValueToInt64(const VarValue& source)
 {
 	#ifdef API_VAR_NEXTGEN
 		if (VarValueIsInt64(source))
@@ -227,7 +227,7 @@ INT64  VarValueToInt64(const VarValue source)
 		return 0;
 }
 
-PChar VarValueToString(const VarValue source)
+PChar VarValueToString(const VarValue& source)
 {
 	#ifdef API_VAR_NEXTGEN
 		if (VarValueIsString(source))
