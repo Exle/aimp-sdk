@@ -183,7 +183,8 @@ function uiCreateAction(const ID: string; const Event: IUnknown): IAIMPAction; o
 function uiCreateAction(const ID, Name, Group: string; const Event: IUnknown): IAIMPAction; overload;
 function uiCreateAction(const Name, Group: string; const Event: IUnknown): IAIMPAction; overload;
 function uiMakeActionId(const PluginName, ActionName: string): string;
-function uiMessageBox(AOwner: IAIMPUIForm; AMessage: IAIMPString; AFlags: Cardinal): Integer;
+function uiMessageBox(AOwner: IAIMPUIForm; const AMessage: IAIMPString; AFlags: Cardinal): Integer; overload;
+function uiMessageBox(AOwnerWnd: HWND; const ACaption, AMessage: IAIMPString; AFlags: Cardinal): Integer; overload;
 function uiWrap(AEvent: TThreadMethod; AMasterAdapter: IUnknown = nil): IUnknown; overload;
 function uiWrap(AEvent: TAIMPUINotifyEvent; AMasterAdapter: IUnknown = nil): IUnknown; overload;
 implementation
@@ -227,17 +228,21 @@ begin
     StringReplace(LowerCase(ActionName), ' ', '_', [rfReplaceAll])]);
 end;
 
-function uiMessageBox(AOwner: IAIMPUIForm; AMessage: IAIMPString; AFlags: Cardinal): Integer;
+function uiMessageBox(AOwner: IAIMPUIForm; const AMessage: IAIMPString; AFlags: Cardinal): Integer;
 var
   LCaption: IAIMPString;
+begin
+  AOwner.GetValueAsObject(AIMPUI_FORM_PROPID_CAPTION, IAIMPString, LCaption);
+  Result := uiMessageBox(AOwner.GetHandle, LCaption, AMessage, AFlags);
+end;
+
+function uiMessageBox(AOwnerWnd: HWND; const ACaption, AMessage: IAIMPString; AFlags: Cardinal): Integer;
+var
   LService: IAIMPUIMessageDialog;
 begin
   Result := 0;
   if CoreGetService(IAIMPUIMessageDialog, LService) then
-  begin
-    AOwner.GetValueAsObject(AIMPUI_FORM_PROPID_CAPTION, IAIMPString, LCaption);
-    Result := LService.Execute(AOwner.GetHandle, LCaption, AMessage, AFlags);
-  end;
+    Result := LService.Execute(AOwnerWnd, ACaption, AMessage, AFlags);
 end;
 
 function uiWrap(AEvent: TThreadMethod; AMasterAdapter: IUnknown = nil): IUnknown;
