@@ -57,6 +57,7 @@ const
   AIMP_DECODER_SAMPLEFORMAT_64BITFLOAT = 6; // v5.40
 
   // Flags for IAIMPExtensionAudioDecoder / IAIMPExtensionAudioDecoderOld
+  AIMP_DECODER_FLAGS_FAST_SEEKING          = $0001;
   AIMP_DECODER_FLAGS_FORCE_CREATE_INSTANCE = $1000;
 
   // Flags for IAIMPAudioDecoderListener.Changed

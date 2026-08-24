@@ -1,4 +1,4 @@
-////////////////////////////////////////////////////////////////////////////////
+﻿////////////////////////////////////////////////////////////////////////////////
 //
 //  Project:   AIMP
 //             Programming Interface
@@ -36,6 +36,7 @@ const int AIMP_DECODER_SAMPLEFORMAT_32BITFLOAT = 5;
 const int AIMP_DECODER_SAMPLEFORMAT_64BITFLOAT = 6; // v5.40
 
 // Flags for IAIMPExtensionAudioDecoder / IAIMPExtensionAudioDecoderOld
+const int AIMP_DECODER_FLAGS_FAST_SEEKING		   = 0x0001;
 const int AIMP_DECODER_FLAGS_FORCE_CREATE_INSTANCE = 0x1000;
 
 // Flags for IAIMPAudioDecoderListener.Changed
