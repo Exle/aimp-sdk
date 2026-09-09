@@ -1,9 +1,9 @@
-////////////////////////////////////////////////////////////////////////////////
+﻿////////////////////////////////////////////////////////////////////////////////
 //
 //  Project:   AIMP
 //             Programming Interface
 //
-//  Target:    v6.00 build 3000
+//  Target:    v6.00 build 3083
 //
 //  Purpose:   AlbumArts API
 //
@@ -20,8 +20,6 @@
 #include "apiFileManager.h"
 
 static const GUID IID_IAIMPAlbumArtRequest = {0x41494D50, 0x416C, 0x6241, 0x72, 0x74, 0x52, 0x65, 0x71, 0x73, 0x74, 0x00};
-static const GUID IID_IAIMPExtensionAlbumArtCatalog   = {0x41494D50, 0x4578, 0x7441, 0x6C, 0x62, 0x41, 0x72, 0x74, 0x43, 0x61, 0x74};
-static const GUID IID_IAIMPExtensionAlbumArtCatalog2  = {0x41494D50, 0x4578, 0x416C, 0x62, 0x41, 0x72, 0x74, 0x43, 0x61, 0x74, 0x32};
 static const GUID IID_IAIMPExtensionAlbumArtProvider  = {0x41494D50, 0x4578, 0x7441, 0x6C, 0x62, 0x41, 0x72, 0x74, 0x50, 0x72, 0x76};
 static const GUID IID_IAIMPExtensionAlbumArtProvider2 = {0x41494D50, 0x4578, 0x416C, 0x62, 0x41, 0x72, 0x74, 0x50, 0x72, 0x76, 0x32};
 static const GUID IID_IAIMPExtensionAlbumArtProvider3 = {0x41494D50, 0x4578, 0x416C, 0x62, 0x41, 0x72, 0x74, 0x50, 0x72, 0x76, 0x33};
@@ -43,6 +41,7 @@ const int AIMP_ALBUMART_REQUEST_PROPID_FIND_IN_INTERNET               = 4;
 const int AIMP_ALBUMART_REQUEST_PROPID_FIND_IN_INTERNET_MAX_FILE_SIZE = 5;
 const int AIMP_ALBUMART_REQUEST_PROPID_FIND_IN_TAGS                   = 6;
 const int AIMP_ALBUMART_REQUEST_PROPID_RESULTS                        = 7;
+const int AIMP_ALBUMART_REQUEST_PROPID_USER_ACTION                    = 8; // v6.0
 
 // Flags for IAIMPServiceAlbumArt.Get
 const int AIMP_SERVICE_ALBUMART_FLAGS_NOCACHE  = 1;
@@ -63,8 +62,9 @@ class IAIMPAlbumArtRequest: public IAIMPPropertyList
 		virtual BOOL WINAPI IsCanceled() = 0;
 };
 
-/* IAIMPExtensionAlbumArtCatalog */
-
+// IAIMPExtensionAlbumArtCatalog, IAIMPExtensionAlbumArtCatalog2 are deprecated,
+//  use IAIMPExtensionAlbumArtProvider3 or IAIMPExtensionExternalCatalog instead
+/*
 class IAIMPExtensionAlbumArtCatalog: public IUnknown
 {
 	public:
@@ -73,13 +73,11 @@ class IAIMPExtensionAlbumArtCatalog: public IUnknown
 		virtual HRESULT WINAPI Show(IAIMPString *FileURI, IAIMPString *Artist, IAIMPString *Album, IAIMPImageContainer **Image) = 0;
 };
 
-/* IAIMPExtensionAlbumArtCatalog2 */
-
 class IAIMPExtensionAlbumArtCatalog2: public IAIMPExtensionAlbumArtCatalog
 {
 	public:
 		virtual HRESULT WINAPI Show2(IAIMPFileInfo *FileInfo, IAIMPImageContainer **Image) = 0;
-};
+};*/
 
 /* IAIMPExtensionAlbumArtProvider */
 

@@ -3,7 +3,7 @@
 //  Project:   AIMP
 //             Programming Interface
 //
-//  Target:    v6.00 build 3000
+//  Target:    v6.00 build 3083
 //
 //  Purpose:   AlbumArts API
 //
@@ -32,12 +32,6 @@ uses
 const
   SID_IAIMPAlbumArtRequest = '{41494D50-416C-6241-7274-526571737400}';
   IID_IAIMPAlbumArtRequest: TGUID = SID_IAIMPAlbumArtRequest;
-
-  SID_IAIMPExtensionAlbumArtCatalog = '{41494D50-4578-7441-6C62-417274436174}';
-  IID_IAIMPExtensionAlbumArtCatalog: TGUID = SID_IAIMPExtensionAlbumArtCatalog;
-
-  SID_IAIMPExtensionAlbumArtCatalog2 = '{41494D50-4578-416C-6241-727443617432}';
-  IID_IAIMPExtensionAlbumArtCatalog2: TGUID = SID_IAIMPExtensionAlbumArtCatalog2;
 
   SID_IAIMPExtensionAlbumArtProvider = '{41494D50-4578-7441-6C62-417274507276}';
   IID_IAIMPExtensionAlbumArtProvider: TGUID = SID_IAIMPExtensionAlbumArtProvider;
@@ -69,6 +63,7 @@ const
   AIMP_ALBUMART_REQUEST_PROPID_FIND_IN_INTERNET_MAX_FILE_SIZE = 5;
   AIMP_ALBUMART_REQUEST_PROPID_FIND_IN_TAGS                   = 6;
   AIMP_ALBUMART_REQUEST_PROPID_RESULTS                        = 7;
+  AIMP_ALBUMART_REQUEST_PROPID_USER_ACTION                    = 8; // v6.0
 
   // Flags for IAIMPServiceAlbumArt.Get
   AIMP_SERVICE_ALBUMART_FLAGS_NOCACHE  = 1;
@@ -88,21 +83,8 @@ type
     function IsCanceled: LongBool; stdcall;
   end;
 
-  { IAIMPExtensionAlbumArtCatalog }
-
-  IAIMPExtensionAlbumArtCatalog = interface(IUnknown)
-  [SID_IAIMPExtensionAlbumArtCatalog]
-    function GetIcon(out Icon: HICON): HRESULT; stdcall; // deprecated
-    function GetName(out Name: IAIMPString): HRESULT; stdcall;
-    function Show(FileURI, Artist, Album: IAIMPString; out Image: IAIMPImageContainer): HRESULT; stdcall;
-  end;
-
-  { IAIMPExtensionAlbumArtCatalog2 }
-
-  IAIMPExtensionAlbumArtCatalog2 = interface(IAIMPExtensionAlbumArtCatalog)
-  [SID_IAIMPExtensionAlbumArtCatalog2]
-    function Show2(FileInfo: IAIMPFileInfo; out Image: IAIMPImageContainer): HRESULT; stdcall;
-  end;
+  // IAIMPExtensionAlbumArtCatalog, IAIMPExtensionAlbumArtCatalog2 are deprecated,
+  //  use IAIMPExtensionAlbumArtProvider3 or IAIMPExtensionExternalCatalog instead
 
   { IAIMPExtensionAlbumArtProvider }
 

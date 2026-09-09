@@ -1,9 +1,9 @@
-////////////////////////////////////////////////////////////////////////////////
+﻿////////////////////////////////////////////////////////////////////////////////
 //
 //  Project:   AIMP
 //             Programming Interface
 //
-//  Target:    v6.00 build 3000
+//  Target:    v6.00 build 3083
 //
 //  Purpose:   File Manager API
 //
@@ -24,6 +24,7 @@ static const GUID IID_IAIMPExtensionFileFormat = {0x41494D50, 0x4578, 0x7446, 0x
 static const GUID IID_IAIMPExtensionFileInfoProvider = {0x41494D50, 0x4578, 0x7446, 0x69, 0x6C, 0x65, 0x49, 0x6E, 0x66, 0x6F, 0x00};
 static const GUID IID_IAIMPExtensionFileInfoProviderEx = {0x41494D50, 0x4578, 0x7446, 0x69, 0x6C, 0x65, 0x49, 0x6E, 0x66, 0x6F, 0x45};
 static const GUID IID_IAIMPExtensionFileSystem = {0x41494D50, 0x4578, 0x7446, 0x53, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
+static const GUID IID_IAIMPExtensionExternalCatalog = {0x41494D50, 0x4578, 0x7445, 0x78, 0x74, 0x72, 0x6E, 0x43, 0x61, 0x74, 0x00};
 static const GUID IID_IAIMPFileInfo = {0x41494D50, 0x4669, 0x6C65, 0x49, 0x6E, 0x66, 0x6F, 0x00, 0x00, 0x00, 0x00};
 static const GUID IID_IAIMPFileSystem = {0x41494D50, 0x4653, 0x0000, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
 static const GUID IID_IAIMPFileSystemCommandCopyToClipboard = {0x41465343, 0x6D64, 0x436F, 0x70, 0x79, 0x32, 0x43, 0x6C, 0x70, 0x62, 0x64};
@@ -100,7 +101,7 @@ const int AIMP_VIRTUALFILE_PROPID_AUDIOSOURCEFILE  = 1;
 const int AIMP_VIRTUALFILE_PROPID_CLIPSTART        = 2;
 const int AIMP_VIRTUALFILE_PROPID_CLIPFINISH       = 3;
 const int AIMP_VIRTUALFILE_PROPID_INDEXINSET       = 4;
-const int AIMP_VIRTUALFILE_PROPID_FILEFORMAT       = 5; 
+const int AIMP_VIRTUALFILE_PROPID_FILEFORMAT       = 5;
 
 // Flags for the IAIMPServiceFileFormats and IAIMPExtensionFileFormat
 const int AIMP_SERVICE_FILEFORMATS_CATEGORY_AUDIO     = 1;
@@ -165,7 +166,7 @@ class IAIMPVirtualFile: public IAIMPPropertyList
 };
 
 #pragma pack(push, 1)
-struct TAIMPFileAttributes 
+struct TAIMPFileAttributes
 {
 	DWORD Attributes;
 	DOUBLE TimeCreation;
@@ -192,7 +193,7 @@ class IAIMPFileSystemCustomFileCommand : public IUnknown
 
 /* IAIMPFileSystemCommandCopyToClipboard */
 
-class IAIMPFileSystemCommandCopyToClipboard : public IUnknown 
+class IAIMPFileSystemCommandCopyToClipboard : public IUnknown
 {
 	public:
 		virtual HRESULT WINAPI CopyToClipboard(IAIMPObjectList* Files) = 0;
@@ -214,7 +215,7 @@ class IAIMPFileSystemCommandDropSource : public IUnknown
 
 /* IAIMPFileSystemCommandFileInfo */
 
-class IAIMPFileSystemCommandFileInfo : public IUnknown 
+class IAIMPFileSystemCommandFileInfo : public IUnknown
 {
 	public:
 		virtual HRESULT WINAPI GetFileAttrs(IAIMPString* FileName, TAIMPFileAttributes* Attrs) = 0;
@@ -279,6 +280,16 @@ class IAIMPExtensionFileInfoProviderEx: public IUnknown
 class IAIMPExtensionFileSystem : public IAIMPPropertyList
 {
 
+};
+
+/* IAIMPExtensionExternalCatalog */
+
+class IAIMPExtensionExternalCatalog: public IUnknown // since v6.00
+{
+	public:
+		virtual HRESULT WINAPI GetIcon(IAIMPImageContainer **Image) = 0;
+		virtual HRESULT WINAPI GetName(IAIMPString **Name) = 0;
+		virtual HRESULT WINAPI Show(HWND OwnerWnd, /*nullable*/IUnknown *Data) = 0;
 };
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -361,7 +372,7 @@ class IAIMPServiceFileURI: public IUnknown
 		virtual HRESULT WINAPI ExtractFileParentDirName(IAIMPString* FileURI, IAIMPString** S) = 0;
 		virtual HRESULT WINAPI ExtractFileParentName(IAIMPString* FileURI, IAIMPString** S) = 0;
 		virtual HRESULT WINAPI ExtractFilePath(IAIMPString* FileURI, IAIMPString** S) = 0;
-		virtual HRESULT WINAPI IsURL(IAIMPString* FileURI) = 0;	
+		virtual HRESULT WINAPI IsURL(IAIMPString* FileURI) = 0;
 };
 
 /* IAIMPServiceFileURI2 */

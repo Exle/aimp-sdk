@@ -3,7 +3,7 @@
 //  Project:   AIMP
 //             Programming Interface
 //
-//  Target:    v6.00 build 3000
+//  Target:    v6.00 build 3083
 //
 //  Purpose:   Tags Library API
 //

@@ -3,7 +3,7 @@
 //  Project:   AIMP
 //             Programming Interface
 //
-//  Target:    v6.00 build 3000
+//  Target:    v6.00 build 3083
 //
 //  Purpose:   File Manager API
 //
@@ -20,14 +20,19 @@ unit apiFileManager;
 interface
 
 uses
-  Types, apiObjects;
-  
+  Types,
+  apiObjects,
+  apiTypes;
+
 const
   SID_IAIMPFileInfo = '{41494D50-4669-6C65-496E-666F00000000}';
   IID_IAIMPFileInfo: TGUID = SID_IAIMPFileInfo;
 
   SID_IAIMPExtensionFileExpander = '{41494D50-4578-7446-696C-654578706472}';
   IID_IAIMPExtensionFileExpander: TGUID = SID_IAIMPExtensionFileExpander;
+
+  SID_IAIMPExtensionExternalCatalog = '{41494D50-4578-7445-7874-726E43617400}';
+  IID_IAIMPExtensionExternalCatalog: TGUID = SID_IAIMPExtensionExternalCatalog;
 
   SID_IAIMPExtensionFileFormat = '{41494D50-4578-7446-696C-65466D740000}';
   IID_IAIMPExtensionFileFormat: TGUID = SID_IAIMPExtensionFileFormat;
@@ -147,7 +152,7 @@ const
   AIMP_VIRTUALFILE_PROPID_CLIPSTART        = 2;
   AIMP_VIRTUALFILE_PROPID_CLIPFINISH       = 3;
   AIMP_VIRTUALFILE_PROPID_INDEXINSET       = 4;
-  AIMP_VIRTUALFILE_PROPID_FILEFORMAT       = 5;  
+  AIMP_VIRTUALFILE_PROPID_FILEFORMAT       = 5;
 
   // Flags for the IAIMPServiceFileFormats and IAIMPExtensionFileFormat
   AIMP_SERVICE_FILEFORMATS_CATEGORY_AUDIO     = 1;
@@ -158,7 +163,7 @@ const
   AIMP_SERVICE_FILESTREAMING_FLAG_READ        = 0;
   AIMP_SERVICE_FILESTREAMING_FLAG_READWRITE   = 2;
   AIMP_SERVICE_FILESTREAMING_FLAG_BUFFERED    = 4;
-  
+
   // Flags for the IAIMPServiceFileInfo.GetFileInfoXXX
   AIMP_SERVICE_FILEINFO_FLAG_DONTUSEAUDIODECODERS = 1;
 
@@ -206,7 +211,7 @@ type
   [SID_IAIMPVirtualFile]
     function CreateStream(out Stream: IAIMPStream): HRESULT; stdcall;
     function GetFileInfo(Info: IAIMPFileInfo): HRESULT; stdcall;
-    function IsExists: LongBool; stdcall; 
+    function IsExists: LongBool; stdcall;
     function IsInSameStream(VirtualFile: IAIMPVirtualFile): HRESULT; stdcall;
     function Synchronize: HRESULT; stdcall;
   end;
@@ -316,6 +321,15 @@ type
 
   IAIMPExtensionFileSystem = interface(IAIMPPropertyList)
   [SID_IAIMPExtensionFileSystem]
+  end;
+
+  { IAIMPExtensionExternalCatalog }
+
+  IAIMPExtensionExternalCatalog = interface // v6.00
+  [SID_IAIMPExtensionExternalCatalog]
+    function GetIcon(out Icon: IAIMPImageContainer): HRESULT; stdcall;
+    function GetName(out Name: IAIMPString): HRESULT; stdcall;
+    function Execute(OwnerWnd: HWND; Data: IUnknown{nullable}): HRESULT; stdcall;
   end;
 
 //----------------------------------------------------------------------------------------------------------------------

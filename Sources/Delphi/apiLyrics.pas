@@ -3,7 +3,7 @@
 //  Project:   AIMP
 //             Programming Interface
 //
-//  Target:    v6.00 build 3000
+//  Target:    v6.00 build 3083
 //
 //  Purpose:   Lyrics API
 //
@@ -57,8 +57,9 @@ const
   AIMP_LYRICS_FORMAT_SRT = 2;
 
   // Flags for IAIMPServiceLyrics.Get
-  AIMP_SERVICE_LYRICS_FLAGS_NOCACHE = 1;
-  AIMP_SERVICE_LYRICS_FLAGS_WAITFOR = 4;
+  AIMP_SERVICE_LYRICS_FLAGS_NOCACHE    = 1;
+  AIMP_SERVICE_LYRICS_FLAGS_WAITFOR    = 4;
+  AIMP_SERVICE_LYRICS_FLAGS_USERACTION = 8; // v6.0
 
   // IAIMPExtensionLyricsProvider.GetCategory
   AIMP_LYRICS_PROVIDER_CATEGORY_FILE     = 1;
