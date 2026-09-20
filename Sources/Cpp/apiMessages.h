@@ -38,8 +38,8 @@ const int AIMP_MSG_CMD_QFI_PLAYING_TRACK = AIMP_MSG_CMD_BASE + 2;
 
 // Show custom text in display of RunningLine or Text elements
 // Param1: 0 - Hide text automaticly after 2 seconds
-//          1 - Text will be hidden manually (put nil to Param2 to hide previous text)
-// Param2: Pointer to TChar-array
+//         1 - Text will be hidden manually (put nil to Param2 to hide previous text)
+// Param2: Pointer to TChar-array (nullable)
 const int AIMP_MSG_CMD_SHOW_NOTIFICATION = AIMP_MSG_CMD_BASE + 3;
 
 const int AIMP_MSG_CMD_TOGGLE_PARTREPEAT = AIMP_MSG_CMD_BASE + 5;
