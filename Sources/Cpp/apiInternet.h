@@ -1,4 +1,4 @@
-////////////////////////////////////////////////////////////////////////////////
+﻿////////////////////////////////////////////////////////////////////////////////
 //
 //  Project:   AIMP
 //             Programming Interface
@@ -40,14 +40,15 @@ const int AIMP_SERVICE_CONSET_CONNECTIONTYPE_PROXY          = 1;
 const int AIMP_SERVICE_CONSET_CONNECTIONTYPE_SYSTEMDEFAULTS = 2;
 
 // Flags for HTTPClient
-const int AIMP_SERVICE_HTTPCLIENT_FLAGS_WAITFOR         = 1;
-const int AIMP_SERVICE_HTTPCLIENT_FLAGS_UTF8            = 2;
-const int AIMP_SERVICE_HTTPCLIENT_FLAGS_PRIORITY_NORMAL = 0;
-const int AIMP_SERVICE_HTTPCLIENT_FLAGS_PRIORITY_LOW    = 4;
-const int AIMP_SERVICE_HTTPCLIENT_FLAGS_PRIORITY_HIGH   = 8;
-const int AIMP_SERVICE_HTTPCLIENT_FLAGS_ASYNC_ACCEPT    = 16; // v6.0
-const int AIMP_SERVICE_HTTPCLIENT_FLAGS_ASYNC_PROGRESS  = 32; // v6.0
-const int AIMP_SERVICE_HTTPCLIENT_FLAGS_ASYNC_COMPLETE  = 64; // v6.0
+const int AIMP_SERVICE_HTTPCLIENT_FLAGS_WAITFOR         	= 1;
+const int AIMP_SERVICE_HTTPCLIENT_FLAGS_UTF8            	= 2;
+const int AIMP_SERVICE_HTTPCLIENT_FLAGS_PRIORITY_NORMAL 	= 0;
+const int AIMP_SERVICE_HTTPCLIENT_FLAGS_PRIORITY_LOW    	= 4;
+const int AIMP_SERVICE_HTTPCLIENT_FLAGS_PRIORITY_HIGH   	= 8;
+const int AIMP_SERVICE_HTTPCLIENT_FLAGS_ASYNC_ACCEPT    	= 16; // v6.0
+const int AIMP_SERVICE_HTTPCLIENT_FLAGS_ASYNC_PROGRESS  	= 32; // v6.0
+const int AIMP_SERVICE_HTTPCLIENT_FLAGS_ASYNC_COMPLETE  	= 64; // v6.0
+const int AIMP_SERVICE_HTTPCLIENT_FLAGS_IGNORE_CERT_ISSUES 	= 128; // v6.0
 
 // Methods for IAIMPServiceHTTPClient2.Request
 const int AIMP_SERVICE_HTTPCLIENT_METHOD_GET    = 0;
