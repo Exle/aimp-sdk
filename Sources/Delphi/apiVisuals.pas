@@ -3,7 +3,7 @@
 //  Project:   AIMP
 //             Programming Interface
 //
-//  Target:    v6.00 build 3083
+//  Target:    v6.00 build 3090
 //
 //  Purpose:   Visualization API
 //
@@ -27,6 +27,9 @@ const
   SID_IAIMPExtensionEmbeddedVisualization = '{41494D50-4578-7445-6D62-645669730000}';
   IID_IAIMPExtensionEmbeddedVisualization: TGUID = SID_IAIMPExtensionEmbeddedVisualization;
 
+  SID_IAIMPExtensionEmbeddedVisualization2 = '{41494D50-4578-7445-6D62-645669733200}'; // v6.0
+  IID_IAIMPExtensionEmbeddedVisualization2: TGUID = SID_IAIMPExtensionEmbeddedVisualization2;
+
   SID_IAIMPVisualizationDirectOutput = '{41494D50-5669-7344-4F00-000000000000}';
   IID_IAIMPVisualizationDirectOutput: TGUID = SID_IAIMPVisualizationDirectOutput;
 
@@ -36,9 +39,11 @@ const
   SID_IAIMPServiceVisualizations = '{41494D50-5372-7656-6973-75616C000000}';
   IID_IAIMPServiceVisualizations: TGUID = SID_IAIMPServiceVisualizations;
 
-  // Button ID for IAIMPExtensionEmbeddedVisualization.Click
-  AIMP_VISUAL_CLICK_BUTTON_LEFT   = 0;
-  AIMP_VISUAL_CLICK_BUTTON_MIDDLE = 1;
+  // Button ID for IAIMPExtensionEmbeddedVisualization.Action
+  AIMP_VISUAL_ACTION_CLICK        = 0;
+  AIMP_VISUAL_ACTION_CLICK_MIDDLE = 1;
+  AIMP_VISUAL_ACTION_MOVE         = 3; // v6.0, only for IID_IAIMPExtensionEmbeddedVisualization2
+  AIMP_VISUAL_ACTION_LEAVE        = 4; // v6.0, only for IID_IAIMPExtensionEmbeddedVisualization2
 
   // flags for IAIMPExtensionEmbeddedVisualization.GetFlags and IAIMPExtensionCustomVisualization.GetFlags
   AIMP_VISUAL_FLAGS_RQD_DATA_WAVEFORM             = 1;
@@ -115,10 +120,16 @@ type
     function Initialize(Width, Height: Integer): HRESULT; stdcall;
     procedure Finalize; stdcall;
     // Basic functionality
-    procedure Click(X, Y: Integer; Button: Integer); stdcall;
+    procedure Action(X, Y, Action: Integer); stdcall;
     procedure Draw(Canvas: HCANVAS; Data: PAIMPVisualData); stdcall;
     procedure Resize(NewWidth, NewHeight: Integer); stdcall;
   end;
+
+  { IAIMPExtensionEmbeddedVisualization2 }
+
+  IAIMPExtensionEmbeddedVisualization2 = interface(IAIMPExtensionEmbeddedVisualization)
+  [SID_IAIMPExtensionEmbeddedVisualization2]
+  end; // v6.0
 
   { IAIMPVisualizationDirectOutput }
 

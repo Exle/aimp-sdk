@@ -20,12 +20,15 @@
 
 static const GUID IID_IAIMPExtensionCustomVisualization = {0x41494D50, 0x4578, 0x7443, 0x73, 0x74, 0x6D, 0x56, 0x69, 0x73, 0x00, 0x00};
 static const GUID IID_IAIMPExtensionEmbeddedVisualization = {0x41494D50, 0x4578, 0x7445, 0x6D, 0x62, 0x64, 0x56, 0x69, 0x73, 0x00, 0x00};
+static const GUID IID_IAIMPExtensionEmbeddedVisualization2 = {0x41494D50, 0x4578, 0x7445, 0x6D, 0x62, 0x64, 0x56, 0x69, 0x73, 0x32, 0x00}; // v6.0
+static const GUID IID_IAIMPVisualizationDirectOutput = { 0x41494D50, 0x5669, 0x7344, 0x4F, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 }; // v6.0
 static const GUID IID_IAIMPServiceVisualizations = {0x41494D50, 0x5372, 0x7656, 0x69, 0x73, 0x75, 0x61, 0x6C, 0x00, 0x00, 0x00};
-static const GUID IID_IAIMPVisualizationDirectOutput = { 0x41494D50, 0x5669, 0x7344, 0x4F, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
 
-// Button ID for IAIMPExtensionEmbeddedVisualization.Click
-const INT32 AIMP_VISUAL_CLICK_BUTTON_LEFT   = 0;
-const INT32 AIMP_VISUAL_CLICK_BUTTON_MIDDLE = 1;
+// Button ID for IAIMPExtensionEmbeddedVisualization.Action
+const INT32 AIMP_VISUAL_ACTION_CLICK        = 0;
+const INT32 AIMP_VISUAL_ACTION_CLICK_MIDDLE = 1;
+const INT32 AIMP_VISUAL_ACTION_MOVE         = 3; // v6.0, only for IID_IAIMPExtensionEmbeddedVisualization2
+const INT32 AIMP_VISUAL_ACTION_LEAVE        = 4; // v6.0, only for IID_IAIMPExtensionEmbeddedVisualization2
 
 // flags for IAIMPExtensionEmbeddedVisualization.GetFlags and IAIMPExtensionCustomVisualization.GetFlags
 const DWORD AIMP_VISUAL_FLAGS_RQD_DATA_WAVEFORM = 1;
@@ -74,7 +77,7 @@ class IAIMPExtensionEmbeddedVisualization: public IUnknown
 		virtual HRESULT WINAPI Initialize(INT32 Width, INT32 Height) = 0;
 		virtual void WINAPI Finalize() = 0;
 		// Basic functionality
-		virtual void WINAPI Click(INT32 X, INT32 Y, INT32 Button) = 0;
+		virtual void WINAPI Action(INT32 X, INT32 Y, INT32 Action) = 0;
 		virtual void WINAPI Draw(HCANVAS Canvas, PAIMPVisualData Data) = 0;
 		virtual void WINAPI Resize(INT32 NewWidth, INT32 NewHeight) = 0;
 };
