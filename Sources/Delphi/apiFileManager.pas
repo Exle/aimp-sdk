@@ -88,8 +88,8 @@ const
   SID_IAIMPFileSystemCommandDelete = '{41465343-6D64-4465-6C65-746500000000}';
   IID_IAIMPFileSystemCommandDelete: TGUID = SID_IAIMPFileSystemCommandDelete;
 
-  SID_IAIMPFileSystemCommandFileExists = '{41465343-6D64-4669-6C65-457869737470}';
-  IID_IAIMPFileSystemCommandFileExists: TGUID = SID_IAIMPFileSystemCommandFileExists;
+  SID_IAIMPFileSystemCommandFileInfo = '{41465343-6D64-4669-6C65-457869737470}';
+  IID_IAIMPFileSystemCommandFileInfo: TGUID = SID_IAIMPFileSystemCommandFileInfo;
 
   SID_IAIMPFileSystemCommandStreaming = '{41465343-6D64-5374-7265-616D696E6700}';
   IID_IAIMPFileSystemCommandStreaming: TGUID = SID_IAIMPFileSystemCommandStreaming;
@@ -262,7 +262,7 @@ type
   { IAIMPFileSystemCommandFileInfo }
 
   IAIMPFileSystemCommandFileInfo = interface(IUnknown)
-  [SID_IAIMPFileSystemCommandFileExists]
+  [SID_IAIMPFileSystemCommandFileInfo]
     function GetFileAttrs(FileName: IAIMPString; out Attrs: TAIMPFileAttributes): HRESULT; stdcall;
     function GetFileSize(FileName: IAIMPString; out Size: Int64): HRESULT; stdcall;
     function IsFileExists(FileName: IAIMPString): HRESULT; stdcall;

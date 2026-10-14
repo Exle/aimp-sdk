@@ -1,4 +1,4 @@
-////////////////////////////////////////////////////////////////////////////////
+﻿////////////////////////////////////////////////////////////////////////////////
 //
 //  Project:   AIMP
 //             Programming Interface
@@ -81,6 +81,7 @@ const int AIMP_PLAYLIST_PROPID_VIEW_NUMBERS             = 34;
 const int AIMP_PLAYLIST_PROPID_VIEW_NUMBERS_ABSOLUTE    = 35;
 const int AIMP_PLAYLIST_PROPID_VIEW_SECOND_LINE         = 36;
 const int AIMP_PLAYLIST_PROPID_VIEW_SWITCHES            = 37;
+const int AIMP_PLAYLIST_PROPID_VIEW_THUMBNAILS			= 38; // v6.00
 const int AIMP_PLAYLIST_PROPID_FOCUSINDEX               = 50;
 const int AIMP_PLAYLIST_PROPID_PLAYBACKCURSOR           = 51;
 const int AIMP_PLAYLIST_PROPID_PLAYINGINDEX             = 52;
@@ -141,6 +142,7 @@ const int AIMP_PLAYLIST_NOTIFY_MAKEVISIBLE      = 0x00001000;
 const int AIMP_PLAYLIST_NOTIFY_PLAYBACKQUEUE    = 0x00002000;
 const int AIMP_PLAYLIST_NOTIFY_PLAYBACKBOOKMARK = 0x00004000; // v5.40
 const int AIMP_PLAYLIST_NOTIFY_GROUPNAME        = 0x00008000; // v5.40
+const int AIMP_PLAYLIST_NOTIFY_SETTINGS			= 0x00010000; // v6.00
 
 // Properties IDS for IAIMPPlaylistPreimage
 const int AIMP_PLAYLISTPREIMAGE_PROPID_FACTORYID = 1;
