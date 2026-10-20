@@ -1,9 +1,9 @@
-////////////////////////////////////////////////////////////////////////////////
+﻿////////////////////////////////////////////////////////////////////////////////
 //
 //  Project:   AIMP
 //             Programming Interface
 //
-//  Target:    v6.00 build 3083
+//  Target:    v6.00 build 3090
 //
 //  Purpose:   Messages API
 //
@@ -526,6 +526,7 @@ const int AIMP_MSG_EVENT_FILEMARK = AIMP_MSG_EVENT_BASE + 12;
 // !!!WARNING: You must not fire this event manually!
 const int AIMP_MSG_EVENT_STATISTICS_CHANGED = AIMP_MSG_EVENT_BASE + 14;
 
+// Called, when app skin (our hue) has been changed
 // Param1, Param2: unused
 const int AIMP_MSG_EVENT_SKIN = AIMP_MSG_EVENT_BASE + 15;
 
@@ -574,8 +575,9 @@ const int AIMP_MSG_EVENT_DSP = AIMP_MSG_EVENT_BASE + 24;
 // Called, after chaning the accent color or night/day mode
 const int AIMP_MSG_EVENT_UI_MODE = AIMP_MSG_EVENT_BASE + 25;
 
-// Called on message loop idle (Linux only)
-const int  AIMP_MSG_EVENT_IDLE = AIMP_MSG_EVENT_BASE + 26;
+// Called, when skin hue/accent is changed (skin may not be reloaded)
+// Param1, Param2: unused
+const int AIMP_MSG_EVENT_SKIN_ACCENT = AIMP_MSG_EVENT_BASE + 26; // v6.0
 
 // ---------------------------------------------------------------------------------------------------------------------
 // Quick File Info

@@ -583,6 +583,10 @@ const
   // Called, after chaning the accent color or night/day mode
   AIMP_MSG_EVENT_UI_MODE = AIMP_MSG_EVENT_BASE + 25;
 
+  // Called, when skin hue/accent is changed (skin may not be reloaded)
+  // Param1, Param2: unused
+  AIMP_MSG_EVENT_SKIN_ACCENT = AIMP_MSG_EVENT_BASE + 26; // v6.0
+
 // -----------------------------------------------------------------------------
 // Quick File Info
 // -----------------------------------------------------------------------------

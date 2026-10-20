@@ -1,9 +1,9 @@
-////////////////////////////////////////////////////////////////////////////////
+﻿////////////////////////////////////////////////////////////////////////////////
 //
 //  Project:   AIMP
 //             Programming Interface
 //
-//  Target:    v6.00 build 3083
+//  Target:    v6.00 build 3090
 //
 //  Purpose:   Skin Manager API
 //
@@ -28,11 +28,13 @@ const int AIMP_SKININFO_PROPID_DESCRIPTION  = 3;
 const int AIMP_SKININFO_PROPID_PREVIEW      = 4;
 
 // SkinsManager Properties
-const int AIMP_SERVICE_SKINSMAN_PROPID_SKIN           = 1;
-const int AIMP_SERVICE_SKINSMAN_PROPID_HUE            = 2;
-const int AIMP_SERVICE_SKINSMAN_PROPID_HUE_INTENSITY  = 3;
-const int AIMP_SERVICE_SKINSMAN_PROPID_HUE_BRIGHTNESS = 4; // v6.0
-
+const int AIMP_SERVICE_SKINSMAN_PROPID_SKIN                = 1; // IAIMPString
+const int AIMP_SERVICE_SKINSMAN_PROPID_HUE                 = 2; // Int32
+const int AIMP_SERVICE_SKINSMAN_PROPID_HUE_INTENSITY       = 3; // Int32
+const int AIMP_SERVICE_SKINSMAN_PROPID_HUE_BRIGHTNESS      = 4; // Int32, v6.0
+const int AIMP_SERVICE_SKINSMAN_PROPID_ALBUMART_ACCENT     = 5; // Int64 (ARGB), v6.0
+const int AIMP_SERVICE_SKINSMAN_PROPID_ALBUMART_BACKGROUND = 6; // Int64 (ARGB), v6.0
+const int AIMP_SERVICE_SKINSMAN_PROPID_ALBUMART_FOREGROUND = 7; // Int64 (ARGB), v6.0
 
 // Flags for IAIMPServiceSkinsManager.Install
 const int AIMP_SERVICE_SKINSMAN_FLAGS_INSTALL_FOR_ALL_USERS = 1;
