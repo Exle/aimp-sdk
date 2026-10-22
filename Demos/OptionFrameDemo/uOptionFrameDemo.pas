@@ -156,7 +156,7 @@ end;
 
 destructor TAIMPDemoPluginOptionForm.Destroy;
 begin
-  FForm.Release(False);
+  FForm.Destroy(False);
   FForm := nil;
   inherited;
 end;

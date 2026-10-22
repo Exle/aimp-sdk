@@ -99,7 +99,7 @@ begin
   FAlbumArt := nil;
   FArtist := nil;
   FTitle := nil;
-  FForm.Release(False);
+  FForm.Destroy(False);
   FForm := nil;
   inherited;
 end;

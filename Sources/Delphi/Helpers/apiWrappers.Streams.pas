@@ -103,6 +103,7 @@ type
   end;
 
 function CreateResourceStream(const AName: string; AType: PChar): IAIMPStream;
+function uiLoadGlyph(AStream: TStream): IAIMPImageContainer;
 function uiLoadGlyphFromResource(const AName: string): IAIMPImageContainer; overload;
 function uiLoadGlyphFromResource(const AName: string; AType: PChar): IAIMPImageContainer; overload;
 implementation
@@ -110,6 +111,14 @@ implementation
 function CreateResourceStream(const AName: string; AType: PChar): IAIMPStream;
 begin
   Result := TAIMPStreamAdapter.Create(TResourceStream.Create(HInstance, AName, AType));
+end;
+
+function uiLoadGlyph(AStream: TStream): IAIMPImageContainer;
+begin
+  CoreCreateObject(IAIMPImageContainer, Result);
+  Result.SetDataSize(AStream.Size);
+  AStream.Position := 0;
+  AStream.ReadBuffer(Result.GetData^, Result.GetDataSize);
 end;
 
 function uiLoadGlyphFromResource(const AName: string): IAIMPImageContainer;
@@ -125,9 +134,7 @@ begin
   begin
     LStream := TResourceStream.Create(HInstance, AName, AType);
     try
-      CoreCreateObject(IAIMPImageContainer, Result);
-      Result.SetDataSize(LStream.Size);
-      LStream.ReadBuffer(Result.GetData^, Result.GetDataSize);
+      Result := uiLoadGlyph(LStream);
     finally
       LStream.Free;
     end;

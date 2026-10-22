@@ -386,7 +386,7 @@ begin
   FPlaylists := nil;
   CoreIntf.UnregisterExtension(FFactory);
   CoreIntf.UnregisterExtension(Self);
-  FForm.Release(False);
+  FForm.Destroy(False);
   FForm := nil;
   inherited;
 end;
