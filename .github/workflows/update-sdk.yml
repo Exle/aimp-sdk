@@ -63,7 +63,7 @@ jobs:
             : "${url:?Failed to parse download URL}"
             url=$(sed 's/&amp;/\&/g;s|^/|https://aimp.ru/|' <<<"$url")
 
-            version=$(grep -oP '^.*</a>\K.*?(?=<h3)' <<<"$block" | xargs || true)
+            version=$(grep -oP '<div class="link_container"><div>\K.*?(?=<h3)' <<<"$block" | xargs || true)
             : "${version:?Failed to parse version}"
 
             md5=$(grep -m1 -oP '<nobr>MD5:\s*\K[a-f0-9]{32}' <<<"$block" || true)
