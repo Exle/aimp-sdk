@@ -3,7 +3,7 @@
 //  Project:   AIMP
 //             Programming Interface
 //
-//  Target:    v6.00 build 3090
+//  Target:    v6.00 build 3100
 //
 //  Purpose:   Playlists API
 //
@@ -38,17 +38,18 @@ static const GUID IID_IAIMPExtensionPlaylistPreimageFactory = {0x41494D50, 0x457
 static const GUID IID_IAIMPExtensionPlaylistShuffler = {0x41494D50, 0x4578, 0x7450, 0x6C, 0x73, 0x53, 0x68, 0x75, 0x66, 0x6C, 0x72};
 
 // Property IDs for IAIMPPlaylistItem
-const int AIMP_PLAYLISTITEM_PROPID_CUSTOM		  = 0;
-const int AIMP_PLAYLISTITEM_PROPID_DISPLAYTEXT    = 1;
-const int AIMP_PLAYLISTITEM_PROPID_FILEINFO       = 2;
-const int AIMP_PLAYLISTITEM_PROPID_FILENAME       = 3;
-const int AIMP_PLAYLISTITEM_PROPID_GROUP          = 4;
-const int AIMP_PLAYLISTITEM_PROPID_INDEX          = 5;
-const int AIMP_PLAYLISTITEM_PROPID_MARK           = 6;
-const int AIMP_PLAYLISTITEM_PROPID_PLAYINGSWITCH  = 7;
-const int AIMP_PLAYLISTITEM_PROPID_PLAYLIST       = 8;
-const int AIMP_PLAYLISTITEM_PROPID_SELECTED       = 9;
+const int AIMP_PLAYLISTITEM_PROPID_CUSTOM             = 0;
+const int AIMP_PLAYLISTITEM_PROPID_DISPLAYTEXT        = 1;
+const int AIMP_PLAYLISTITEM_PROPID_FILEINFO           = 2;
+const int AIMP_PLAYLISTITEM_PROPID_FILENAME           = 3;
+const int AIMP_PLAYLISTITEM_PROPID_GROUP              = 4;
+const int AIMP_PLAYLISTITEM_PROPID_INDEX              = 5;
+const int AIMP_PLAYLISTITEM_PROPID_MARK               = 6;
+const int AIMP_PLAYLISTITEM_PROPID_PLAYINGSWITCH      = 7;
+const int AIMP_PLAYLISTITEM_PROPID_PLAYLIST           = 8;
+const int AIMP_PLAYLISTITEM_PROPID_SELECTED           = 9;
 const int AIMP_PLAYLISTITEM_PROPID_PLAYBACKQUEUEINDEX = 10;
+const int AIMP_PLAYLISTITEM_PROPID_DEADSTATE          = 11; // v6.0
 
 // Property IDs for IAIMPPlaylistGroup
 const int AIMP_PLAYLISTGROUP_PROPID_NAME      = 1;

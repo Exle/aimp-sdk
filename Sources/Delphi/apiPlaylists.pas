@@ -3,7 +3,7 @@
 //  Project:   AIMP
 //             Programming Interface
 //
-//  Target:    v6.00 build 3090
+//  Target:    v6.00 build 3100
 //
 //  Purpose:   Playlists API
 //
@@ -91,6 +91,7 @@ const
   AIMP_PLAYLISTITEM_PROPID_PLAYLIST           = 8;
   AIMP_PLAYLISTITEM_PROPID_SELECTED           = 9;
   AIMP_PLAYLISTITEM_PROPID_PLAYBACKQUEUEINDEX = 10;
+  AIMP_PLAYLISTITEM_PROPID_DEADSTATE          = 11; // v6.0
 
   // Property IDs for IAIMPPlaylistGroup
   AIMP_PLAYLISTGROUP_PROPID_NAME      = 1;

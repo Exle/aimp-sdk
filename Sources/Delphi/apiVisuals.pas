@@ -3,7 +3,7 @@
 //  Project:   AIMP
 //             Programming Interface
 //
-//  Target:    v6.00 build 3090
+//  Target:    v6.00 build 3100
 //
 //  Purpose:   Visualization API
 //
@@ -27,9 +27,6 @@ const
   SID_IAIMPExtensionEmbeddedVisualization = '{41494D50-4578-7445-6D62-645669730000}';
   IID_IAIMPExtensionEmbeddedVisualization: TGUID = SID_IAIMPExtensionEmbeddedVisualization;
 
-  SID_IAIMPExtensionEmbeddedVisualization2 = '{41494D50-4578-7445-6D62-645669733200}'; // v6.0
-  IID_IAIMPExtensionEmbeddedVisualization2: TGUID = SID_IAIMPExtensionEmbeddedVisualization2;
-
   SID_IAIMPVisualizationDirectOutput = '{41494D50-5669-7344-4F00-000000000000}';
   IID_IAIMPVisualizationDirectOutput: TGUID = SID_IAIMPVisualizationDirectOutput;
 
@@ -42,15 +39,25 @@ const
   // Button ID for IAIMPExtensionEmbeddedVisualization.Action
   AIMP_VISUAL_ACTION_CLICK        = 0;
   AIMP_VISUAL_ACTION_CLICK_MIDDLE = 1;
-  AIMP_VISUAL_ACTION_MOVE         = 3; // v6.0, only for IID_IAIMPExtensionEmbeddedVisualization2
-  AIMP_VISUAL_ACTION_LEAVE        = 4; // v6.0, only for IID_IAIMPExtensionEmbeddedVisualization2
+  AIMP_VISUAL_ACTION_MOVE         = 3; // v6.0, only if AIMP_VISUAL_FLAGS_ACTION_EXTRA in Flags
+  AIMP_VISUAL_ACTION_LEAVE        = 4; // v6.0, only if AIMP_VISUAL_FLAGS_ACTION_EXTRA in Flags
+  AIMP_VISUAL_ACTION_CLICK_DOUBLE = 5; // v6.0, only if AIMP_VISUAL_FLAGS_ACTION_DOUBLE_CLICK in Flags
+  AIMP_VISUAL_ACTION_WHEEL_DOWN   = 6; // v6.0, only if AIMP_VISUAL_FLAGS_ACTION_WHEEL in Flags
+  AIMP_VISUAL_ACTION_WHEEL_UP     = 7; // v6.0, only if AIMP_VISUAL_FLAGS_ACTION_WHEEL in Flags
+  AIMP_VISUAL_ACTION_DOWN         = 8; // v6.0, only if AIMP_VISUAL_FLAGS_ACTION_EXTRA in Flags
 
-  // flags for IAIMPExtensionEmbeddedVisualization.GetFlags and IAIMPExtensionCustomVisualization.GetFlags
+  // Flags for
+  //   IAIMPExtensionCustomVisualization.GetFlags
+  //   IAIMPExtensionEmbeddedVisualization.GetFlags and
   AIMP_VISUAL_FLAGS_RQD_DATA_WAVEFORM             = 1;
   AIMP_VISUAL_FLAGS_RQD_DATA_SPECTRUM             = 2;
   AIMP_VISUAL_FLAGS_NOT_SUSPEND                   = 4;
   AIMP_VISUAL_FLAGS_RQD_DATA_LOGARITHMIC_SPECTRUM = 8; // for internal use
-
+  // Flags for IAIMPExtensionEmbeddedVisualization.GetFlags to receive
+  // extra actions in IAIMPExtensionEmbeddedVisualization.Action method
+  AIMP_VISUAL_FLAGS_ACTION_EXTRA        = 16; // v6.0, for AIMP_VISUAL_ACTION_DOWN, AIMP_VISUAL_ACTION_MOVE, AIMP_VISUAL_ACTION_LEAVE
+  AIMP_VISUAL_FLAGS_ACTION_DOUBLE_CLICK = 32; // v6.0, for AIMP_VISUAL_ACTION_CLICK_DOUBLE
+  AIMP_VISUAL_FLAGS_ACTION_WHEEL        = 64; // v6.0, for AIMP_VISUAL_ACTION_WHEEL_XXX
 
   AIMP_VISUAL_SPECTRUM_SIZE = 256;
   AIMP_VISUAL_WAVEFORM_SIZE = 512;
@@ -94,8 +101,9 @@ type
     Peaks: array[0..1] of Single;
     Spectrum: array[0..2] of TAIMPVisualDataSpectrum;
     Waveform: array[0..1] of TAIMPVisualDataWaveform;
-    Reserved: Integer;
+    SampleRate: Integer; // since v6.0
     LogarithmicSpectrum: array[0..2] of TAIMPVisualDataLogarithmicSpectrum; // for internal use
+    Reserved: Integer; // since v6.0
   end;
 
   { IAIMPExtensionCustomVisualization }
@@ -103,7 +111,7 @@ type
   IAIMPExtensionCustomVisualization = interface(IUnknown)
   [SID_IAIMPExtensionCustomVisualization]
     // Common information
-    function GetFlags: Integer; stdcall;
+    function GetFlags: LongWord; stdcall;
     // Basic functionality
     procedure Draw(Data: PAIMPVisualData); stdcall;
   end;
@@ -113,7 +121,7 @@ type
   IAIMPExtensionEmbeddedVisualization = interface
   [SID_IAIMPExtensionEmbeddedVisualization]
     // Common information
-    function GetFlags: Integer; stdcall;
+    function GetFlags: LongWord; stdcall;
     function GetMaxDisplaySize(out Width, Height: Integer): HRESULT; stdcall;
     function GetName(out S: IAIMPString): HRESULT; stdcall;
     // Initialization / Finalization
@@ -124,12 +132,6 @@ type
     procedure Draw(Canvas: HCANVAS; Data: PAIMPVisualData); stdcall;
     procedure Resize(NewWidth, NewHeight: Integer); stdcall;
   end;
-
-  { IAIMPExtensionEmbeddedVisualization2 }
-
-  IAIMPExtensionEmbeddedVisualization2 = interface(IAIMPExtensionEmbeddedVisualization)
-  [SID_IAIMPExtensionEmbeddedVisualization2]
-  end; // v6.0
 
   { IAIMPVisualizationDirectOutput }
 
@@ -147,4 +149,3 @@ type
 implementation
 
 end.
-

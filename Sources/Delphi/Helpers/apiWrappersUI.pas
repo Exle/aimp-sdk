@@ -3,7 +3,7 @@
 //  Project:   AIMP
 //             Programming Interface
 //
-//  Target:    v6.00 build 3090
+//  Target:    v6.00 build 3100
 //
 //  Author:    Artem Izmaylov
 //             © 2006-2026
