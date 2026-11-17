@@ -1482,7 +1482,7 @@ type
   [SID_IAIMPUIPathChooser]
     function Add(Path: IAIMPString; Recursive: LongBool): HRESULT; stdcall;
     function Clear: HRESULT; stdcall;
-    function Delete(Index: Integer): HRESULT;
+    function Delete(Index: Integer): HRESULT; stdcall;
     function Get(Index: Integer; out Path: IAIMPString; out Recursive: LongBool): HRESULT; stdcall;
     function GetCount: Integer; stdcall;
   end;

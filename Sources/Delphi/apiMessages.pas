@@ -459,7 +459,7 @@ const
 
   // Param1: AIMP_MSG_PROPVALUE_GET / AIMP_MSG_PROPVALUE_SET
   // Param2: Pointer to LongBool (32-bit boolean value) variable
-  //          Default: False (switched off)
+  //         Default: False (switched off)
   AIMP_MSG_PROPERTY_EQUALIZER_AUTO =  AIMP_MSG_PROPERTY_BASE + 36;
 
   // Param1: AIMP_MSG_PROPVALUE_GET / AIMP_MSG_PROPVALUE_SET
@@ -477,6 +477,14 @@ const
   // Param1: AIMP_MSG_PROPVALUE_GET / AIMP_MSG_PROPVALUE_SET
   // Param2: Pointer to LongBool (32-bit boolean value) variable
   AIMP_MSG_PROPERTY_JUMP_TO_BEGINNING_ON_PREV_TRACK = AIMP_MSG_PROPERTY_BASE + 39;
+
+  // Playback Repeat Mode
+  // Param1: AIMP_MSG_PROPVALUE_GET / AIMP_MSG_PROPVALUE_SET
+  // Param2: Pointer to Integer variable
+  //   0 - none
+  //   1 - repeat single track
+  //   2 - repeat playlist
+  AIMP_MSG_PROPERTY_REPEAT_MODE = AIMP_MSG_PROPERTY_BASE + 40; // v6.0
 
 // -----------------------------------------------------------------------------
 // Events

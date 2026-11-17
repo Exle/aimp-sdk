@@ -1,4 +1,4 @@
-////////////////////////////////////////////////////////////////////////////////
+﻿////////////////////////////////////////////////////////////////////////////////
 //
 //  Project:   AIMP
 //             Programming Interface
@@ -184,7 +184,11 @@ class IAIMPServicePlayer2: public IAIMPServicePlayer
 class IAIMPServicePlayerEqualizer: public IAIMPEqualizerBands
 {
 	public:
-		virtual BOOL WINAPI GetActive() = 0;
+		// This method cannot be invoked from C++ in 32-bit
+		// code because of wrong calling conversion.
+		// USE AIMP_MSG_PROPERTY_EQUALIZER instead
+		virtual BOOL WINAPI _broken_GetActive() = 0;
+
 		virtual HRESULT WINAPI SetActive(BOOL Value) = 0;
 
 		virtual HRESULT WINAPI GetPreamp(DOUBLE* Value) = 0;
